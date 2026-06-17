@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-data-access",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/data-access/src",
+  "prefix": "sb",
+  "tags": ["scope:shared", "type:data-access"]
+}

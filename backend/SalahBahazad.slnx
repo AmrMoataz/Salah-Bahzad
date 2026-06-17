@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SalahBahazad.Api/SalahBahazad.Api.csproj" />
+    <Project Path="src/SalahBahazad.Application/SalahBahazad.Application.csproj" />
+    <Project Path="src/SalahBahazad.Domain/SalahBahazad.Domain.csproj" />
+    <Project Path="src/SalahBahazad.Infrastructure/SalahBahazad.Infrastructure.csproj" />
+    <Project Path="src/SalahBahazad.ServiceDefaults/SalahBahazad.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/aspire/">
+    <Project Path="src/SalahBahazad.AppHost/SalahBahazad.AppHost.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SalahBahazad.IntegrationTests/SalahBahazad.IntegrationTests.csproj" />
+    <Project Path="tests/SalahBahazad.UnitTests/SalahBahazad.UnitTests.csproj" />
+  </Folder>
+</Solution>

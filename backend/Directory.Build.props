@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!--
+    Suppress CVEs in transitive dependencies we cannot directly control.
+    These advisories span multiple library versions with no published patch yet.
+    Reviewed 2026-06-18 — re-evaluate when upstream libraries release fixes.
+
+    System.Security.Cryptography.Xml — transitive via FirebaseAdmin 3.x
+    OpenTelemetry.Api / Exporter — CVEs span all stable 1.x releases
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-37gx-xxp4-5rgx" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-w3x6-4m5h-cxqf" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-8785-wc3w-h8q6" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-g94r-2vxg-569j" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-4625-4j76-fww9" />
+  </ItemGroup>
+</Project>

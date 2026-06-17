@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx build admin-portal --configuration=production --skip-nx-cache",
+    "startTime": "2026-06-17T22:47:55.633Z",
+    "endTime": "2026-06-17T22:48:04.130Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "admin-portal:build:production",
+      "target": "build",
+      "projectName": "admin-portal",
+      "hash": "4341816419734700817",
+      "startTime": "2026-06-17T22:47:55.650Z",
+      "endTime": "2026-06-17T22:48:04.120Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

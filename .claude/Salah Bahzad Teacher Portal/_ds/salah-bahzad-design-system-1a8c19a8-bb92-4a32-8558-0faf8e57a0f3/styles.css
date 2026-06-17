@@ -1,0 +1,5 @@
+/* Salah Bahzad Design System — Global styles entry point */
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/shadows.css";

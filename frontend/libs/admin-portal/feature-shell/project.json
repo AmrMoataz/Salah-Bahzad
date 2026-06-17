@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "admin-portal-feature-shell",
+  "projectType": "library",
+  "sourceRoot": "libs/admin-portal/feature-shell/src",
+  "prefix": "sb",
+  "tags": ["scope:admin-portal", "type:feature"]
+}

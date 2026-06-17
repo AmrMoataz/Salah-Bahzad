@@ -1,0 +1,11 @@
+/* Salah Bahzad Design System — Shadow tokens */
+
+:root {
+  /* ---------- Shadows ---------- */
+  --sb-shadow-xs:    0 1px 2px rgba(26, 26, 22, 0.06);
+  --sb-shadow-sm:    0 2px 6px rgba(26, 26, 22, 0.08);
+  --sb-shadow-md:    0 6px 16px rgba(26, 26, 22, 0.10);
+  --sb-shadow-lg:    0 14px 32px rgba(26, 26, 22, 0.12);
+  --sb-shadow-xl:    0 24px 48px rgba(26, 26, 22, 0.16);
+  --sb-shadow-focus: 0 0 0 3px var(--sb-focus-ring);
+}

@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sb/shared/ui": ["libs/shared/ui/src/index.ts"],
+      "@sb/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@sb/shared/util": ["libs/shared/util/src/index.ts"],
+      "@sb/admin-portal/feature-auth": ["libs/admin-portal/feature-auth/src/index.ts"],
+      "@sb/admin-portal/feature-shell": ["libs/admin-portal/feature-shell/src/index.ts"],
+      "@sb/admin-portal/feature-dashboard": ["libs/admin-portal/feature-dashboard/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

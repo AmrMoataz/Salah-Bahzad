@@ -1,0 +1,54 @@
+/* Salah Bahzad Design System — Spacing and radius tokens */
+
+:root {
+  /* ---------- Spacing (4px base unit) ---------- */
+  --sb-space-0:  0;
+  --sb-space-1:  0.25rem;  /* 4 */
+  --sb-space-2:  0.5rem;   /* 8 */
+  --sb-space-3:  0.75rem;  /* 12 */
+  --sb-space-4:  1rem;     /* 16 */
+  --sb-space-5:  1.25rem;  /* 20 */
+  --sb-space-6:  1.5rem;   /* 24 */
+  --sb-space-7:  1.75rem;  /* 28 */
+  --sb-space-8:  2rem;     /* 32 */
+  --sb-space-10: 2.5rem;   /* 40 */
+  --sb-space-12: 3rem;     /* 48 */
+  --sb-space-16: 4rem;     /* 64 */
+  --sb-space-20: 5rem;     /* 80 */
+  --sb-space-24: 6rem;     /* 96 */
+
+  /* ---------- Border radius ---------- */
+  --sb-radius-xs:     4px;
+  --sb-radius-sm:     6px;
+  --sb-radius-md:     10px;
+  --sb-radius-lg:     14px;
+  --sb-radius-xl:     20px;
+  --sb-radius-2xl:    28px;
+  --sb-radius-pill:   999px;
+  --sb-radius-circle: 50%;
+
+  /* ---------- Z-index ---------- */
+  --sb-z-base:     0; /* @kind spacing */
+  --sb-z-dropdown: 1000; /* @kind spacing */
+  --sb-z-sticky:   1100; /* @kind spacing */
+  --sb-z-overlay:  1200; /* @kind spacing */
+  --sb-z-modal:    1300; /* @kind spacing */
+  --sb-z-toast:    1400; /* @kind spacing */
+  --sb-z-tooltip:  1500; /* @kind spacing */
+
+  /* ---------- Motion (timing & easing) ---------- */
+  --sb-timing-fast:      150ms; /* @kind spacing */
+  --sb-timing:           250ms; /* @kind spacing */
+  --sb-timing-slow:      400ms; /* @kind spacing */
+  --sb-easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1); /* @kind other */
+  --sb-easing-out:      cubic-bezier(0, 0, 0.2, 1); /* @kind other */
+  --sb-easing-in:       cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sb-timing-fast: 0ms; /* @kind spacing */
+    --sb-timing: 0ms; /* @kind spacing */
+    --sb-timing-slow: 0ms; /* @kind spacing */
+  }
+}

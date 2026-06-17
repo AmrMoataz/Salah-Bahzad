@@ -1,0 +1,51 @@
+> ng run admin-portal:build:production
+
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-BBX7W6FW.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m232.18 kB[39m[2m | [22m               [36m59.10 kB[39m
+[32mchunk-PH6J3LHM.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m146.16 kB[39m[2m | [22m               [36m43.68 kB[39m
+[32mchunk-O4PJ7VV7.js[39m    [2m | [22m[2m-[22m            [2m | [22m [36m45.35 kB[39m[2m | [22m               [36m10.37 kB[39m
+[32mpolyfills-YMBILSHJ.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mstyles-TPQQQIXO.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m  [36m6.19 kB[39m[2m | [22m                [36m1.76 kB[39m
+[32mmain-CG6B6MIS.js[39m     [2m | [22m[2mmain[22m         [2m | [22m  [36m4.41 kB[39m[2m | [22m                [36m1.62 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m[1m468.88 kB[22m[2m | [22m              [1m127.86 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-O5NTZNLJ.js[39m    [2m | [22m[2mbrowser[22m      [2m | [22m [36m67.57 kB[39m[2m | [22m               [36m17.71 kB[39m
+[32mchunk-QLYUCGEX.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m12.59 kB[39m[2m | [22m                [36m3.30 kB[39m
+[32mchunk-XH3FRZ5D.js[39m    [2m | [22m[2mindex[22m        [2m | [22m  [36m5.54 kB[39m[2m | [22m                [36m1.80 kB[39m
+[32mchunk-LCFGT32Y.js[39m    [2m | [22m[2mindex[22m        [2m | [22m[36m155 bytes[39m[2m | [22m              [36m155 bytes[39m
+
+Application bundle generation complete. [4.163 seconds] - 2026-06-17T22:18:16.044Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: All imports are unused[0m [1m[35m[plugin angular-compiler][0m
+
+    ../../libs/admin-portal/feature-shell/src/lib/topbar/topbar.component.ts:8:2:
+[37m      8 │   [32mimports[37m: [RouterLink],
+        ╵   [32m~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mCannot use type selector "--collapsed" directly after nesting selector "&"[0m [1m[35m[plugin angular-compiler][0m [css-syntax-error]
+
+    angular:styles/component:css;72a59063f7b8c0b6fceee6e403d145f444a416ca3e6f21c6f631f7b8f754152c;C:/Users/Amr/source/repos/SalahBahazad/New System/Salah bahzad/frontend/libs/admin-portal/feature-shell/src/lib/sidebar/sidebar.component.ts:13:7:
+[37m      13 │       &[32m--collapsed[37m { width: 64px; }
+         │        [32m~~~~~~~~~~~[37m
+         ╵        [32m:is(--collapsed)[0m
+
+  CSS nesting syntax does not allow the "&" selector to come before a type selector. You can wrap this selector in ":is(...)" as a workaround. This restriction exists to avoid problems with SASS nesting, where the same syntax means something very different that has no equivalent in real CSS (appending a suffix to the parent selector).
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mCannot use type selector "--active" directly after nesting selector "&"[0m [1m[35m[plugin angular-compiler][0m [css-syntax-error]
+
+    angular:styles/component:css;72a59063f7b8c0b6fceee6e403d145f444a416ca3e6f21c6f631f7b8f754152c;C:/Users/Amr/source/repos/SalahBahazad/New System/Salah bahzad/frontend/libs/admin-portal/feature-shell/src/lib/sidebar/sidebar.component.ts:65:7:
+[37m      65 │       &[32m--active[37m {
+         │        [32m~~~~~~~~[37m
+         ╵        [32m:is(--active)[0m
+
+  CSS nesting syntax does not allow the "&" selector to come before a type selector. You can wrap this selector in ":is(...)" as a workaround. This restriction exists to avoid problems with SASS nesting, where the same syntax means something very different that has no equivalent in real CSS (appending a suffix to the parent selector).
+
+[39m[22m
+Output location: C:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\dist\apps\admin-portal
+

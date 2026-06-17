@@ -1,0 +1,105 @@
+<div class="login">
+  <!-- Brand panel -->
+  <aside class="login__brand">
+    <div class="login__brand-top">
+      <img src="/assets/logo-white.png" alt="Salah Bahzad" class="login__logo" />
+    </div>
+
+    <div class="login__brand-hero">
+      <p class="login__headline">Run your whole<br />academy from<br />one place.</p>
+      <p class="login__tagline">
+        Students, sessions, codes, attendance and audit — the back-office for
+        the Salah Bahzad platform.
+      </p>
+    </div>
+
+    <p class="login__copyright">© Salah Bahzad Platform · Teacher Portal</p>
+
+    <img src="/assets/salah-relaxing.png" alt="" class="login__mascot" aria-hidden="true" />
+  </aside>
+
+  <!-- Form panel -->
+  <main class="login__form-side" role="main">
+    <div class="login__card">
+      <h1 class="login__title">Welcome back</h1>
+      <p class="login__subtitle">Sign in to the staff back-office</p>
+
+      <!-- Server error -->
+      @if (serverError()) {
+        <div class="login__alert" role="alert" aria-live="assertive">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zM8 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+          </svg>
+          {{ serverError() }}
+        </div>
+      }
+
+      <!-- Form -->
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="login__form"
+        novalidate
+      >
+        <sb-form-field
+          label="Email address"
+          fieldId="email"
+          [error]="emailError"
+          [required]="true"
+        >
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="sb-input"
+            autocomplete="email"
+            placeholder="salah@bahzad.edu.eg"
+            [attr.aria-describedby]="emailError ? 'email-error' : null"
+            [attr.aria-invalid]="emailError ? 'true' : null"
+          />
+        </sb-form-field>
+
+        <sb-form-field
+          label="Password"
+          fieldId="password"
+          [error]="passwordError"
+          [required]="true"
+        >
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="sb-input"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            [attr.aria-describedby]="passwordError ? 'password-error' : null"
+            [attr.aria-invalid]="passwordError ? 'true' : null"
+          />
+        </sb-form-field>
+
+        <div class="login__options">
+          <label class="login__remember">
+            <input type="checkbox" formControlName="remember" class="login__checkbox" />
+            Remember me
+          </label>
+          <a href="#" class="login__reset-link">Forgot password?</a>
+        </div>
+
+        <sb-button
+          type="submit"
+          variant="primary"
+          size="lg"
+          [loading]="isLoading()"
+          [disabled]="isLoading()"
+          style="width: 100%"
+        >
+          @if (isLoading()) { Signing in… } @else { Sign in }
+        </sb-button>
+      </form>
+
+      <p class="login__footnote">
+        Staff accounts only. Student sign-in lives in the learner app.
+      </p>
+    </div>
+  </main>
+</div>
