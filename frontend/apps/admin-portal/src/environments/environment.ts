@@ -1,6 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000',
+  // Empty = same-origin: requests go to /api/* and the Angular dev-server proxy
+  // (proxy.conf.js) forwards them to the live API. Avoids cross-origin CORS.
+  apiUrl: '',
   firebase: {
     apiKey: 'AIzaSyCtaaoO-5YSaItKDHC4kf5KPHwPLnV_Cu0',
     authDomain: 'salah-bahzad-development.firebaseapp.com',

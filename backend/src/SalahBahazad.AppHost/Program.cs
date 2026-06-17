@@ -1,12 +1,17 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ── Database ───────────────────────────────────────────────────────────────
-var postgres = builder.AddPostgres("postgres")
-    .WithPgAdmin()
-    .WithDataVolume();
+// Fixed local-dev password and host port so the Aspire-managed Postgres is reachable at a
+// known connection string — lets EF Core migrations run from the CLI against the very
+// database the app uses. This is a throwaway local DB, so the password lives in code.
+var postgresPassword = builder.AddParameter("postgres-password", "postgres");
+
+var postgres = builder.AddPostgres("postgres", password: postgresPassword, port: 5432)
+    .WithDataVolume()
+    .WithPgAdmin();
 
 // "DefaultConnection" matches the appsettings key — Aspire injects
-// ConnectionStrings__DefaultConnection into the API automatically.
+// ConnectionStrings__DefaultConnection into the API automatically (service discovery).
 var db = postgres.AddDatabase("DefaultConnection");
 
 // ── Backend API ────────────────────────────────────────────────────────────

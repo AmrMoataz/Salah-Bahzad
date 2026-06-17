@@ -37,155 +37,11 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": ".nx/workspace-data/source-maps.json",
-        "hash": "8635557029442069218"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/3rdpartylicenses.txt",
-        "hash": "2349070879150688222"
-      },
-      {
-        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
-        "hash": "2293311408604305942"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-RM7XECJW.js",
-        "hash": "7984971953768427775"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/assets/logo-white.png",
-        "hash": "7889811111971437387"
-      },
-      {
-        "file": "dist/apps/admin-portal/3rdpartylicenses.txt",
-        "hash": "2349070879150688222"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/index.html",
-        "hash": "15210997309427958781"
-      },
-      {
-        "file": ".nx/workspace-data/project-graph.json",
-        "hash": "8440915996621335883"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
-        "hash": "8032069726640755705"
-      },
-      {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
-        "hash": "1936077544932444468"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
-        "hash": "8032069726640755705"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/main-MA6Y6NH6.js",
-        "hash": "10694563886611074664"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-LCFGT32Y.js",
-        "hash": "14064373213286916819"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
-        "hash": "8340170722183547573"
-      },
-      {
-        "file": "README.md",
-        "hash": "3062190976032545220"
-      },
-      {
-        "file": "nx.json",
-        "hash": "16934025050528280795"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
-        "hash": "8340170722183547573"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/assets/salah-relaxing.png",
-        "hash": "5392773801751168725"
-      },
-      {
         "file": ".npmrc",
         "hash": "9925967549247833609"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/index.html",
-        "hash": "6694906591184278617"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-XO7HO6OV.js",
-        "hash": "6938242651676126098"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
-        "hash": "11367369648440959011"
-      },
-      {
-        "file": ".nx/workspace-data/nx_files.nxt",
-        "hash": "14269341486116771601"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
-        "hash": "16663936402748314244"
-      },
-      {
-        "file": "jest.preset.js",
-        "hash": "11619306368730712518"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
-        "hash": "9464864458309480703"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/main-CG6B6MIS.js",
-        "hash": "12213987245370999976"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "17522677900060425948"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
-        "hash": "11367369648440959011"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
-        "hash": "16663936402748314244"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O4PJ7VV7.js",
-        "hash": "7096587740654066042"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "12756689355048627123"
-      },
-      {
-        "file": "package.json",
-        "hash": "10017285891096624604"
-      },
-      {
         "file": "dist/apps/admin-portal/browser/chunk-BBX7W6FW.js",
-        "hash": "3409262679274824257"
-      },
-      {
-        "file": ".nx/workspace-data/file-map.json",
-        "hash": "15805374320682766052"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/prerendered-routes.json",
-        "hash": "15049165521752226651"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-PH6J3LHM.js",
-        "hash": "5645893844328382935"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-BBX7W6FW.js",
         "hash": "3409262679274824257"
       },
       {
@@ -193,16 +49,20 @@
         "hash": "5645893844328382935"
       },
       {
-        "file": "eslint.config.js",
-        "hash": "12176749841134729328"
+        "file": "dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
+        "hash": "11367369648440959011"
       },
       {
-        "file": ".nx/workspace-data/d/daemon.log",
-        "hash": "13011578553070881380"
+        "file": "package.json",
+        "hash": "10017285891096624604"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
-        "hash": "9464864458309480703"
+        "file": ".nx/workspace-data/source-maps.json",
+        "hash": "8635557029442069218"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
+        "hash": "11367369648440959011"
       },
       {
         "file": ".prettierrc",
@@ -213,12 +73,152 @@
         "hash": "9927798185078342001"
       },
       {
+        "file": ".nx/cache/terminalOutputs/637664534807063827",
+        "hash": "752749192374893754"
+      },
+      {
+        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
+        "hash": "2574776958396163381"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-PH6J3LHM.js",
+        "hash": "5645893844328382935"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-XO7HO6OV.js",
+        "hash": "6938242651676126098"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
+        "hash": "8340170722183547573"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "11619306368730712518"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
+        "hash": "16663936402748314244"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/prerendered-routes.json",
+        "hash": "15049165521752226651"
+      },
+      {
+        "file": ".nx/workspace-data/file-map.json",
+        "hash": "10802990613917215276"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-BBX7W6FW.js",
+        "hash": "3409262679274824257"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
+        "hash": "8340170722183547573"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "12756689355048627123"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-RM7XECJW.js",
+        "hash": "7984971953768427775"
+      },
+      {
         "file": "dist/apps/admin-portal/prerendered-routes.json",
         "hash": "15049165521752226651"
       },
       {
-        "file": ".nx/cache/terminalOutputs/637664534807063827",
-        "hash": "752749192374893754"
+        "file": "dist/apps/admin-portal/browser/assets/salah-relaxing.png",
+        "hash": "5392773801751168725"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O4PJ7VV7.js",
+        "hash": "7096587740654066042"
+      },
+      {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
+        "hash": "2104051914904474139"
+      },
+      {
+        "file": "nx.json",
+        "hash": "16934025050528280795"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/index.html",
+        "hash": "6694906591184278617"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/3rdpartylicenses.txt",
+        "hash": "2349070879150688222"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
+        "hash": "8032069726640755705"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/main-CG6B6MIS.js",
+        "hash": "12213987245370999976"
+      },
+      {
+        "file": ".nx/workspace-data/d/daemon.log",
+        "hash": "4887732943566604799"
+      },
+      {
+        "file": "README.md",
+        "hash": "3062190976032545220"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
+        "hash": "16663936402748314244"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
+        "hash": "9464864458309480703"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/main-MA6Y6NH6.js",
+        "hash": "10694563886611074664"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
+        "hash": "9464864458309480703"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/index.html",
+        "hash": "15210997309427958781"
+      },
+      {
+        "file": "dist/apps/admin-portal/3rdpartylicenses.txt",
+        "hash": "2349070879150688222"
+      },
+      {
+        "file": ".nx/workspace-data/nx_files.nxt",
+        "hash": "14269341486116771601"
+      },
+      {
+        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-LCFGT32Y.js",
+        "hash": "14064373213286916819"
+      },
+      {
+        "file": "eslint.config.js",
+        "hash": "12176749841134729328"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "17522677900060425948"
+      },
+      {
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "2998700990966948922"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
+        "hash": "8032069726640755705"
+      },
+      {
+        "file": "dist/apps/admin-portal/browser/assets/logo-white.png",
+        "hash": "7889811111971437387"
       }
     ],
     "projectFileMap": {
@@ -349,11 +349,11 @@
         },
         {
           "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.html",
-          "hash": "487264403502120798"
+          "hash": "6062290711156827287"
         },
         {
           "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.scss",
-          "hash": "5210855284412574398"
+          "hash": "927449404531886976"
         },
         {
           "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.ts",
@@ -425,7 +425,7 @@
       "admin-portal": [
         {
           "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/.tsbuildinfo",
-          "hash": "6901367536228260043"
+          "hash": "5517388061923502958"
         },
         {
           "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/angular-compiler.db",
@@ -517,7 +517,7 @@
         },
         {
           "file": "apps/admin-portal/src/environments/environment.ts",
-          "hash": "17667809850979806529"
+          "hash": "17571207061992282258"
         },
         {
           "file": "apps/admin-portal/src/index.html",

@@ -27,9 +27,16 @@ public sealed class ExchangeFirebaseTokenHandler(
             command.FirebaseIdToken, cancellationToken);
 
         // Look up the staff member by Firebase UID.
+        // Login is a cross-tenant operation: the caller is not yet authenticated, so there is
+        // no tenant claim and the global TenantId query filter would resolve to Guid.Empty and
+        // hide every row. The Firebase UID identifies the account; we discover the tenant FROM
+        // the resulting record (and stamp it into the JWT). IgnoreQueryFilters() also drops the
+        // soft-delete filter, but IsDeleted is re-checked explicitly below.
         // Non-staff Firebase accounts won't exist here → 401 (FR-ADM-AUTH-001).
         var staff = await db.Staff
+            .IgnoreQueryFilters()
             .AsNoTracking()
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(s => s.FirebaseUid == claims.Uid, cancellationToken);
 
         if (staff is null)
