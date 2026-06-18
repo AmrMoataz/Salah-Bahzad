@@ -12,4 +12,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
+  <!-- Handlers are internal (invoked only via ISender). Expose them to:
+       SalahBahazad.Api       — the Mediator source generator emits handler DI registrations there
+       SalahBahazad.UnitTests — handler unit tests construct handlers directly -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="SalahBahazad.Api" />
+    <InternalsVisibleTo Include="SalahBahazad.UnitTests" />
+  </ItemGroup>
+
 </Project>

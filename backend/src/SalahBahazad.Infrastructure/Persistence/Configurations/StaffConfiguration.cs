@@ -22,6 +22,8 @@ internal sealed class StaffConfiguration : IEntityTypeConfiguration<Staff>
 
         builder.Property(s => s.Role).IsRequired();
 
+        builder.Property(s => s.LastSeenAtUtc);
+
         // Soft-delete columns
         builder.Property(s => s.IsDeleted).HasDefaultValue(false);
         builder.Property(s => s.DeletedAtUtc);

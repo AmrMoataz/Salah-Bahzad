@@ -15,7 +15,8 @@ namespace SalahBahazad.Infrastructure.Persistence.Interceptors;
 /// </summary>
 public sealed class AuditSaveChangesInterceptor(
     ICurrentUserResolver currentUser,
-    ICurrentTenantResolver tenantResolver)
+    ICurrentTenantResolver tenantResolver,
+    TimeProvider clock)
     : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
@@ -41,7 +42,7 @@ public sealed class AuditSaveChangesInterceptor(
 
     private void StampAndAudit(DbContext context)
     {
-        var now = DateTimeOffset.UtcNow;
+        var now = clock.GetUtcNow();
         var actorId = currentUser.IsAuthenticated ? currentUser.UserId : (Guid?)null;
         var tenantId = tenantResolver.IsResolved ? tenantResolver.TenantId : Guid.Empty;
 
@@ -96,6 +97,7 @@ public sealed class AuditSaveChangesInterceptor(
                 tenantId: tenantId,
                 action: action,
                 entityType: entry.Entity.GetType().Name,
+                occurredAtUtc: now,
                 entityId: entityId,
                 actorId: actorId,
                 actorType: actorId.HasValue ? "Staff" : "System",

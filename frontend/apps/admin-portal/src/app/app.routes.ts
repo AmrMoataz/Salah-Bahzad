@@ -24,6 +24,11 @@ export const appRoutes: Routes = [
         loadComponent: () =>
           import('@sb/admin-portal/feature-dashboard').then((m) => m.DashboardComponent),
       },
+      {
+        path: 'staff',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-staff').then((m) => m.StaffListComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

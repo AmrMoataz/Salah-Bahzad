@@ -1,28 +1,23 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-
 namespace SalahBahazad.Api.Endpoints;
 
 /// <summary>
 /// Liveness and readiness probes for orchestrators (NFR-AUD-004, NFR-AVAIL-001).
 /// </summary>
-internal static class HealthEndpoints
+internal sealed class HealthEndpoints : IEndpointGroup
 {
-    internal static IEndpointRouteBuilder MapHealthEndpoints(this IEndpointRouteBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("/healthz", () => Results.Ok(new { status = "healthy", utc = DateTimeOffset.UtcNow }))
+        app.MapGet("/healthz", (TimeProvider clock) =>
+                Results.Ok(new { status = "healthy", utc = clock.GetUtcNow() }))
             .WithTags("Health")
             .AllowAnonymous()
             .ExcludeFromDescription();
 
-        app.MapGet("/readyz", async (IServiceProvider sp) =>
-        {
-            // Could add DB + Redis checks here later
-            return Results.Ok(new { status = "ready", utc = DateTimeOffset.UtcNow });
-        })
+        app.MapGet("/readyz", (TimeProvider clock) =>
+                // Could add DB + Redis checks here later
+                Results.Ok(new { status = "ready", utc = clock.GetUtcNow() }))
             .WithTags("Health")
             .AllowAnonymous()
             .ExcludeFromDescription();
-
-        return app;
     }
 }

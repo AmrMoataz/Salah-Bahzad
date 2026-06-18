@@ -12,10 +12,11 @@ namespace SalahBahazad.Application.Features.Auth.Commands.ExchangeFirebaseToken;
 /// an active staff member (non-staff Firebase accounts are rejected — FR-ADM-AUTH-001),
 /// and issues a platform JWT pair.
 /// </summary>
-public sealed class ExchangeFirebaseTokenHandler(
+internal sealed class ExchangeFirebaseTokenHandler(
     IFirebaseAuthService firebaseAuth,
     IJwtTokenService jwtTokenService,
     IAppDbContext db,
+    TimeProvider clock,
     ILogger<ExchangeFirebaseTokenHandler> logger)
     : IRequestHandler<ExchangeFirebaseTokenCommand, AuthTokenResponse>
 {
@@ -33,9 +34,8 @@ public sealed class ExchangeFirebaseTokenHandler(
         // the resulting record (and stamp it into the JWT). IgnoreQueryFilters() also drops the
         // soft-delete filter, but IsDeleted is re-checked explicitly below.
         // Non-staff Firebase accounts won't exist here → 401 (FR-ADM-AUTH-001).
+        // Tracked (not AsNoTracking) so we can stamp the sign-in timestamp below.
         var staff = await db.Staff
-            .IgnoreQueryFilters()
-            .AsNoTracking()
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(s => s.FirebaseUid == claims.Uid, cancellationToken);
 
@@ -51,6 +51,11 @@ public sealed class ExchangeFirebaseTokenHandler(
             logger.LogWarning("Staff {StaffId} is inactive or deleted — login rejected", staff.Id);
             throw new UnauthorizedAccessException("Your account has been deactivated.");
         }
+
+        // Record "Last active". There is no tenant claim yet, so the audit interceptor is a no-op
+        // for this save — it only updates the staff row's LastSeenAtUtc.
+        staff.RecordSignIn(clock.GetUtcNow());
+        await db.SaveChangesAsync(cancellationToken);
 
         var accessToken = jwtTokenService.IssueAccessToken(staff);
         var refreshToken = jwtTokenService.IssueRefreshToken(staff);

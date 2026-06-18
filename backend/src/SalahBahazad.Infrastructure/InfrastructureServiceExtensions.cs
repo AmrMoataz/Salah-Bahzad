@@ -20,6 +20,9 @@ public static class InfrastructureServiceExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // System clock — inject TimeProvider for testable, deterministic time (dotnet-claude-kit convention).
+        services.AddSingleton(TimeProvider.System);
+
         // HTTP context accessors (needed by tenant/user resolvers)
         services.AddHttpContextAccessor();
 
@@ -44,8 +47,9 @@ public static class InfrastructureServiceExtensions
 
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
-        // Firebase Admin SDK (initialise once)
-        if (FirebaseApp.DefaultInstance is null)
+        // Firebase Admin SDK (initialise once). Skippable via Firebase:Disable=true for tests/CI,
+        // where IFirebaseAuthService is replaced by a fake and no real credentials are available.
+        if (!configuration.GetValue("Firebase:Disable", false) && FirebaseApp.DefaultInstance is null)
         {
             var serviceAccountJson = configuration["Firebase:ServiceAccountJson"];
             GoogleCredential credential;
@@ -58,7 +62,25 @@ public static class InfrastructureServiceExtensions
             FirebaseApp.Create(new AppOptions { Credential = credential });
         }
 
-        services.AddSingleton<IFirebaseAuthService, FirebaseAuthService>();
+        // IHttpClientFactory for the Identity Toolkit REST call (password-reset email delivery).
+        services.AddHttpClient();
+
+        // Web API key lets Firebase send its own templated reset email (accounts:sendOobCode).
+        // Distinct from the Admin SDK service-account credential above. Required unless Firebase is
+        // disabled (tests/CI), where IFirebaseAuthService is replaced by a fake and the key is unused.
+        var firebaseDisabled = configuration.GetValue("Firebase:Disable", false);
+        var firebaseWebApiKey = configuration["Firebase:WebApiKey"];
+        if (string.IsNullOrWhiteSpace(firebaseWebApiKey))
+        {
+            firebaseWebApiKey = firebaseDisabled
+                ? string.Empty
+                : throw new InvalidOperationException("Firebase:WebApiKey is not configured.");
+        }
+
+        services.AddSingleton<IFirebaseAuthService>(sp =>
+            new FirebaseAuthService(
+                sp.GetRequiredService<IHttpClientFactory>(),
+                firebaseWebApiKey));
 
         // Platform JWT
         services.AddSingleton<IJwtTokenService, JwtTokenService>();

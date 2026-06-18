@@ -41,6 +41,7 @@ public sealed class AuditEntry
         Guid tenantId,
         string action,
         string entityType,
+        DateTimeOffset occurredAtUtc,
         Guid? entityId = null,
         Guid? actorId = null,
         string? actorRole = null,
@@ -68,7 +69,7 @@ public sealed class AuditEntry
             IpAddress = ipAddress,
             Portal = portal,
             DeviceId = deviceId,
-            OccurredAtUtc = DateTimeOffset.UtcNow,
+            OccurredAtUtc = occurredAtUtc,
             PrevHash = prevHash,
         };
     }

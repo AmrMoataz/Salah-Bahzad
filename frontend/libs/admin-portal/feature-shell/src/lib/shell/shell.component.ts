@@ -1,71 +1,54 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  inject,
   signal,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
+import { AuthStore } from '@sb/shared/data-access';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { TopbarComponent } from '../topbar/topbar.component';
-import { NavItem } from '../nav-item.model';
+import { NavGroup } from '../nav-item.model';
 
-const NAV_ITEMS: NavItem[] = [
+/** Inline stroke-style icon (24×24 grid) matching the Salah Bahzad design prototype. */
+const icon = (path: string): string =>
+  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+
+const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'Dashboard',
-    route: '/dashboard',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M2 11a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-6zm6-6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V5zm6 3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1V8z"/>
-    </svg>`,
+    title: 'Operations',
+    items: [
+      { label: 'Dashboard', route: '/dashboard', icon: icon('M4 4h6v8H4zM14 4h6v5h-6zM14 13h6v7h-6zM4 16h6v4H4z') },
+      { label: 'Students', route: '/students', icon: icon('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75') },
+      { label: 'Sessions', route: '/sessions', icon: icon('M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z') },
+      { label: 'Codes', route: '/codes', icon: icon('M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2 2 2 0 0 0 0-4zM9 7v10') },
+      { label: 'Attendance', route: '/attendance', icon: icon('M9 3h6v2H9zM8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M9 12l2 2 4-4') },
+    ],
   },
   {
-    label: 'Students',
-    route: '/students',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM17 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 0 0-1.5-4.33A5 5 0 0 1 19 16v1h-6.07zM6 11a5 5 0 0 1 5 5v1H1v-1a5 5 0 0 1 5-5z"/>
-    </svg>`,
-  },
-  {
-    label: 'Sessions',
-    route: '/sessions',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M2 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm0 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2z"/>
-    </svg>`,
-  },
-  {
-    label: 'Codes',
-    route: '/codes',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-7-7A.997.997 0 0 1 2 10V5a3 3 0 0 1 3-3h5c.256 0 .512.098.707.293l7 7z" clip-rule="evenodd"/>
-    </svg>`,
-  },
-  {
-    label: 'Taxonomy',
-    route: '/taxonomy',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M5 3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H5zm6-8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2z"/>
-    </svg>`,
-  },
-  {
-    label: 'Staff',
-    route: '/staff',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM14 15a4 4 0 0 0-8 0v3h8v-3zM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM16 18v-3a5.972 5.972 0 0 0-.75-2.906A3.005 3.005 0 0 1 19 15v3h-3zM4.75 12.094A5.973 5.973 0 0 0 4 15v3H1v-3a3 3 0 0 1 3.75-2.906z"/>
-    </svg>`,
-  },
-  {
-    label: 'Attendance',
-    route: '/attendance',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2H6z" clip-rule="evenodd"/>
-    </svg>`,
-  },
-  {
-    label: 'Activity Log',
-    route: '/activity',
-    icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/>
-    </svg>`,
+    title: 'Manage',
+    items: [
+      { label: 'Taxonomy', route: '/taxonomy', icon: icon('M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01') },
+      { label: 'Staff', route: '/staff', icon: icon('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'), permission: 'StaffRead' },
+      { label: 'Activity Log', route: '/activity', icon: icon('M22 12h-4l-3 9L9 3l-3 9H2') },
+    ],
   },
 ];
+
+/** Route segment → [title, subtitle] shown in the topbar. */
+const ROUTE_META: Record<string, readonly [string, string]> = {
+  dashboard: ['Dashboard', 'Operational overview'],
+  students: ['Students', 'Learner accounts'],
+  sessions: ['Sessions', 'Content catalogue'],
+  codes: ['Codes', 'Enrollment code register'],
+  attendance: ['Attendance', 'Cross-student progress'],
+  taxonomy: ['Taxonomy', 'Reference data'],
+  staff: ['Staff', 'Teacher & assistant accounts'],
+  activity: ['Activity Log', 'Audit investigation'],
+};
 
 @Component({
   selector: 'sb-shell',
@@ -75,14 +58,25 @@ const NAV_ITEMS: NavItem[] = [
   template: `
     <div class="shell">
       <sb-sidebar
-        [navItems]="navItems"
-        [collapsed]="sidebarCollapsed()"
-        (collapsedChange)="sidebarCollapsed.set($event)"
+        [navGroups]="navGroups()"
+        [open]="mobileNavOpen()"
+        (navigate)="mobileNavOpen.set(false)"
       />
+
+      @if (mobileNavOpen()) {
+        <div class="shell__scrim" (click)="mobileNavOpen.set(false)"></div>
+      }
+
       <div class="shell__main">
-        <sb-topbar />
+        <sb-topbar
+          [title]="pageTitle()"
+          [subtitle]="pageSubtitle()"
+          (menuToggle)="mobileNavOpen.set(!mobileNavOpen())"
+        />
         <main class="shell__content" id="main-content" tabindex="-1">
-          <router-outlet />
+          <div class="shell__content-inner">
+            <router-outlet />
+          </div>
         </main>
       </div>
     </div>
@@ -98,34 +92,63 @@ const NAV_ITEMS: NavItem[] = [
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-width: 0;
       overflow: hidden;
     }
 
     .shell__content {
       flex: 1;
       overflow-y: auto;
-      padding: var(--sb-space-6);
       background: var(--sb-bg);
     }
 
-    @media (max-width: 1024px) {
-      :host ::ng-deep .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: var(--sb-z-overlay);
-        height: 100%;
-        transform: translateX(-100%);
-        transition: transform var(--sb-dur) var(--sb-ease-standard);
+    /* Centered content column (matches the prototype's 1240px max-width). */
+    .shell__content-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: var(--sb-space-7) var(--sb-space-7) var(--sb-space-16);
+    }
 
-        &.sidebar--open {
-          transform: translateX(0);
-        }
-      }
+    .shell__scrim {
+      position: fixed;
+      inset: 0;
+      background: var(--sb-scrim);
+      z-index: calc(var(--sb-z-overlay) - 1);
+    }
+
+    @media (min-width: 901px) {
+      .shell__scrim { display: none; }
     }
   `],
 })
 export class ShellComponent {
-  readonly navItems = NAV_ITEMS;
-  readonly sidebarCollapsed = signal(false);
+  readonly #auth = inject(AuthStore);
+  readonly #router = inject(Router);
+
+  readonly mobileNavOpen = signal(false);
+
+  /** Nav groups with permission-gated items removed (empty groups dropped). */
+  readonly navGroups = computed<NavGroup[]>(() =>
+    NAV_GROUPS.map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) => !item.permission || this.#auth.hasPermission(item.permission),
+      ),
+    })).filter((group) => group.items.length > 0),
+  );
+
+  readonly #currentUrl = toSignal(
+    this.#router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+    ),
+    { initialValue: this.#router.url },
+  );
+
+  readonly #segment = computed(
+    () => this.#currentUrl().split('?')[0].split('/').filter(Boolean)[0] ?? 'dashboard',
+  );
+
+  readonly pageTitle = computed(() => ROUTE_META[this.#segment()]?.[0] ?? 'Salah Bahzad');
+  readonly pageSubtitle = computed(() => ROUTE_META[this.#segment()]?.[1] ?? '');
 }

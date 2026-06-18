@@ -19,6 +19,9 @@
     ],
     "@sb/admin-portal/feature-dashboard": [
       "libs/admin-portal/feature-dashboard/src/index.ts"
+    ],
+    "@sb/admin-portal/feature-staff": [
+      "libs/admin-portal/feature-staff/src/index.ts"
     ]
   },
   "nxJsonPlugins": [
@@ -41,195 +44,229 @@
         "hash": "9925967549247833609"
       },
       {
-        "file": "dist/apps/admin-portal/browser/chunk-BBX7W6FW.js",
-        "hash": "3409262679274824257"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-PH6J3LHM.js",
-        "hash": "5645893844328382935"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
-        "hash": "11367369648440959011"
-      },
-      {
-        "file": "package.json",
-        "hash": "10017285891096624604"
-      },
-      {
-        "file": ".nx/workspace-data/source-maps.json",
-        "hash": "8635557029442069218"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/polyfills-YMBILSHJ.js",
-        "hash": "11367369648440959011"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "15623139863315169796"
-      },
-      {
-        "file": ".nx/cache/run.json",
-        "hash": "9927798185078342001"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/637664534807063827",
-        "hash": "752749192374893754"
-      },
-      {
-        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
-        "hash": "2574776958396163381"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-PH6J3LHM.js",
-        "hash": "5645893844328382935"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-XO7HO6OV.js",
-        "hash": "6938242651676126098"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
-        "hash": "8340170722183547573"
-      },
-      {
-        "file": "jest.preset.js",
-        "hash": "11619306368730712518"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
-        "hash": "16663936402748314244"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/prerendered-routes.json",
-        "hash": "15049165521752226651"
-      },
-      {
-        "file": ".nx/workspace-data/file-map.json",
-        "hash": "10802990613917215276"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-BBX7W6FW.js",
-        "hash": "3409262679274824257"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O5NTZNLJ.js",
-        "hash": "8340170722183547573"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "12756689355048627123"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-RM7XECJW.js",
-        "hash": "7984971953768427775"
-      },
-      {
-        "file": "dist/apps/admin-portal/prerendered-routes.json",
-        "hash": "15049165521752226651"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/assets/salah-relaxing.png",
-        "hash": "5392773801751168725"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-O4PJ7VV7.js",
-        "hash": "7096587740654066042"
-      },
-      {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
-        "hash": "2104051914904474139"
-      },
-      {
         "file": "nx.json",
         "hash": "16934025050528280795"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/index.html",
-        "hash": "6694906591184278617"
+        "file": ".nx/workspace-data/source-maps.json",
+        "hash": "11324377760122464491"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/3rdpartylicenses.txt",
-        "hash": "2349070879150688222"
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "38711113165921995"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
-        "hash": "8032069726640755705"
+        "file": "package.json",
+        "hash": "9949800819568205987"
       },
       {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/main-CG6B6MIS.js",
-        "hash": "12213987245370999976"
-      },
-      {
-        "file": ".nx/workspace-data/d/daemon.log",
-        "hash": "4887732943566604799"
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
+        "hash": "2182511977015807085"
       },
       {
         "file": "README.md",
         "hash": "3062190976032545220"
       },
       {
-        "file": "dist/apps/admin-portal/browser/styles-TPQQQIXO.css",
-        "hash": "16663936402748314244"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
-        "hash": "9464864458309480703"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/main-MA6Y6NH6.js",
-        "hash": "10694563886611074664"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-XH3FRZ5D.js",
-        "hash": "9464864458309480703"
-      },
-      {
-        "file": "dist/apps/admin-portal/browser/index.html",
-        "hash": "15210997309427958781"
-      },
-      {
-        "file": "dist/apps/admin-portal/3rdpartylicenses.txt",
-        "hash": "2349070879150688222"
-      },
-      {
-        "file": ".nx/workspace-data/nx_files.nxt",
-        "hash": "14269341486116771601"
-      },
-      {
-        "file": ".nx/cache/637664534807063827/dist/apps/admin-portal/browser/chunk-LCFGT32Y.js",
-        "hash": "14064373213286916819"
+        "file": ".nx/workspace-data/file-map.json",
+        "hash": "5926856711821647627"
       },
       {
         "file": "eslint.config.js",
         "hash": "12176749841134729328"
       },
       {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
+        "hash": "5480488143224229452"
+      },
+      {
         "file": "package-lock.json",
-        "hash": "17522677900060425948"
+        "hash": "622763718357521700"
       },
       {
-        "file": ".nx/workspace-data/project-graph.json",
-        "hash": "2998700990966948922"
+        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
+        "hash": "7011992865249923428"
       },
       {
-        "file": "dist/apps/admin-portal/browser/chunk-QLYUCGEX.js",
-        "hash": "8032069726640755705"
+        "file": ".nx/workspace-data/lockfile.hash",
+        "hash": "13782734902890737128"
       },
       {
-        "file": "dist/apps/admin-portal/browser/assets/logo-white.png",
-        "hash": "7889811111971437387"
+        "file": ".nx/workspace-data/nx_files.nxt",
+        "hash": "11962035259275659905"
+      },
+      {
+        "file": ".nx/workspace-data/parsed-lock-file.json",
+        "hash": "9146527401027002814"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "15623139863315169796"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "11619306368730712518"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "9557392665866545934"
       }
     ],
     "projectFileMap": {
+      "admin-portal": [
+        {
+          "file": "apps/admin-portal/angular.json",
+          "hash": "8648163708700210572"
+        },
+        {
+          "file": "apps/admin-portal/jest.config.ts",
+          "hash": "7858057655553426955"
+        },
+        {
+          "file": "apps/admin-portal/package.json",
+          "hash": "14390418522957875711"
+        },
+        {
+          "file": "apps/admin-portal/project.json",
+          "hash": "7665141877430967587"
+        },
+        {
+          "file": "apps/admin-portal/proxy.conf.js",
+          "hash": "5313285034330690040"
+        },
+        {
+          "file": "apps/admin-portal/src/app/app.component.ts",
+          "hash": "4605375804199365288",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/admin-portal/src/app/app.config.ts",
+          "hash": "17201977924567068998",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@angular/common",
+            "npm:@angular/platform-browser",
+            "shared-data-access",
+            "npm:@angular/fire"
+          ]
+        },
+        {
+          "file": "apps/admin-portal/src/app/app.routes.ts",
+          "hash": "15331429526237602329",
+          "deps": [
+            "npm:@angular/router",
+            "admin-portal-feature-auth",
+            [
+              "admin-portal-feature-auth",
+              "dynamic"
+            ],
+            [
+              "admin-portal-feature-shell",
+              "dynamic"
+            ],
+            [
+              "admin-portal-feature-dashboard",
+              "dynamic"
+            ],
+            [
+              "admin-portal-feature-staff",
+              "dynamic"
+            ]
+          ]
+        },
+        {
+          "file": "apps/admin-portal/src/assets/logo-small.png",
+          "hash": "8925199864528157510"
+        },
+        {
+          "file": "apps/admin-portal/src/assets/logo-white.png",
+          "hash": "7889811111971437387"
+        },
+        {
+          "file": "apps/admin-portal/src/assets/salah-mascot.png",
+          "hash": "7561281850600549081"
+        },
+        {
+          "file": "apps/admin-portal/src/assets/salah-relaxing.png",
+          "hash": "5392773801751168725"
+        },
+        {
+          "file": "apps/admin-portal/src/environments/environment.prod.ts",
+          "hash": "8962577254721968502"
+        },
+        {
+          "file": "apps/admin-portal/src/environments/environment.staging.ts",
+          "hash": "2175981077621565262"
+        },
+        {
+          "file": "apps/admin-portal/src/environments/environment.ts",
+          "hash": "17571207061992282258"
+        },
+        {
+          "file": "apps/admin-portal/src/index.html",
+          "hash": "14244855017678093129"
+        },
+        {
+          "file": "apps/admin-portal/src/main.ts",
+          "hash": "18011325418030756581",
+          "deps": [
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "apps/admin-portal/src/styles.scss",
+          "hash": "14032072958132711785"
+        },
+        {
+          "file": "apps/admin-portal/src/test-setup.ts",
+          "hash": "17711435995618823417",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "apps/admin-portal/tsconfig.app.json",
+          "hash": "3999191266684285931"
+        },
+        {
+          "file": "apps/admin-portal/tsconfig.json",
+          "hash": "5184397625526541767"
+        },
+        {
+          "file": "apps/admin-portal/tsconfig.spec.json",
+          "hash": "9890126725829548007"
+        }
+      ],
       "shared-ui": [
         {
+          "file": "libs/shared/ui/jest.config.ts",
+          "hash": "6246949688172579937"
+        },
+        {
           "file": "libs/shared/ui/project.json",
-          "hash": "3346305922473317960"
+          "hash": "9130203929204949180"
         },
         {
           "file": "libs/shared/ui/src/index.ts",
-          "hash": "274064157266456955"
+          "hash": "14994159335797463045"
+        },
+        {
+          "file": "libs/shared/ui/src/lib/alert/alert.component.ts",
+          "hash": "14253835326466158147",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/avatar/avatar.component.ts",
+          "hash": "10210743089591203933",
+          "deps": [
+            "npm:@angular/core"
+          ]
         },
         {
           "file": "libs/shared/ui/src/lib/button/button.component.ts",
@@ -240,6 +277,27 @@
           ]
         },
         {
+          "file": "libs/shared/ui/src/lib/confirm-dialog/confirm-dialog.component.spec.ts",
+          "hash": "3589116348717159504",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/confirm-dialog/confirm-dialog.component.ts",
+          "hash": "328499352144889779",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/empty-state/empty-state.component.ts",
+          "hash": "11953254104909440819",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
           "file": "libs/shared/ui/src/lib/form-field/form-field.component.ts",
           "hash": "14062525703429072778",
           "deps": [
@@ -247,10 +305,46 @@
           ]
         },
         {
-          "file": "libs/shared/ui/src/lib/status-pill/status-pill.component.ts",
-          "hash": "17131406330050643829",
+          "file": "libs/shared/ui/src/lib/modal/modal.component.spec.ts",
+          "hash": "17619097703170269922",
           "deps": [
             "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/modal/modal.component.ts",
+          "hash": "9450161920976893428",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/select/select.component.spec.ts",
+          "hash": "8600685807538924643",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/select/select.component.ts",
+          "hash": "9534011771808293025",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/lib/status-pill/status-pill.component.ts",
+          "hash": "12560170221587607493",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/ui/src/test-setup.ts",
+          "hash": "17711435995618823417",
+          "deps": [
+            "npm:jest-preset-angular"
           ]
         },
         {
@@ -260,73 +354,10 @@
         {
           "file": "libs/shared/ui/tsconfig.lib.json",
           "hash": "8993976497808532181"
-        }
-      ],
-      "admin-portal-feature-dashboard": [
-        {
-          "file": "libs/admin-portal/feature-dashboard/project.json",
-          "hash": "6345261376290157393"
         },
         {
-          "file": "libs/admin-portal/feature-dashboard/src/index.ts",
-          "hash": "4436493741501911641"
-        },
-        {
-          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard/dashboard.component.ts",
-          "hash": "1096658718328038865",
-          "deps": [
-            "npm:@angular/core",
-            "shared-data-access"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-dashboard/tsconfig.json",
-          "hash": "17092705240196255247"
-        },
-        {
-          "file": "libs/admin-portal/feature-dashboard/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        }
-      ],
-      "shared-data-access": [
-        {
-          "file": "libs/shared/data-access/project.json",
-          "hash": "449373934118759123"
-        },
-        {
-          "file": "libs/shared/data-access/src/index.ts",
-          "hash": "2822442637779715580"
-        },
-        {
-          "file": "libs/shared/data-access/src/lib/auth/auth.interceptor.ts",
-          "hash": "5341263071254620541",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core"
-          ]
-        },
-        {
-          "file": "libs/shared/data-access/src/lib/auth/auth.models.ts",
-          "hash": "14723757736256010464"
-        },
-        {
-          "file": "libs/shared/data-access/src/lib/auth/auth.store.ts",
-          "hash": "9077874194438019",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router",
-            "npm:@angular/fire",
-            "npm:@angular/common",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "libs/shared/data-access/tsconfig.json",
-          "hash": "17092705240196255247"
-        },
-        {
-          "file": "libs/shared/data-access/tsconfig.lib.json",
-          "hash": "8993976497808532181"
+          "file": "libs/shared/ui/tsconfig.spec.json",
+          "hash": "17263122952907776525"
         }
       ],
       "admin-portal-feature-auth": [
@@ -385,28 +416,30 @@
         },
         {
           "file": "libs/admin-portal/feature-shell/src/lib/nav-item.model.ts",
-          "hash": "13306313989875075934"
+          "hash": "9978126400155506526"
         },
         {
           "file": "libs/admin-portal/feature-shell/src/lib/shell/shell.component.ts",
-          "hash": "7016970446198914159",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-shell/src/lib/sidebar/sidebar.component.ts",
-          "hash": "12091393617193485095",
+          "hash": "9373899072513459056",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
+            "npm:rxjs",
             "shared-data-access"
           ]
         },
         {
+          "file": "libs/admin-portal/feature-shell/src/lib/sidebar/sidebar.component.ts",
+          "hash": "3978558253647087044",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
           "file": "libs/admin-portal/feature-shell/src/lib/topbar/topbar.component.ts",
-          "hash": "16731386384585187023",
+          "hash": "11583843941189113107",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
@@ -422,139 +455,165 @@
           "hash": "8993976497808532181"
         }
       ],
-      "admin-portal": [
+      "admin-portal-feature-dashboard": [
         {
-          "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/.tsbuildinfo",
-          "hash": "5517388061923502958"
+          "file": "libs/admin-portal/feature-dashboard/project.json",
+          "hash": "6345261376290157393"
         },
         {
-          "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/angular-compiler.db",
-          "hash": "8459235808198969155"
+          "file": "libs/admin-portal/feature-dashboard/src/index.ts",
+          "hash": "4436493741501911641"
         },
         {
-          "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/angular-compiler.db-lock",
-          "hash": "5412326131393467978"
-        },
-        {
-          "file": "apps/admin-portal/.angular/cache/20.3.29/admin-portal/vite/com.chrome.devtools.json",
-          "hash": "8247848225151151527"
-        },
-        {
-          "file": "apps/admin-portal/angular.json",
-          "hash": "8648163708700210572"
-        },
-        {
-          "file": "apps/admin-portal/jest.config.ts",
-          "hash": "7858057655553426955"
-        },
-        {
-          "file": "apps/admin-portal/package.json",
-          "hash": "14390418522957875711"
-        },
-        {
-          "file": "apps/admin-portal/project.json",
-          "hash": "7665141877430967587"
-        },
-        {
-          "file": "apps/admin-portal/proxy.conf.js",
-          "hash": "5313285034330690040"
-        },
-        {
-          "file": "apps/admin-portal/src/app/app.component.ts",
-          "hash": "4605375804199365288",
+          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard/dashboard.component.ts",
+          "hash": "1096658718328038865",
           "deps": [
             "npm:@angular/core",
-            "npm:@angular/router"
+            "shared-data-access"
           ]
         },
         {
-          "file": "apps/admin-portal/src/app/app.config.ts",
-          "hash": "17201977924567068998",
+          "file": "libs/admin-portal/feature-dashboard/tsconfig.json",
+          "hash": "17092705240196255247"
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        }
+      ],
+      "admin-portal-feature-staff": [
+        {
+          "file": "libs/admin-portal/feature-staff/jest.config.ts",
+          "hash": "7614759097121627180"
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/project.json",
+          "hash": "1343419376003521750"
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/index.ts",
+          "hash": "14406305893754530630"
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.models.ts",
+          "hash": "9482697095286065308",
           "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router",
+            "shared-data-access"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.spec.ts",
+          "hash": "13458787684071073948",
+          "deps": [
             "npm:@angular/common",
-            "npm:@angular/platform-browser",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.ts",
+          "hash": "13526850401014312300",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.spec.ts",
+          "hash": "5938002975522060128",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.ts",
+          "hash": "7017565820204935958",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
             "shared-data-access",
-            "npm:@angular/fire"
+            "shared-ui"
           ]
         },
         {
-          "file": "apps/admin-portal/src/app/app.routes.ts",
-          "hash": "8869503948326808975",
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.spec.ts",
+          "hash": "13059444049643197418",
           "deps": [
-            "npm:@angular/router",
-            "admin-portal-feature-auth",
-            [
-              "admin-portal-feature-auth",
-              "dynamic"
-            ],
-            [
-              "admin-portal-feature-shell",
-              "dynamic"
-            ],
-            [
-              "admin-portal-feature-dashboard",
-              "dynamic"
-            ]
+            "npm:@angular/core",
+            "shared-data-access"
           ]
         },
         {
-          "file": "apps/admin-portal/src/assets/logo-white.png",
-          "hash": "7889811111971437387"
-        },
-        {
-          "file": "apps/admin-portal/src/assets/salah-relaxing.png",
-          "hash": "5392773801751168725"
-        },
-        {
-          "file": "apps/admin-portal/src/environments/environment.prod.ts",
-          "hash": "8962577254721968502"
-        },
-        {
-          "file": "apps/admin-portal/src/environments/environment.staging.ts",
-          "hash": "2175981077621565262"
-        },
-        {
-          "file": "apps/admin-portal/src/environments/environment.ts",
-          "hash": "17571207061992282258"
-        },
-        {
-          "file": "apps/admin-portal/src/index.html",
-          "hash": "14244855017678093129"
-        },
-        {
-          "file": "apps/admin-portal/src/main.ts",
-          "hash": "18011325418030756581",
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.ts",
+          "hash": "10325082756869186154",
           "deps": [
-            "npm:@angular/platform-browser"
+            "npm:@angular/core",
+            "shared-data-access",
+            "shared-ui"
           ]
         },
         {
-          "file": "apps/admin-portal/src/styles.scss",
-          "hash": "14032072958132711785"
-        },
-        {
-          "file": "apps/admin-portal/src/test-setup.ts",
+          "file": "libs/admin-portal/feature-staff/src/test-setup.ts",
           "hash": "17711435995618823417",
           "deps": [
             "npm:jest-preset-angular"
           ]
         },
         {
-          "file": "apps/admin-portal/tsconfig.app.json",
-          "hash": "3999191266684285931"
+          "file": "libs/admin-portal/feature-staff/tsconfig.json",
+          "hash": "3788528804526066759"
         },
         {
-          "file": "apps/admin-portal/tsconfig.json",
-          "hash": "5184397625526541767"
+          "file": "libs/admin-portal/feature-staff/tsconfig.lib.json",
+          "hash": "8993976497808532181"
         },
         {
-          "file": "apps/admin-portal/tsconfig.spec.json",
-          "hash": "9890126725829548007"
+          "file": "libs/admin-portal/feature-staff/tsconfig.spec.json",
+          "hash": "17263122952907776525"
+        }
+      ],
+      "shared-data-access": [
+        {
+          "file": "libs/shared/data-access/project.json",
+          "hash": "449373934118759123"
+        },
+        {
+          "file": "libs/shared/data-access/src/index.ts",
+          "hash": "2822442637779715580"
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.interceptor.ts",
+          "hash": "5341263071254620541",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.models.ts",
+          "hash": "14723757736256010464"
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.store.ts",
+          "hash": "9077874194438019",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@angular/fire",
+            "npm:@angular/common",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/data-access/tsconfig.json",
+          "hash": "17092705240196255247"
+        },
+        {
+          "file": "libs/shared/data-access/tsconfig.lib.json",
+          "hash": "8993976497808532181"
         }
       ]
     }
   },
-  "externalNodesHash": "15388253102313393002"
+  "externalNodesHash": "4777876341675349529"
 }

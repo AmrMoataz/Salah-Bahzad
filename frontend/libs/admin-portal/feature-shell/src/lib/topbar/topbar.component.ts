@@ -1,5 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthStore } from '@sb/shared/data-access';
 
 @Component({
@@ -7,138 +15,298 @@ import { AuthStore } from '@sb/shared/data-access';
   standalone: true,
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(document:click)': 'closeMenu()' },
   template: `
     <header class="topbar">
-      <div class="topbar__left">
-        <h1 class="topbar__title">{{ pageTitle() }}</h1>
-      </div>
-      <div class="topbar__right">
-        <!-- Avatar menu (simplified — expand with dropdown in Phase 1) -->
-        @if (staff()) {
-          <div class="topbar__user">
-            <div class="topbar__avatar" [title]="staff()!.displayName" aria-label="User menu">
-              {{ initials() }}
-            </div>
-            <div class="topbar__user-info">
-              <span class="topbar__user-name">{{ staff()!.displayName }}</span>
-              <span class="topbar__user-role">{{ staff()!.role }}</span>
-            </div>
-            <button
-              class="topbar__signout"
-              (click)="signOut()"
-              type="button"
-              aria-label="Sign out"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path d="M3 3h4.5a.5.5 0 0 1 0 1H3.5v8h4a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5v-9A.5.5 0 0 1 3 3zm7.354 2.646a.5.5 0 0 0-.708.708L11.293 7.5H6.5a.5.5 0 0 0 0 1h4.793l-1.647 1.646a.5.5 0 0 0 .708.708l2.5-2.5a.5.5 0 0 0 0-.708l-2.5-2.5z"/>
-              </svg>
-            </button>
-          </div>
+      <button
+        class="topbar__burger"
+        type="button"
+        (click)="menuToggle.emit()"
+        aria-label="Open navigation"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" />
+        </svg>
+      </button>
+
+      <div class="topbar__heading">
+        <h1 class="topbar__title">{{ title() }}</h1>
+        @if (subtitle()) {
+          <p class="topbar__subtitle">{{ subtitle() }}</p>
         }
       </div>
+
+      <button class="topbar__bell" type="button" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        <span class="topbar__bell-dot" aria-hidden="true"></span>
+      </button>
+
+      @if (staff(); as user) {
+        <div class="topbar__user">
+          <button
+            class="topbar__user-btn"
+            type="button"
+            (click)="toggleMenu($event)"
+            [attr.aria-expanded]="menuOpen()"
+            aria-haspopup="menu"
+          >
+            <span class="topbar__avatar">{{ initials() }}</span>
+            <span class="topbar__user-info">
+              <span class="topbar__user-name">{{ user.displayName }}</span>
+              <span class="topbar__user-role">{{ user.role }}</span>
+            </span>
+            <svg class="topbar__chevron" [class.is-open]="menuOpen()" width="14" height="14"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          @if (menuOpen()) {
+            <div class="topbar__menu" role="menu">
+              <a class="topbar__menu-item" role="menuitem" routerLink="/settings" (click)="closeMenu()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span>Settings</span>
+              </a>
+              <div class="topbar__menu-divider"></div>
+              <button
+                class="topbar__menu-item topbar__menu-item--danger"
+                role="menuitem"
+                type="button"
+                (click)="signOut()"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+                <span>Sign out</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
     </header>
   `,
   styles: [`
     .topbar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      height: 60px;
-      padding: 0 var(--sb-space-6);
+      gap: var(--sb-space-4);
+      height: 64px;
+      flex-shrink: 0;
+      padding: 0 var(--sb-space-5);
       background: var(--sb-surface);
       border-bottom: 1px solid var(--sb-border);
-      box-shadow: var(--sb-shadow-xs);
-      flex-shrink: 0;
     }
+
+    .topbar__burger {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--sb-border);
+      border-radius: var(--sb-radius-md);
+      background: var(--sb-surface);
+      color: var(--sb-text);
+      cursor: pointer;
+    }
+
+    .topbar__burger:hover { background: var(--sb-surface-sunken); }
+    .topbar__burger:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+
+    .topbar__heading { min-width: 0; flex-shrink: 1; }
 
     .topbar__title {
-      font-size: var(--sb-text-lg);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-text-md);
+      font-weight: var(--sb-weight-extrabold);
+      line-height: 1.1;
       color: var(--sb-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .topbar__right { display: flex; align-items: center; gap: var(--sb-space-4); }
+    .topbar__subtitle {
+      font-size: 12.5px;
+      color: var(--sb-text-muted);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-    .topbar__user {
+    .topbar__bell {
+      position: relative;
+      margin-left: auto;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--sb-border);
+      border-radius: var(--sb-radius-md);
+      background: var(--sb-surface);
+      color: var(--sb-text);
+      cursor: pointer;
+    }
+
+    .topbar__bell:hover { background: var(--sb-surface-sunken); }
+    .topbar__bell:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+
+    .topbar__bell-dot {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      width: 7px;
+      height: 7px;
+      border-radius: var(--sb-radius-circle);
+      background: var(--sb-danger);
+      border: 1.5px solid var(--sb-surface);
+    }
+
+    .topbar__user { position: relative; flex-shrink: 0; }
+
+    .topbar__user-btn {
       display: flex;
       align-items: center;
       gap: var(--sb-space-3);
+      padding: 4px 6px 4px 4px;
+      border: none;
+      background: transparent;
+      border-radius: var(--sb-radius-pill);
+      cursor: pointer;
     }
 
+    .topbar__user-btn:hover { background: var(--sb-surface-sunken); }
+    .topbar__user-btn:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+
     .topbar__avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
       border-radius: var(--sb-radius-circle);
-      background: var(--sb-primary);
-      color: white;
-      display: flex;
+      background: var(--sb-primary-600);
+      color: #fff;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      font-weight: var(--sb-weight-extrabold);
       font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-bold);
-      cursor: pointer;
-      flex-shrink: 0;
+      text-transform: uppercase;
     }
 
     .topbar__user-info {
       display: flex;
       flex-direction: column;
-      gap: 1px;
+      line-height: 1.15;
+      text-align: left;
     }
 
     .topbar__user-name {
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-semibold);
+      font-size: 13.5px;
+      font-weight: var(--sb-weight-bold);
       color: var(--sb-text);
-      line-height: 1.2;
     }
 
     .topbar__user-role {
-      font-size: var(--sb-text-xs);
+      font-size: 11.5px;
       color: var(--sb-text-muted);
-      line-height: 1.2;
     }
 
-    .topbar__signout {
-      background: transparent;
-      border: none;
-      cursor: pointer;
+    .topbar__chevron {
       color: var(--sb-text-muted);
-      padding: var(--sb-space-2);
-      border-radius: var(--sb-radius-sm);
+      transition: transform var(--sb-dur-fast) var(--sb-ease-standard);
+    }
+    .topbar__chevron.is-open { transform: rotate(180deg); }
+
+    .topbar__menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 200px;
+      background: var(--sb-surface);
+      border: 1px solid var(--sb-border);
+      border-radius: var(--sb-radius-md);
+      box-shadow: var(--sb-shadow-lg);
+      padding: 6px;
+      z-index: var(--sb-z-dropdown);
+    }
+
+    .topbar__menu-item {
       display: flex;
       align-items: center;
-      transition: all var(--sb-dur) var(--sb-ease-standard);
-
-      &:hover { background: var(--sb-surface-sunken); color: var(--sb-danger-fg); }
-      &:focus-visible { box-shadow: var(--sb-shadow-focus); outline: none; }
+      gap: var(--sb-space-3);
+      width: 100%;
+      padding: 9px 12px;
+      border: none;
+      background: none;
+      border-radius: var(--sb-radius-sm);
+      cursor: pointer;
+      font-size: var(--sb-text-sm);
+      font-weight: var(--sb-weight-semibold);
+      color: var(--sb-text);
+      text-decoration: none;
+      text-align: left;
     }
 
-    @media (max-width: 640px) {
+    .topbar__menu-item:hover { background: var(--sb-surface-sunken); color: var(--sb-text); text-decoration: none; }
+    .topbar__menu-item:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+    .topbar__menu-item--danger { color: var(--sb-danger-fg); }
+
+    .topbar__menu-divider { height: 1px; background: var(--sb-border); margin: 4px 0; }
+
+    @media (max-width: 900px) {
+      .topbar__burger { display: inline-flex; }
       .topbar__user-info { display: none; }
     }
   `],
 })
 export class TopbarComponent {
   readonly #authStore = inject(AuthStore);
-  readonly #router = inject(Router);
 
-  readonly pageTitle = input<string>('Dashboard');
+  readonly title = input<string>('');
+  readonly subtitle = input<string>('');
+  /** Emitted when the mobile burger is pressed. */
+  readonly menuToggle = output<void>();
+
   readonly staff = this.#authStore.staff;
+  readonly menuOpen = signal(false);
 
-  get initials(): () => string {
-    return () => {
-      const name = this.staff()?.displayName ?? '';
-      return name
-        .split(' ')
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-    };
+  readonly initials = computed(() => {
+    const name = this.staff()?.displayName ?? '';
+    return name
+      .split(' ')
+      .map((part) => part[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  });
+
+  toggleMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.menuOpen.update((open) => !open);
+  }
+
+  closeMenu(): void {
+    if (this.menuOpen()) {
+      this.menuOpen.set(false);
+    }
   }
 
   async signOut(): Promise<void> {
+    this.menuOpen.set(false);
     await this.#authStore.signOut();
   }
 }

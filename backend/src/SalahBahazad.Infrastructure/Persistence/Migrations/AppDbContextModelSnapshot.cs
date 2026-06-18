@@ -141,6 +141,9 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<DateTimeOffset?>("LastSeenAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 

@@ -4,5 +4,14 @@
   "projectType": "library",
   "sourceRoot": "libs/shared/ui/src",
   "prefix": "sb",
-  "tags": ["scope:shared", "type:ui"]
+  "tags": ["scope:shared", "type:ui"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/ui"],
+      "options": {
+        "jestConfig": "libs/shared/ui/jest.config.ts"
+      }
+    }
+  }
 }

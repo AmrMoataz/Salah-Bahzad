@@ -13,20 +13,20 @@ namespace SalahBahazad.Infrastructure.Services;
 /// Refresh tokens are longer-lived JWTs (server validates signature only; revocation
 /// via Redis is added in the revocation feature). No passwords stored (FR-PLAT-AUTH-002/004).
 /// </summary>
-internal sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenService
+internal sealed class JwtTokenService(IConfiguration configuration, TimeProvider clock) : IJwtTokenService
 {
     private static readonly JwtSecurityTokenHandler Handler = new();
 
     public PlatformToken IssueAccessToken(Staff staff)
     {
-        var expiry = DateTimeOffset.UtcNow.AddMinutes(
+        var expiry = clock.GetUtcNow().AddMinutes(
             configuration.GetValue("Jwt:AccessTokenMinutes", 15));
         return BuildToken(staff, expiry, "access");
     }
 
     public PlatformToken IssueRefreshToken(Staff staff)
     {
-        var expiry = DateTimeOffset.UtcNow.AddDays(
+        var expiry = clock.GetUtcNow().AddDays(
             configuration.GetValue("Jwt:RefreshTokenDays", 7));
         return BuildToken(staff, expiry, "refresh");
     }

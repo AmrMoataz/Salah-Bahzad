@@ -2,12 +2,14 @@ using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.RateLimiting;
 using SalahBahazad.Api.Endpoints;
+using SalahBahazad.Api.Middleware;
 using SalahBahazad.Application.Common.Behaviors;
 using SalahBahazad.Infrastructure;
 using SalahBahazad.ServiceDefaults;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 
 // ── Bootstrap logger (captures startup errors) ────────────────────────────
@@ -53,8 +55,13 @@ try
         typeof(IPipelineBehavior<,>),
         typeof(ValidationBehavior<,>));
 
-    // ── ProblemDetails (RFC 7807) ────────────────────────────────────────────
+    // ── ProblemDetails (RFC 7807) + global exception → HTTP status mapping ────
     builder.Services.AddProblemDetails();
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+    // ── JSON: serialize enums as names so role/permissions match the Angular contract ──
+    builder.Services.ConfigureHttpJsonOptions(options =>
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     // ── OpenAPI / Scalar ─────────────────────────────────────────────────────
     builder.Services.AddOpenApi();
@@ -123,9 +130,8 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // ── Endpoints ────────────────────────────────────────────────────────────
-    app.MapAuthEndpoints();
-    app.MapHealthEndpoints();
+    // ── Endpoints (auto-discovered IEndpointGroup implementations) ────────────
+    app.MapEndpoints();
 
     // ── Bootstrap seed (Development only) ─────────────────────────────────────
     // Migrations are gated (no auto-apply on prod boot), so seeding assumes the schema

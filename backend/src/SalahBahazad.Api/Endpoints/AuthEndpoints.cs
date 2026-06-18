@@ -10,9 +10,9 @@ namespace SalahBahazad.Api.Endpoints;
 /// Staff authentication endpoints (FR-ADM-AUTH-001, FR-PLAT-AUTH-002).
 /// Firebase token exchange → platform JWT pair.
 /// </summary>
-internal static class AuthEndpoints
+internal sealed class AuthEndpoints : IEndpointGroup
 {
-    internal static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/auth")
             .WithTags("Auth")
@@ -27,13 +27,11 @@ internal static class AuthEndpoints
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status401Unauthorized)
             .Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests);
-
-        return app;
     }
 
     private static async Task<IResult> ExchangeAsync(
         [FromBody] ExchangeFirebaseTokenRequest request,
-        IMediator mediator,
+        ISender sender,
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
@@ -45,7 +43,7 @@ internal static class AuthEndpoints
             ip,
             deviceId);
 
-        var result = await mediator.Send(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
         return Results.Ok(result);
     }
 }

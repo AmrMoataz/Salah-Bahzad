@@ -20,7 +20,8 @@
       "@sb/shared/util": ["libs/shared/util/src/index.ts"],
       "@sb/admin-portal/feature-auth": ["libs/admin-portal/feature-auth/src/index.ts"],
       "@sb/admin-portal/feature-shell": ["libs/admin-portal/feature-shell/src/index.ts"],
-      "@sb/admin-portal/feature-dashboard": ["libs/admin-portal/feature-dashboard/src/index.ts"]
+      "@sb/admin-portal/feature-dashboard": ["libs/admin-portal/feature-dashboard/src/index.ts"],
+      "@sb/admin-portal/feature-staff": ["libs/admin-portal/feature-staff/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

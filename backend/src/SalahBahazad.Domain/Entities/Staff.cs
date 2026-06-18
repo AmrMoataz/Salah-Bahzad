@@ -17,6 +17,9 @@ public sealed class Staff : TenantEntityBase, ISoftDeletable
     public StaffRole Role { get; private set; }
     public bool IsActive { get; private set; } = true;
 
+    /// <summary>Timestamp of the most recent successful sign-in; null until the member first logs in.</summary>
+    public DateTimeOffset? LastSeenAtUtc { get; private set; }
+
     // ISoftDeletable
     public bool IsDeleted { get; private set; }
     public Guid? DeletedById { get; private set; }
@@ -65,10 +68,13 @@ public sealed class Staff : TenantEntityBase, ISoftDeletable
     public void Deactivate() => IsActive = false;
     public void Activate() => IsActive = true;
 
-    public void SoftDelete(Guid deletedById)
+    /// <summary>Stamps a successful sign-in, surfaced as "Last active" in the staff list (FR-ADM-STAFF-001).</summary>
+    public void RecordSignIn(DateTimeOffset now) => LastSeenAtUtc = now;
+
+    public void SoftDelete(Guid deletedById, DateTimeOffset now)
     {
         IsDeleted = true;
         DeletedById = deletedById;
-        DeletedAtUtc = DateTimeOffset.UtcNow;
+        DeletedAtUtc = now;
     }
 }
