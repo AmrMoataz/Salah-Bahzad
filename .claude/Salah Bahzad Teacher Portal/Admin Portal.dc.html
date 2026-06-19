@@ -27,6 +27,13 @@
   @keyframes sbtoast { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   .sb-navbtn:hover { background: var(--sb-primary-50) !important; }
   .sb-main { scroll-behavior: smooth; }
+  .sb-glyph { transition: border-color 150ms, background 150ms, transform 150ms; }
+  .sb-glyph:hover { border-color: var(--sb-primary) !important; background: var(--sb-primary-50) !important; transform: translateY(-1px); }
+  .sb-glyph:active { transform: translateY(0); }
+  .sb-ltx-row { transition: border-color 150ms, background 150ms; }
+  .sb-ltx-row:hover { border-color: var(--sb-primary) !important; background: var(--sb-primary-50) !important; }
+  .sb-help-link { transition: border-color 150ms, background 150ms; }
+  .sb-help-link:hover { border-color: var(--sb-primary) !important; background: var(--sb-primary-50) !important; }
 </style>
 </helmet>
 
@@ -72,7 +79,7 @@
     <div style="display: flex; height: 100vh; overflow: hidden;">
 
       <aside style="{{ sidebarStyle }}">
-        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px 18px; border-bottom: 1px solid var(--sb-border); margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 10px; flex-shrink: 0; border-bottom: 1px solid var(--sb-border); margin-bottom: 14px;">
           <img src="assets/logo-small.png" alt="" style="height: 34px; width: 34px; object-fit: contain;">
           <div style="line-height: 1.1;">
             <div style="font-weight: 800; font-size: 15px;">Salah Bahzad</div>
@@ -116,7 +123,7 @@
             <div style="font-size: 12.5px; color: var(--sb-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ topSubtitle }}</div>
           </div>
           <button class="sb-navbtn" style="margin-left: auto; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--sb-border); background: var(--sb-surface); border-radius: var(--sb-radius-md); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--sb-text); position: relative;" onClick="{{ onBell }}">{{ bellIcon }}<span style="position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--sb-danger); border: 1.5px solid var(--sb-surface);"></span></button>
-          <div style="position: relative;" data-avatar-menu>
+          <div style="position: relative;" data-avatar-menu="">
             <button onClick="{{ onAvatarClick }}" style="display: flex; align-items: center; gap: 10px; border: none; background: transparent; cursor: pointer; padding: 4px 6px 4px 4px; border-radius: var(--sb-radius-pill);">
               <span style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: var(--sb-primary-600); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;">{{ avatarInitials }}</span>
               <span class="sb-username" style="text-align: left; line-height: 1.15;">
@@ -140,7 +147,7 @@
         </header>
 
         <main class="sb-main" style="flex: 1; overflow-y: auto; background: var(--sb-bg);">
-          <div class="sb-scr" style="max-width: 1240px; margin: 0 auto; padding: 28px 28px 64px;">{{ screen }}</div>
+          <div class="sb-scr" style="max-width: 1240px; margin: 0 auto; padding: 28px 28px 64px;">{{screen}}</div>
         </main>
       </div>
     </div>
@@ -915,6 +922,132 @@ class Component extends DCLogic {
       this.el(this.SBCombobox, { value: this._unlockStudent || '', onChange: v => { this._unlockStudent = v; this.forceUpdate(); }, options: this.state.students.filter(s => s.status === 'active').map(s => ({ value: s.id, label: s.name, description: s.phone })), placeholder: 'Search by name or phone…' }));
   }
 
+  copyLatex = (cmd) => {
+    const done = () => this.toast('Copied  ' + cmd, 'info');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cmd).then(done, () => this.fallbackCopy(cmd, done));
+    } else {
+      this.fallbackCopy(cmd, done);
+    }
+  };
+  fallbackCopy = (text, done) => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '-9999px'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, text.length);
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    } catch (e) { this.toast('Press Ctrl/Cmd+C to copy', 'info'); }
+  };
+
+  /* ====== LATEX REFERENCE DRAWER ====== */
+  latexRefModal() {
+    const el = React.createElement;
+    const { Drawer } = this.DS;
+
+    const head = (label, hint) => el('div', { style: { display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 } },
+      el('span', { style: { width: 7, height: 7, borderRadius: '50%', background: 'var(--sb-primary)', flexShrink: 0 } }),
+      el('h3', { style: { margin: 0, fontSize: 12.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--sb-text)' } }, label),
+      hint && el('span', { style: { fontSize: 12, color: 'var(--sb-text-subtle)' } }, hint));
+
+    // Click-to-copy symbol tile: big rendered glyph + the command in mono
+    const glyph = (cmd, out, copy) => el('button', { key: cmd, type: 'button', className: 'sb-glyph', onClick: () => this.copyLatex(copy || cmd),
+      style: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 6px', background: 'var(--sb-surface)', border: '1px solid var(--sb-border)', borderRadius: 'var(--sb-radius-md)', cursor: 'pointer', fontFamily: 'var(--sb-font-sans)' } },
+      el('span', { style: { fontSize: 23, fontWeight: 700, color: 'var(--sb-text)', lineHeight: 1 } }, out),
+      el('span', { style: { fontSize: 11, fontFamily: 'var(--sb-font-mono)', color: 'var(--sb-primary-700)', whiteSpace: 'nowrap' } }, cmd));
+    const glyphGrid = (items) => el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))', gap: 8 } }, items.map(it => glyph(it[0], it[1], it[2])));
+
+    // Click-to-copy input→output row
+    const ioRow = (cmd, out, note) => el('button', { key: cmd, type: 'button', className: 'sb-ltx-row', onClick: () => this.copyLatex(cmd),
+      style: { display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '9px 12px', background: 'var(--sb-surface)', border: '1px solid var(--sb-border)', borderRadius: 'var(--sb-radius-md)', cursor: 'pointer', fontFamily: 'var(--sb-font-sans)' } },
+      el('code', { style: { fontFamily: 'var(--sb-font-mono)', fontSize: 13, color: 'var(--sb-primary-700)', flexShrink: 0, minWidth: 88 } }, cmd),
+      el('span', { style: { color: 'var(--sb-text-subtle)', flexShrink: 0 } }, '→'),
+      el('span', { style: { fontSize: 16, fontWeight: 700, color: 'var(--sb-text)', minWidth: 44 } }, out),
+      note && el('span', { style: { fontSize: 11.5, color: 'var(--sb-text-subtle)', marginLeft: 'auto', textAlign: 'right' } }, note));
+    const ioList = (rows) => el('div', { style: { display: 'flex', flexDirection: 'column', gap: 7 } }, rows.map(r => ioRow(r[0], r[1], r[2])));
+
+    // Worked example: "you type" (mono) over "preview" (rendered)
+    const example = (raw, rendered) => el('div', { style: { border: '1px solid var(--sb-border)', borderRadius: 'var(--sb-radius-md)', overflow: 'hidden' } },
+      el('div', { style: { padding: '11px 14px', background: 'var(--sb-surface-sunken)', borderBottom: '1px solid var(--sb-border)' } },
+        el('div', { style: { fontSize: 10, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--sb-text-subtle)', marginBottom: 6 } }, 'You type'),
+        el('code', { style: { fontFamily: 'var(--sb-font-mono)', fontSize: 12.5, lineHeight: 1.6, color: 'var(--sb-text)', whiteSpace: 'pre-wrap' } }, raw)),
+      el('div', { style: { padding: '11px 14px' } },
+        el('div', { style: { fontSize: 10, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--sb-primary-700)', marginBottom: 6 } }, 'Preview'),
+        el('div', { style: { fontSize: 15, lineHeight: 1.6, color: 'var(--sb-text)' } }, rendered)));
+
+    const chip = (txt) => el('code', { style: { fontFamily: 'var(--sb-font-mono)', fontSize: 12.5, background: 'var(--sb-surface)', border: '1px solid var(--sb-warning-border)', borderRadius: 'var(--sb-radius-sm)', padding: '3px 8px', color: 'var(--sb-text)' } }, txt);
+
+    const grid = (min, gap, children) => el('div', { style: { display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(${min}px, 1fr))`, gap } }, children);
+    const block = (children) => el('div', { style: { marginBottom: 24 } }, children);
+
+    return el(Drawer, { open: true, onClose: () => this.setState({ latexRef: false }), side: 'right', width: 660, title: 'LaTeX reference' },
+      el('div', { style: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, marginBottom: 22, padding: '11px 14px', background: 'var(--sb-info-bg)', borderRadius: 'var(--sb-radius-md)', border: '1px solid var(--sb-info-border)', color: 'var(--sb-text)' } },
+        el('span', { style: { flexShrink: 0, fontSize: 16 } }, '☼'),
+        el('span', null, 'A ', el('strong', null, 'lightweight previewer'), ' — not full LaTeX. Anything it doesn\u2019t recognise renders as plain text. Tap any tile to copy it.')),
+
+      block(el('div', null, head('Operators'), glyphGrid([
+        ['\\times', '×'], ['\\cdot', '·'], ['\\div', '÷'], ['\\pm', '±'], ['\\mp', '∓'],
+        ['\\approx', '≈'], ['\\leq', '≤'], ['\\geq', '≥'], ['\\neq', '≠'], ['\\infty', '∞'],
+        ['\\sum', '∑'], ['\\int', '∫'], ['\\to', '→'], ['\\degree', '°'],
+      ]))),
+
+      block(el('div', null, head('Greek'), glyphGrid([
+        ['\\alpha', 'α'], ['\\beta', 'β'], ['\\gamma', 'γ'], ['\\delta', 'δ'], ['\\Delta', 'Δ'],
+        ['\\theta', 'θ'], ['\\lambda', 'λ'], ['\\mu', 'μ'], ['\\pi', 'π'], ['\\phi', 'φ'],
+        ['\\omega', 'ω'], ['\\Omega', 'Ω'],
+      ]))),
+
+      block(el('div', null,
+        head('Delimiters'),
+        el('div', { style: { display: 'flex', flexDirection: 'column', gap: 7 } },
+          ioRow('$ … $', 'inline', 'flows with text — no nested $'),
+          ioRow('$$ … $$', 'block', 'centered, own line — can span lines')))),
+
+      block(grid(250, 20, [
+        el('div', { key: 'p' }, head('Powers & subscripts'), ioList([
+          ['x^2', 'x²', 'single char'], ['x^{12}', 'x¹²', 'braced group'],
+          ['x^{n+1}', 'xⁿ⁺¹'], ['a_1', 'a₁', 'single char'], ['a_{12}', 'a₁₂', 'braced group'],
+        ])),
+        el('div', { key: 'f' }, head('Fractions & roots'), ioList([
+          ['\\frac{a}{b}', '(a)/(b)', 'flat braces only'],
+          ['\\sqrt{x}', '√(x)'], ['\\sqrt', '√'],
+        ])),
+      ])),
+
+      block(el('div', null,
+        head('Text, units & spacing'),
+        ioList([
+          ['\\mathrm{m/s}', 'm/s', 'upright units'],
+          ['\\text{if } x>0', 'if x>0', 'words inside math'],
+          ['\\,  \\;  \\:', '␣', 'thin spaces — 4\\,\\mathrm{m/s}'],
+        ]))),
+
+      block(el('div', null,
+        head('Worked examples'),
+        grid(240, 12, [
+          el('div', { key: 0 }, example('A car starts at $a = 4\\,\\mathrm{m/s^2}$.\nSpeed after $t = 5\\,\\mathrm{s}$?', 'A car starts at  a = 4 m/s². Speed after  t = 5 s?')),
+          el('div', { key: 1 }, example('$$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$', 'x = (-b ± √(b²-4ac))/(2a)')),
+          el('div', { key: 2 }, example('Given $\\theta = 30\\degree$, $\\omega \\approx 2\\pi$.', 'Given  θ = 30°,  ω ≈ 2π.')),
+          el('div', { key: 3 }, example('The sum $\\sum a_n$ as $n \\to \\infty$.', 'The sum  ∑ aₙ  as  n → ∞.')),
+        ]))),
+
+      el('div', { style: { padding: '14px 16px', background: 'var(--sb-warning-bg)', border: '1px solid var(--sb-warning-border)', borderRadius: 'var(--sb-radius-md)' } },
+        el('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 } },
+          el('span', { style: { color: 'var(--sb-warning-fg)', fontSize: 15 } }, '⚠'),
+          el('h3', { style: { margin: 0, fontSize: 12.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--sb-text)' } }, 'Avoid — renders as raw text')),
+        el('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 } },
+          [chip('x^a'), chip('v_i'), chip('\\frac{x^{2}}{y}'), chip('\\leftarrow'), chip('\\left'), chip('\\right'), chip('lone $')]),
+        el('p', { style: { margin: 0, fontSize: 12.5, lineHeight: 1.6, color: 'var(--sb-text-muted)' } },
+          'Super/subscripts only map a fixed character set (e.g. no ', el('code', { style: { fontFamily: 'var(--sb-font-mono)' } }, 'x^a'), ' or ', el('code', { style: { fontFamily: 'var(--sb-font-mono)' } }, 'v_i'), '). ',
+          'Nested braces defeat ', el('code', { style: { fontFamily: 'var(--sb-font-mono)' } }, '\\frac'), '/', el('code', { style: { fontFamily: 'var(--sb-font-mono)' } }, '\\sqrt'), '. ',
+          'There is no escape for ', el('code', { style: { fontFamily: 'var(--sb-font-mono)' } }, '$'), ' — keep stray dollar signs out of prose.'))
+    );
+  }
+
   /* ====== QUESTION EDITOR ====== */
   scrQuestionEditor() {
     const { Button, Card, Switch, Input } = this.DS;
@@ -925,13 +1058,16 @@ class Component extends DCLogic {
     return this.el('div', null,
       this.backLink('Back to question bank', 'session-detail', this.state.sessions[0].id),
       this.pageHead(isNew ? 'New question' : 'Edit question', 'MCQ authoring with LaTeX, variations and flags',
-        this.el('div', { style: { display: 'flex', gap: 8 } }, this.el(Button, { variant: 'ghost', onClick: () => window.history.length && this.go('session-detail', this.state.sessions[0].id) }, 'Cancel'), this.el(Button, { variant: 'primary', onClick: () => this.saveQuestion(isNew) }, 'Save question'))),
+        this.el('div', { style: { display: 'flex', gap: 8 } },
+          this.el(Button, { variant: 'ghost', onClick: () => window.history.length && this.go('session-detail', this.state.sessions[0].id) }, 'Cancel'),
+          this.el(Button, { variant: 'primary', onClick: () => this.saveQuestion(isNew) }, 'Save question'))),
+      this.state.latexRef && this.latexRefModal(),
       this.el('div', { style: { display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' } },
         [0, 1, 2].slice(0, Math.max(1, d.variations)).map(i => this.el('button', { key: i, onClick: () => this.setSub('vtab', i), style: { padding: '7px 14px', borderRadius: 'var(--sb-radius-pill)', border: '1px solid ' + (vtab === i ? 'var(--sb-primary)' : 'var(--sb-border-strong)'), background: vtab === i ? 'var(--sb-primary-50)' : 'var(--sb-surface)', color: vtab === i ? 'var(--sb-primary)' : 'var(--sb-text-muted)', fontWeight: 700, fontSize: 13, cursor: 'pointer' } }, `Variation ${i + 1}`)),
         this.el('button', { onClick: () => { this.setD('variations', Math.min(3, (d.variations || 1) + 1)); this.toast('Variation added', 'info'); }, style: { padding: '7px 12px', borderRadius: 'var(--sb-radius-pill)', border: '1px dashed var(--sb-border-strong)', background: 'transparent', color: 'var(--sb-text-muted)', fontWeight: 700, fontSize: 13, cursor: 'pointer' } }, '+ Add variation')),
       this.el('div', { style: { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 16, alignItems: 'start' } },
         this.el('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
-          this.el(Card, { title: 'Question (LaTeX supported)', padding: true }, this.el('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
+          this.el(Card, { title: 'Question (LaTeX supported)', padding: true, actions: this.el('button', { type: 'button', className: 'sb-help-link', onClick: () => this.setState({ latexRef: true }), style: { display: 'inline-flex', alignItems: 'center', gap: 6, border: '1px solid var(--sb-border)', background: 'var(--sb-surface)', cursor: 'pointer', color: 'var(--sb-primary-700)', fontSize: 12.5, fontWeight: 700, fontFamily: 'var(--sb-font-sans)', padding: '5px 11px', borderRadius: 'var(--sb-radius-pill)' } }, this.icon('info', 14), 'Formatting help') }, this.el('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
             this.el('textarea', { defaultValue: d.text || 'A car accelerates from rest at $a = 4\\,\\mathrm{m/s^2}$. Find its speed after $t = 5\\,\\mathrm{s}$.', onChange: e => this.setD('text', e.target.value), style: { width: '100%', minHeight: 120, padding: 12, border: '1px solid var(--sb-border-strong)', borderRadius: 'var(--sb-radius-md)', fontSize: 13.5, fontFamily: 'var(--sb-font-mono)', resize: 'vertical', outline: 'none' } }),
             this.el('div', { onClick: () => this.pickFile('image/*', f => { this._d.img = f.name; this.toast('Image attached: ' + f.name, 'success'); }), style: { cursor: 'pointer', border: '1.5px dashed var(--sb-border-strong)', borderRadius: 'var(--sb-radius-md)', padding: 18, textAlign: 'center', color: 'var(--sb-text-muted)', fontSize: 13 } }, this.icon('download', 20), this.el('div', { style: { marginTop: 6 } }, d.img || 'Upload a question image (optional)')))),
           this.el(Card, { title: 'Answer options', padding: true }, this.el('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
@@ -1369,7 +1505,7 @@ class Component extends DCLogic {
 
   sidebarStyle() {
     const open = this.state.navOpen;
-    return { width: 248, flexShrink: 0, background: 'var(--sb-surface)', borderRight: '1px solid var(--sb-border)', padding: '18px 14px 16px', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', position: window.innerWidth <= 900 ? 'fixed' : 'relative', left: window.innerWidth <= 900 ? (open ? 0 : -260) : 0, top: 0, zIndex: 100, transition: 'left .25s var(--sb-easing-standard)', boxShadow: (window.innerWidth <= 900 && open) ? 'var(--sb-shadow-lg)' : 'none' };
+    return { width: 248, flexShrink: 0, background: 'var(--sb-surface)', borderRight: '1px solid var(--sb-border)', padding: '0 14px 16px', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', position: window.innerWidth <= 900 ? 'fixed' : 'relative', left: window.innerWidth <= 900 ? (open ? 0 : -260) : 0, top: 0, zIndex: 100, transition: 'left .25s var(--sb-easing-standard)', boxShadow: (window.innerWidth <= 900 && open) ? 'var(--sb-shadow-lg)' : 'none' };
   }
 }
 

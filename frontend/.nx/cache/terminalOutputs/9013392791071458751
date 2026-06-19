@@ -1,0 +1,53 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m shared-ui [39m[27m[0m [2mlibs/shared/ui/src/lib/modal/[22m[1mmodal.component.spec.ts[22m
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m shared-ui [39m[27m[0m [2mlibs/shared/ui/src/lib/confirm-dialog/[22m[1mconfirm-dialog.component.spec.ts[22m
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m shared-ui [39m[27m[0m [2mlibs/shared/ui/src/lib/select/[22m[1mselect.component.spec.ts[22m
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m shared-ui [39m[27m[0m [2mlibs/shared/ui/src/lib/clipboard/[22m[1mclipboard.service.spec.ts[22m
+[1m[31m  [1m● [22m[1mClipboardService › falls back to execCommand when the Clipboard API rejects[39m[22m
+
+    Property `execCommand` does not exist in the provided object
+[2m[22m
+[2m    [0m [90m 42 |[39m     [36mconst[39m writeText [33m=[39m jest[33m.[39mfn()[33m.[39mmockRejectedValue([36mnew[39m [33mError[39m([32m'denied'[39m))[33m;[39m[22m
+[2m     [90m 43 |[39m     [33mObject[39m[33m.[39mdefineProperty(navigator[33m,[39m [32m'clipboard'[39m[33m,[39m { value[33m:[39m { writeText }[33m,[39m configurable[33m:[39m [36mtrue[39m })[33m;[39m[22m
+[2m    [31m[1m>[22m[2m[39m[90m 44 |[39m     [36mconst[39m exec [33m=[39m jest[33m.[39mspyOn(document[33m,[39m [32m'execCommand'[39m)[33m.[39mmockReturnValue([36mtrue[39m)[33m;[39m[22m
+[2m     [90m    |[39m                       [31m[1m^[22m[2m[39m[22m
+[2m     [90m 45 |[39m[22m
+[2m     [90m 46 |[39m     [36mconst[39m ok [33m=[39m [36mawait[39m service[33m.[39mcopy([32m'\\pi'[39m)[33m;[39m[22m
+[2m     [90m 47 |[39m[0m[22m
+[2m[22m
+[2m      [2mat ModuleMocker.spyOn ([22m[2m../../../node_modules/jest-mock/build/index.js[2m:731:13)[22m[2m[22m
+[2m      [2mat [22m[2m[0m[36msrc/lib/clipboard/clipboard.service.spec.ts[39m[0m[2m:44:23[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
+[2m      [2mat ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
+[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
+[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
+
+[1m[31m  [1m● [22m[1mClipboardService › nudges the user when every copy strategy fails[39m[22m
+
+    Property `execCommand` does not exist in the provided object
+[2m[22m
+[2m    [0m [90m 53 |[39m   it([32m'nudges the user when every copy strategy fails'[39m[33m,[39m [36masync[39m () [33m=>[39m {[22m
+[2m     [90m 54 |[39m     [33mObject[39m[33m.[39mdefineProperty(navigator[33m,[39m [32m'clipboard'[39m[33m,[39m { value[33m:[39m undefined[33m,[39m configurable[33m:[39m [36mtrue[39m })[33m;[39m[22m
+[2m    [31m[1m>[22m[2m[39m[90m 55 |[39m     jest[33m.[39mspyOn(document[33m,[39m [32m'execCommand'[39m)[33m.[39mmockReturnValue([36mfalse[39m)[33m;[39m[22m
+[2m     [90m    |[39m          [31m[1m^[22m[2m[39m[22m
+[2m     [90m 56 |[39m[22m
+[2m     [90m 57 |[39m     [36mconst[39m ok [33m=[39m [36mawait[39m service[33m.[39mcopy([32m'\\pi'[39m)[33m;[39m[22m
+[2m     [90m 58 |[39m[0m[22m
+[2m[22m
+[2m      [2mat ModuleMocker.spyOn ([22m[2m../../../node_modules/jest-mock/build/index.js[2m:731:13)[22m[2m[22m
+[2m      [2mat [22m[2m[0m[36msrc/lib/clipboard/clipboard.service.spec.ts[39m[0m[2m:55:10[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
+[2m      [2mat ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
+[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
+[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
+
+[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m3 passed[39m[22m, 4 total
+[1mTests:       [22m[1m[31m2 failed[39m[22m, [1m[32m15 passed[39m[22m, 17 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        5.028 s, estimated 8 s
+[2mRan all test suites[22m[2m matching [22m/c|l|i|p|b|o|a|r|d/i[2m.[22m

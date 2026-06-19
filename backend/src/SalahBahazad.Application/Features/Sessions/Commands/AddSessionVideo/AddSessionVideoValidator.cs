@@ -13,7 +13,7 @@ internal sealed class AddSessionVideoValidator : AbstractValidator<AddSessionVid
 
         RuleFor(x => x.ContentType)
             .Must(ct => AddSessionVideoCommand.AllowedContentTypes.Contains(ct))
-            .WithMessage("The video must be MP4, MOV, or WebM.");
+            .WithMessage("The video must be MP4, MOV, mkv, or WebM.");
 
         RuleFor(x => x.Length)
             .GreaterThan(0).WithMessage("The video file is required.")

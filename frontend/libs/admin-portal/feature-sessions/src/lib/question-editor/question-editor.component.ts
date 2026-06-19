@@ -18,6 +18,7 @@ import {
   FileUploadComponent,
   FormFieldComponent,
   LatexPreviewComponent,
+  LatexReferenceComponent,
   SwitchComponent,
   ToastService,
 } from '@sb/shared/ui';
@@ -79,6 +80,7 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
     FormFieldComponent,
     FileUploadComponent,
     LatexPreviewComponent,
+    LatexReferenceComponent,
     AlertComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -94,6 +96,8 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
     @if (loadError()) {
       <sb-alert variant="danger" title="Couldn’t load question">{{ loadError() }}</sb-alert>
     } @else {
+      <sb-latex-reference [open]="latexRefOpen()" (close)="latexRefOpen.set(false)" />
+
       <div class="qe__head">
         <div>
           <h1 class="qe__title">{{ isNew() ? 'New question' : 'Edit question' }}</h1>
@@ -121,6 +125,13 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
           <!-- LEFT -->
           <div class="qe__col">
             <sb-card [title]="activeIndex() === 0 ? 'Question (LaTeX supported)' : 'Variation ' + (activeIndex() + 1) + ' (LaTeX supported)'">
+              <button cardActions type="button" class="sb-help-link" (click)="latexRefOpen.set(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                Formatting help
+              </button>
               <div class="qe__field">
                 <textarea
                   class="qe__latex"
@@ -255,6 +266,10 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
     .qe__col--side { position: sticky; top: var(--sb-space-2); }
     @media (max-width: 900px) { .qe__col--side { position: static; } }
 
+    .sb-help-link { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--sb-border); background: var(--sb-surface); cursor: pointer; color: var(--sb-primary-700); font-size: 12.5px; font-weight: 700; font-family: var(--sb-font-sans); padding: 5px 11px; border-radius: var(--sb-radius-pill); transition: border-color var(--sb-timing-fast) var(--sb-easing-standard), background var(--sb-timing-fast) var(--sb-easing-standard); }
+    .sb-help-link:hover { border-color: var(--sb-primary); background: var(--sb-primary-50); }
+    .sb-help-link:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+
     .qe__field { display: flex; flex-direction: column; gap: var(--sb-space-3); }
     .qe__latex { width: 100%; min-height: 120px; padding: var(--sb-space-3); border: 1px solid var(--sb-border-strong); border-radius: var(--sb-radius-md); font-size: var(--sb-code-size); font-family: var(--sb-font-mono); line-height: 1.6; color: var(--sb-text); background: var(--sb-surface); resize: vertical; outline: none; }
     .qe__latex:focus { border-color: var(--sb-primary); box-shadow: var(--sb-shadow-focus); }
@@ -312,6 +327,7 @@ export class QuestionEditorComponent {
   readonly activeUnit = computed<EditableUnit | null>(() => this.units()[this.activeIndex()] ?? null);
 
   readonly loadError = signal<string | null>(null);
+  readonly latexRefOpen = signal(false);
   readonly saving = signal(false);
   readonly variationBusy = signal(false);
   readonly imageBusy = signal(false);

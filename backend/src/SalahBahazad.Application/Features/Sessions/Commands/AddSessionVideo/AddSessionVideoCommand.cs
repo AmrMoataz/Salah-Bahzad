@@ -23,7 +23,7 @@ public sealed record AddSessionVideoCommand(
     long Length,
     string FileName) : IRequest<SessionVideoDto>
 {
-    public static readonly string[] AllowedContentTypes = ["video/mp4", "video/quicktime", "video/webm"];
+    public static readonly string[] AllowedContentTypes = ["video/mp4", "video/quicktime", "video/webm, video/matroska"];
 
     /// <summary>Maximum source video size (2 GB).</summary>
     public const long MaxBytes = 2L * 1024 * 1024 * 1024;

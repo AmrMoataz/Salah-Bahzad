@@ -1,18 +1,18 @@
 {
   "run": {
-    "command": "nx build admin-portal",
-    "startTime": "2026-06-19T19:56:15.554Z",
-    "endTime": "2026-06-19T19:56:21.123Z",
+    "command": "nx test shared-ui --skip-nx-cache --testPathPattern=clipboard.service.spec",
+    "startTime": "2026-06-19T23:35:06.575Z",
+    "endTime": "2026-06-19T23:35:11.441Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "admin-portal:build:production",
-      "target": "build",
-      "projectName": "admin-portal",
-      "hash": "6636892961480248807",
-      "startTime": "2026-06-19T19:56:15.569Z",
-      "endTime": "2026-06-19T19:56:21.084Z",
+      "taskId": "shared-ui:test",
+      "target": "test",
+      "projectName": "shared-ui",
+      "hash": "13170344895768686057",
+      "startTime": "2026-06-19T23:35:06.591Z",
+      "endTime": "2026-06-19T23:35:11.440Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

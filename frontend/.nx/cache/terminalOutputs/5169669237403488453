@@ -1,0 +1,14 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/data-access/[22m[1msession.service.spec.ts[22m ([0m[1m[41m6.596 s[49m[22m[0m)
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/session-list/[22m[1msession-list.component.spec.ts[22m ([0m[1m[41m7.272 s[49m[22m[0m)
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/question-editor/[22m[1mquestion-editor.component.spec.ts[22m ([0m[1m[41m7.368 s[49m[22m[0m)
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/session-form/[22m[1msession-form.component.spec.ts[22m ([0m[1m[41m7.376 s[49m[22m[0m)
+
+[1mTest Suites: [22m[1m[32m4 passed[39m[22m, 4 total
+[1mTests:       [22m[1m[32m25 passed[39m[22m, 25 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        [1m[33m18.633 s[39m[22m
+[2mRan all test suites[22m[2m.[22m
