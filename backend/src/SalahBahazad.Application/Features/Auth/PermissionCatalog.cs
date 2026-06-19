@@ -29,8 +29,11 @@ public static class PermissionCatalog
     [
         Permission.StudentsRead, Permission.StudentsApprove, Permission.StudentsReject,
         Permission.StudentsEdit, Permission.StudentsDeviceClear,
-        Permission.SessionsRead,
-        Permission.CodesRead,
+        // Assistants author/maintain session content (operational); publishing to the catalogue and
+        // deleting stay Teacher-only (administrative) — FR-PLAT-AUTH-007, FR-PLAT-ROLE-003.
+        Permission.SessionsRead, Permission.SessionsCreate, Permission.SessionsEdit,
+		Permission.QuestionsRead, Permission.QuestionsCreate, Permission.QuestionsEdit, Permission.QuestionsDelete,
+		Permission.CodesRead,
         Permission.EnrollmentsRead, Permission.EnrollmentsUnlock,
         Permission.QuestionsRead,
         Permission.TaxonomyRead,

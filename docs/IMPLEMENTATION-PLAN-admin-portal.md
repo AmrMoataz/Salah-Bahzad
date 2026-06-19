@@ -117,7 +117,14 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
 ### Phase 3 — Sessions, content & question bank
 - **Backend:** Session aggregate (details, 0–365 validity, grade/specialization, draft/published/archived) (`FR-PLAT-SES-001/008`); videos w/ per-video access count + **R2 upload pipeline** + transcode-to-HLS job **seam** (`FR-PLAT-SES-002`, `FR-PLAT-VID-007`, `FR-PLAT-AST-001`); materials in R2 (`FR-PLAT-SES-003`); prerequisite, no cycles (`FR-PLAT-SES-004`); quiz settings (`FR-PLAT-SES-006`); question bank — MCQ, LaTeX and/or image, variations, quiz-eligible flag, assignment-only hint, **snapshot-on-edit** (`FR-PLAT-QB-001..006`, `FR-PLAT-SES-007`).
 - **Frontend:** Sessions list; Session create/edit (videos + access count, materials, prerequisite picker, quiz settings, publish); Session detail (tabbed); **Question editor** (LaTeX live preview + image upload, variations, flags); Quiz settings with bank validation (`FR-ADM-QZ-002`).
-- **Exit:** author a full session with videos, materials, a question bank, and a gating quiz config.
+- **Exit:** ✅ author a full session with videos, materials, a question bank, and a gating quiz config.
+  **Met (2026-06-19):** the wiring stream connected both streams against the running Aspire stack — an
+  end-to-end smoke (create → thumbnail → video [→ `Ready` via the transcode stub] → material [+ signed-URL
+  download] → LaTeX/image question + options + variation → quiz settings → prerequisite → publish) passed;
+  the publish gate (`FR-ADM-QZ-002`: quiz over-count → 409) and server-side default-deny (Assistant → 403,
+  anonymous → 401) were verified live; every mutation wrote a hash-chained `AuditEntry` and private media is
+  stored as R2 object keys only (short-lived signed URLs on read). Gates green: `dotnet test -c Release`
+  (113 unit + 48 integration) and `nx build admin-portal` + `nx test admin-portal-feature-sessions` (25).
 
 ### Phase 4 — Enrollment, codes & payments seam
 - **Backend:** Code batches — Teacher-only generate, **Excel export**, lifecycle disable/enable/delete (soft), register with full usage join (`FR-PLAT-COD-001..006`, `FR-ADM-COD-*`, fixes issue #1); enrollment by code (value==price, one-shot) + **staff unlock** + **refund/revoke** + re-enroll/extend resets counters (`FR-PLAT-ENR-001..008`); payment abstraction + `PaymentTransaction` seam, gateway disabled (`FR-PLAT-PAY-001/002`); enrollment side-effects: generate assignment, provision video counters, generate prerequisite quiz (`FR-PLAT-ENR-005`).

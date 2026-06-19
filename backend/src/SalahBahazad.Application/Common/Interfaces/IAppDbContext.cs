@@ -19,6 +19,14 @@ public interface IAppDbContext
     DbSet<Subject> Subjects { get; }
     DbSet<Specialization> Specializations { get; }
 
+    // Sessions & content (tenant-owned) — FR-PLAT-SES-*, FR-ADM-SES-*
+    DbSet<Session> Sessions { get; }
+    DbSet<SessionVideo> SessionVideos { get; }
+    DbSet<SessionMaterial> SessionMaterials { get; }
+
+    // Question bank (tenant-owned) — FR-PLAT-QB-*, FR-ADM-QB-*
+    DbSet<Question> Questions { get; }
+
     // Location reference data (global, seeded, read-only) — FR-PLAT-TAX-003
     DbSet<City> Cities { get; }
     DbSet<Region> Regions { get; }

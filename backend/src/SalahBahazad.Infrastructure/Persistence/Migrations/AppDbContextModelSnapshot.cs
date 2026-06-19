@@ -371,6 +371,102 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                     b.ToTable("grades", (string)null);
                 });
 
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Question", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BodyLatex")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("HintUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ImageObjectKey")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsValidForQuiz")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Mark")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId");
+
+                    b.HasIndex("SessionId", "IsValidForQuiz");
+
+                    b.ToTable("questions", (string)null);
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.QuestionVariation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BodyLatex")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ImageObjectKey")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("question_variations", (string)null);
+                });
+
             modelBuilder.Entity("SalahBahazad.Domain.Entities.Region", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3578,6 +3674,182 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<Guid>("GradeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid?>("PrerequisiteSessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<Guid>("SpecializationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ThumbnailObjectKey")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ValidityDays")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeId");
+
+                    b.HasIndex("PrerequisiteSessionId");
+
+                    b.HasIndex("SpecializationId");
+
+                    b.HasIndex("TenantId", "GradeId");
+
+                    b.HasIndex("TenantId", "Status");
+
+                    b.ToTable("sessions", (string)null);
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.SessionMaterial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(260)
+                        .HasColumnType("character varying(260)");
+
+                    b.Property<string>("ObjectKey")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId");
+
+                    b.ToTable("session_materials", (string)null);
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.SessionVideo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AccessCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("HlsManifestKey")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<int>("LengthMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProcessingStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SourceObjectKey")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId", "Order");
+
+                    b.ToTable("session_videos", (string)null);
+                });
+
             modelBuilder.Entity("SalahBahazad.Domain.Entities.Specialization", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3956,11 +4228,162 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                     b.ToTable("tenants", (string)null);
                 });
 
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Question", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Session", null)
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("SalahBahazad.Domain.Entities.QuestionOption", "Options", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<bool>("IsCorrect")
+                                .HasColumnType("boolean");
+
+                            b1.Property<int>("Order")
+                                .HasColumnType("integer")
+                                .HasColumnName("DisplayOrder");
+
+                            b1.Property<Guid>("QuestionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Text")
+                                .IsRequired()
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("QuestionId");
+
+                            b1.ToTable("question_options", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuestionId");
+                        });
+
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.QuestionVariation", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Question", null)
+                        .WithMany("Variations")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("SalahBahazad.Domain.Entities.QuestionOption", "Options", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<bool>("IsCorrect")
+                                .HasColumnType("boolean");
+
+                            b1.Property<int>("Order")
+                                .HasColumnType("integer")
+                                .HasColumnName("DisplayOrder");
+
+                            b1.Property<Guid>("QuestionVariationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Text")
+                                .IsRequired()
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("QuestionVariationId");
+
+                            b1.ToTable("question_variation_options", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuestionVariationId");
+                        });
+
+                    b.Navigation("Options");
+                });
+
             modelBuilder.Entity("SalahBahazad.Domain.Entities.Region", b =>
                 {
                     b.HasOne("SalahBahazad.Domain.Entities.City", null)
                         .WithMany()
                         .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Session", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Grade", null)
+                        .WithMany()
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SalahBahazad.Domain.Entities.Session", null)
+                        .WithMany()
+                        .HasForeignKey("PrerequisiteSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SalahBahazad.Domain.Entities.Specialization", null)
+                        .WithMany()
+                        .HasForeignKey("SpecializationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("SalahBahazad.Domain.Entities.QuizSetting", "QuizSetting", b1 =>
+                        {
+                            b1.Property<Guid>("SessionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("AttemptCount")
+                                .HasColumnType("integer")
+                                .HasColumnName("QuizAttemptCount");
+
+                            b1.Property<int>("MinPassPercent")
+                                .HasColumnType("integer")
+                                .HasColumnName("QuizMinPassPercent");
+
+                            b1.Property<int>("QuestionCount")
+                                .HasColumnType("integer")
+                                .HasColumnName("QuizQuestionCount");
+
+                            b1.Property<int>("TimeLimitMinutes")
+                                .HasColumnType("integer")
+                                .HasColumnName("QuizTimeLimitMinutes");
+
+                            b1.HasKey("SessionId");
+
+                            b1.ToTable("sessions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SessionId");
+                        });
+
+                    b.Navigation("QuizSetting");
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.SessionMaterial", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Session", null)
+                        .WithMany("Materials")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.SessionVideo", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Session", null)
+                        .WithMany("Videos")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -4002,6 +4425,18 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Question", b =>
+                {
+                    b.Navigation("Variations");
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.Session", b =>
+                {
+                    b.Navigation("Materials");
+
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }

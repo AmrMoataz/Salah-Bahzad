@@ -39,6 +39,9 @@ public static class InfrastructureServiceExtensions
         // Explicit audit writer for read-access / anonymous entries the interceptor cannot capture.
         services.AddScoped<IAuditWriter, AuditWriter>();
 
+        // Video transcode seam — stubbed in Phase 3 (marks Ready); Hangfire + HLS is Phase 5.
+        services.AddScoped<IVideoProcessingQueue, StubVideoProcessingQueue>();
+
         // EF Core + PostgreSQL
         services.AddDbContext<AppDbContext>((sp, opts) =>
         {

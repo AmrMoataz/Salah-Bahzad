@@ -40,6 +40,41 @@ export const appRoutes: Routes = [
           import('@sb/admin-portal/feature-students').then((m) => m.StudentDetailComponent),
       },
       {
+        path: 'sessions',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.SessionListComponent),
+      },
+      {
+        path: 'sessions/new',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.SessionFormComponent),
+      },
+      {
+        path: 'sessions/:id/edit',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.SessionFormComponent),
+      },
+      {
+        path: 'sessions/:id/quiz-settings',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.QuizSettingsComponent),
+      },
+      {
+        path: 'sessions/:id/questions/new',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.QuestionEditorComponent),
+      },
+      {
+        path: 'sessions/:id/questions/:questionId/edit',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.QuestionEditorComponent),
+      },
+      {
+        path: 'sessions/:id',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-sessions').then((m) => m.SessionDetailComponent),
+      },
+      {
         path: 'staff',
         loadComponent: () =>
           import('@sb/admin-portal/feature-staff').then((m) => m.StaffListComponent),

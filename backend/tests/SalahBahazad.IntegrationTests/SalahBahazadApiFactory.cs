@@ -212,6 +212,75 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         return staff;
     }
 
+    public async Task<Subject> SeedSubjectAsync(Guid tenantId, string? name = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var subject = Subject.Create(tenantId, name ?? $"Subject {Guid.NewGuid():N}");
+        db.Subjects.Add(subject);
+        await db.SaveChangesAsync();
+        return subject;
+    }
+
+    public async Task<Specialization> SeedSpecializationAsync(Guid tenantId, Guid subjectId, string? name = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var specialization = Specialization.Create(tenantId, subjectId, name ?? $"Spec {Guid.NewGuid():N}");
+        db.Specializations.Add(specialization);
+        await db.SaveChangesAsync();
+        return specialization;
+    }
+
+    /// <summary>Seeds a grade + subject + specialization for a tenant and returns their ids.</summary>
+    public async Task<(Guid GradeId, Guid SubjectId, Guid SpecializationId)> SeedTaxonomyAsync(Guid tenantId)
+    {
+        var grade = await SeedGradeAsync(tenantId);
+        var subject = await SeedSubjectAsync(tenantId);
+        var specialization = await SeedSpecializationAsync(tenantId, subject.Id);
+        return (grade.Id, subject.Id, specialization.Id);
+    }
+
+    public async Task<Session> SeedSessionAsync(
+        Guid tenantId,
+        Guid gradeId,
+        Guid specializationId,
+        SessionStatus status = SessionStatus.Draft,
+        string? title = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var session = Session.Create(
+            tenantId, title ?? $"Session {Guid.NewGuid():N}", "Seeded session", 100m, 90, gradeId, specializationId);
+
+        switch (status)
+        {
+            case SessionStatus.Published:
+                session.Publish();
+                break;
+            case SessionStatus.Archived:
+                session.Archive();
+                break;
+        }
+
+        db.Sessions.Add(session);
+        await db.SaveChangesAsync(); // no HTTP context → tenant resolves to Empty → no audit rows
+        return session;
+    }
+
+    public async Task<Question> SeedQuestionAsync(
+        Guid tenantId, Guid sessionId, bool isValidForQuiz = true, string? bodyLatex = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var question = Question.Create(
+            tenantId, sessionId, bodyLatex ?? "x^2 + 1", 1, isValidForQuiz, null,
+            [new QuestionOptionDraft("A", true), new QuestionOptionDraft("B", false)]);
+        db.Questions.Add(question);
+        await db.SaveChangesAsync();
+        return question;
+    }
+
     public async Task<AuditEntry?> LatestStaffAuditAsync(Guid tenantId, string action)
         => await LatestAuditAsync(tenantId, nameof(Staff), action);
 

@@ -35,6 +35,14 @@ public sealed class AppDbContext(
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Specialization> Specializations => Set<Specialization>();
 
+    // Sessions & content (tenant-owned) — FR-PLAT-SES-*, FR-ADM-SES-*
+    public DbSet<Session> Sessions => Set<Session>();
+    public DbSet<SessionVideo> SessionVideos => Set<SessionVideo>();
+    public DbSet<SessionMaterial> SessionMaterials => Set<SessionMaterial>();
+
+    // Question bank (tenant-owned) — FR-PLAT-QB-*, FR-ADM-QB-*
+    public DbSet<Question> Questions => Set<Question>();
+
     // Location reference data (global, seeded) — FR-PLAT-TAX-003
     public DbSet<City> Cities => Set<City>();
     public DbSet<Region> Regions => Set<Region>();
