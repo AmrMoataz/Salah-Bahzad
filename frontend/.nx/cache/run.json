@@ -1,8 +1,8 @@
 {
   "run": {
     "command": "nx build admin-portal",
-    "startTime": "2026-06-19T00:40:15.746Z",
-    "endTime": "2026-06-19T00:40:38.988Z",
+    "startTime": "2026-06-19T10:29:50.901Z",
+    "endTime": "2026-06-19T10:29:56.006Z",
     "inner": false
   },
   "tasks": [
@@ -10,9 +10,9 @@
       "taskId": "admin-portal:build:production",
       "target": "build",
       "projectName": "admin-portal",
-      "hash": "15687140186893099234",
-      "startTime": "2026-06-19T00:40:15.761Z",
-      "endTime": "2026-06-19T00:40:38.957Z",
+      "hash": "5690618048236820973",
+      "startTime": "2026-06-19T10:29:50.921Z",
+      "endTime": "2026-06-19T10:29:55.964Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

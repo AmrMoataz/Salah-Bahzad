@@ -26,6 +26,25 @@ public sealed class AppDbContext(
     public DbSet<Staff> Staff => Set<Staff>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
+    // Taxonomy (tenant-owned) — FR-PLAT-TAX-001
+    public DbSet<Grade> Grades => Set<Grade>();
+    public DbSet<Subject> Subjects => Set<Subject>();
+    public DbSet<Specialization> Specializations => Set<Specialization>();
+
+    // Location reference data (global, seeded) — FR-PLAT-TAX-003
+    public DbSet<City> Cities => Set<City>();
+    public DbSet<Region> Regions => Set<Region>();
+
+    /// <summary>
+    /// Current tenant for the global query filter. The filter references THIS context property (not the
+    /// resolver directly): EF Core caches the model once per context type, but rebinds context-instance
+    /// references in a query filter to the <b>current executing context</b> per query — so each request's
+    /// own scoped resolver is read, never a stale captured one. Referencing the scoped service directly
+    /// (Expression.Constant(resolver)) instead let EF bake the first request's tenant into the cached
+    /// query plan and leak it across tenants (NFR-SEC-010).
+    /// </summary>
+    public Guid CurrentTenantId => tenantResolver.TenantId;
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(auditInterceptor);
@@ -111,11 +130,13 @@ public sealed class AppDbContext(
 
             if (isTenantOwned)
             {
-                // e.TenantId == tenantResolver.TenantId  (resolver read per-query, not at model build)
+                // e.TenantId == this.CurrentTenantId. Referencing the context property (not the resolver
+                // constant) lets EF rebind to the current context per query, so the tenant is re-read each
+                // execution rather than baked into the cached query plan (see CurrentTenantId remarks).
                 var entityTenant = Expression.Property(parameter, nameof(ITenantOwned.TenantId));
-                var resolverTenant = Expression.Property(
-                    Expression.Constant(tenantResolver), nameof(ICurrentTenantResolver.TenantId));
-                body = Expression.Equal(entityTenant, resolverTenant);
+                var contextTenant = Expression.Property(
+                    Expression.Constant(this), nameof(CurrentTenantId));
+                body = Expression.Equal(entityTenant, contextTenant);
             }
 
             if (isSoftDeletable)

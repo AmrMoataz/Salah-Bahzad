@@ -127,12 +127,16 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
     }
 
     public async Task<AuditEntry?> LatestStaffAuditAsync(Guid tenantId, string action)
+        => await LatestAuditAsync(tenantId, nameof(Staff), action);
+
+    /// <summary>Most recent audit entry of a given entity type + action within a tenant (most recent Id wins).</summary>
+    public async Task<AuditEntry?> LatestAuditAsync(Guid tenantId, string entityType, string action)
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return await db.AuditEntries
-            .Where(a => a.TenantId == tenantId && a.EntityType == nameof(Staff) && a.Action == action)
-            .OrderByDescending(a => a.OccurredAtUtc)
+            .Where(a => a.TenantId == tenantId && a.EntityType == entityType && a.Action == action)
+            .OrderByDescending(a => a.Id)
             .FirstOrDefaultAsync();
     }
 }

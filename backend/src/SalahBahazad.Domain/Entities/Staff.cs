@@ -56,6 +56,16 @@ public sealed class Staff : TenantEntityBase, ISoftDeletable
         Email = email.Trim().ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Self-service display-name change (Settings → Profile, FR-ADM-SET-001). The email is the
+    /// Firebase sign-in identity and is intentionally not editable here.
+    /// </summary>
+    public void UpdateDisplayName(string displayName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
+        DisplayName = displayName.Trim();
+    }
+
     public void UpdateRole(StaffRole newRole, StaffRole actorRole)
     {
         if (newRole > actorRole)

@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { Auth, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AuthState, AuthTokenResponse, StaffInfo } from './auth.models';
@@ -69,6 +69,35 @@ export class AuthStore {
     await signOut(this.#firebaseAuth);
     this.#clearSession();
     await this.#router.navigate(['/login']);
+  }
+
+  /**
+   * Sends a Firebase password-reset email to the signed-in user's address. Password management is
+   * delegated entirely to Firebase self-service — the platform stores no passwords (FR-PLAT-AUTH-009).
+   */
+  async requestPasswordReset(): Promise<void> {
+    const email = this.#state().staff?.email;
+    if (!email) throw new Error('No signed-in user.');
+    await sendPasswordResetEmail(this.#firebaseAuth, email);
+  }
+
+  /**
+   * Persists a new display name for the signed-in staff member (Settings → Profile, FR-ADM-SET-001)
+   * and refreshes the cached identity so the new name appears across the app immediately. Email and
+   * password stay managed by the authentication provider (Firebase) and are not changed here.
+   */
+  async updateDisplayName(displayName: string): Promise<void> {
+    const apiUrl = this.#getApiUrl();
+    const updated = await firstValueFrom(
+      this.#http.put<{ displayName: string }>(`${apiUrl}/api/profile`, { displayName }),
+    );
+
+    const current = this.#state().staff;
+    if (!current) return;
+
+    const staff: StaffInfo = { ...current, displayName: updated.displayName };
+    sessionStorage.setItem('sb_staff', JSON.stringify(staff));
+    this.#state.update((s) => ({ ...s, staff }));
   }
 
   restoreSession(): boolean {

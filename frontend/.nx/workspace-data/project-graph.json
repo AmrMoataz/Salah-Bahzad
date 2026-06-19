@@ -18,6 +18,78 @@
         "targets": {}
       }
     },
+    "admin-portal-feature-settings": {
+      "name": "admin-portal-feature-settings",
+      "type": "lib",
+      "data": {
+        "root": "libs/admin-portal/feature-settings",
+        "name": "admin-portal-feature-settings",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/admin-portal/feature-settings/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:admin-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/admin-portal/feature-settings"
+            ],
+            "options": {
+              "jestConfig": "libs/admin-portal/feature-settings/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "admin-portal-feature-taxonomy": {
+      "name": "admin-portal-feature-taxonomy",
+      "type": "lib",
+      "data": {
+        "root": "libs/admin-portal/feature-taxonomy",
+        "name": "admin-portal-feature-taxonomy",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/admin-portal/feature-taxonomy/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:admin-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/admin-portal/feature-taxonomy"
+            ],
+            "options": {
+              "jestConfig": "libs/admin-portal/feature-taxonomy/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-shell": {
       "name": "admin-portal-feature-shell",
       "type": "lib",
@@ -15512,6 +15584,70 @@
       {
         "source": "admin-portal-feature-dashboard",
         "target": "shared-data-access",
+        "type": "static"
+      }
+    ],
+    "admin-portal-feature-settings": [
+      {
+        "source": "admin-portal-feature-settings",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-settings",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-settings",
+        "target": "shared-data-access",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-settings",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-settings",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
+    "admin-portal-feature-taxonomy": [
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "shared-data-access",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-taxonomy",
+        "target": "npm:jest-preset-angular",
         "type": "static"
       }
     ],
@@ -37847,5 +37983,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1781829797107
+  "computedAt": 1781865115817
 }

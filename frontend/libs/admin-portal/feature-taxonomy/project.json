@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "admin-portal-feature-taxonomy",
+  "projectType": "library",
+  "sourceRoot": "libs/admin-portal/feature-taxonomy/src",
+  "prefix": "sb",
+  "tags": ["scope:admin-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/admin-portal/feature-taxonomy"],
+      "options": {
+        "jestConfig": "libs/admin-portal/feature-taxonomy/jest.config.ts"
+      }
+    }
+  }
+}

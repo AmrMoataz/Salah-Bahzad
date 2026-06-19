@@ -29,6 +29,16 @@ export const appRoutes: Routes = [
         loadComponent: () =>
           import('@sb/admin-portal/feature-staff').then((m) => m.StaffListComponent),
       },
+      {
+        path: 'taxonomy',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-taxonomy').then((m) => m.TaxonomyPageComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-settings').then((m) => m.SettingsPageComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

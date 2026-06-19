@@ -10,6 +10,15 @@ public interface IAppDbContext
     DbSet<Staff> Staff { get; }
     DbSet<AuditEntry> AuditEntries { get; }
 
+    // Taxonomy (tenant-owned, dynamic) — FR-PLAT-TAX-001
+    DbSet<Grade> Grades { get; }
+    DbSet<Subject> Subjects { get; }
+    DbSet<Specialization> Specializations { get; }
+
+    // Location reference data (global, seeded, read-only) — FR-PLAT-TAX-003
+    DbSet<City> Cities { get; }
+    DbSet<Region> Regions { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
