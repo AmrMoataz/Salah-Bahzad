@@ -20,10 +20,14 @@ public interface IFileStorage
         string key, Stream content, string contentType, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Issues a short-lived pre-signed GET URL for <paramref name="key"/>, valid for
-    /// <paramref name="ttl"/>. The caller MUST perform the authorisation check and write the access
-    /// audit entry <b>before</b> calling this (FR-PLAT-AST-003, NFR-PRIV-001/002).
+    /// Issues a short-lived pre-signed GET URL for <paramref name="key"/>. When <paramref name="ttl"/>
+    /// is null the configured default TTL is used (kept short for minors' PII). The caller MUST perform
+    /// the authorisation check and write the access audit entry <b>before</b> calling this
+    /// (FR-PLAT-AST-003, NFR-PRIV-001/002).
     /// </summary>
-    Task<string> GetSignedReadUrlAsync(
-        string key, TimeSpan ttl, CancellationToken cancellationToken = default);
+    Task<SignedUrl> GetSignedReadUrlAsync(
+        string key, TimeSpan? ttl = null, CancellationToken cancellationToken = default);
 }
+
+/// <summary>A pre-signed read URL and the instant it expires.</summary>
+public sealed record SignedUrl(string Url, DateTimeOffset ExpiresAtUtc);

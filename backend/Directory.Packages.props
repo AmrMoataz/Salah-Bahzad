@@ -83,6 +83,7 @@
     <PackageVersion Include="MockQueryable.NSubstitute" Version="7.0.3" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.3.0" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.3.0" />
+    <PackageVersion Include="Testcontainers.Minio" Version="4.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
     <PackageVersion Include="Verify.Xunit" Version="29.0.0" />
     <PackageVersion Include="Verify.AspNetCore" Version="7.0.0" />

@@ -30,20 +30,35 @@ internal sealed class R2FileStorage(IAmazonS3 s3, R2Options options, TimeProvide
         await s3.PutObjectAsync(request, cancellationToken);
     }
 
-    public Task<string> GetSignedReadUrlAsync(
-        string key, TimeSpan ttl, CancellationToken cancellationToken = default)
+    public async Task<SignedUrl> GetSignedReadUrlAsync(
+        string key, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        var effectiveTtl = ttl ?? TimeSpan.FromSeconds(options.SignedUrlTtlSeconds);
+        // Expiry computed from the injected clock for deterministic, testable TTLs.
+        var expiresAt = clock.GetUtcNow().Add(effectiveTtl);
 
         var request = new GetPreSignedUrlRequest
         {
             BucketName = options.BucketPrivate,
             Key = key,
             Verb = HttpVerb.GET,
-            // Expiry computed from the injected clock for deterministic, testable TTLs.
-            Expires = clock.GetUtcNow().Add(ttl).UtcDateTime,
+            Expires = expiresAt.UtcDateTime,
         };
 
-        return s3.GetPreSignedURLAsync(request);
+        var url = await s3.GetPreSignedURLAsync(request);
+
+        // The AWS SDK v4 presigner emits an https URL even when the endpoint is http (e.g. local
+        // MinIO), which makes the link unreachable in dev/tests. The SigV4 signature covers the host
+        // header, not the scheme, so aligning the scheme with the configured endpoint keeps it valid.
+        // R2 is https in staging/prod, so this is a no-op there.
+        if (options.Endpoint.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            && url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            url = string.Concat("http://", url.AsSpan("https://".Length));
+        }
+
+        return new SignedUrl(url, expiresAt);
     }
 }

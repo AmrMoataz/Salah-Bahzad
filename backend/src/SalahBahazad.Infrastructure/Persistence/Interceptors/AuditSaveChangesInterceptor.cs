@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -114,6 +112,22 @@ public sealed class AuditSaveChangesInterceptor(
                 ? null
                 : Serialize(entry.CurrentValues.ToObject());
 
+            var summary = $"{action} {entityType}";
+
+            // Semantic enrichment: prefer a buffered IAuditableDomainEvent's action/summary so this
+            // single chained row reads meaningfully (e.g. "StudentRejected: duplicate account"). The
+            // field-diff above still records the underlying change; events are still buffered here
+            // because dispatch happens post-commit (FR-PLAT-AUD-002).
+            if (entry.Entity is EntityBase entity)
+            {
+                var semantic = entity.DomainEvents.OfType<IAuditableDomainEvent>().FirstOrDefault();
+                if (semantic is not null)
+                {
+                    action = semantic.AuditAction;
+                    summary = semantic.AuditSummary;
+                }
+            }
+
             var auditEntry = AuditEntry.Create(
                 tenantId: tenantId,
                 action: action,
@@ -123,7 +137,7 @@ public sealed class AuditSaveChangesInterceptor(
                 actorId: actorId,
                 actorRole: actorRole,
                 actorType: actorId.HasValue ? "Staff" : "System",
-                summary: $"{action} {entityType}",
+                summary: summary,
                 beforeJson: beforeJson,
                 afterJson: afterJson,
                 ipAddress: ipAddress,
@@ -131,35 +145,13 @@ public sealed class AuditSaveChangesInterceptor(
                 deviceId: deviceId,
                 prevHash: prevHash);
 
-            var hash = ComputeHash(prevHash, auditEntry);
+            var hash = AuditHasher.ComputeHash(prevHash, auditEntry);
             auditEntry.SetHash(hash);
             context.Set<AuditEntry>().Add(auditEntry);
 
             // Chain forward so multiple entries in one save are linked in order.
             prevHash = hash;
         }
-    }
-
-    /// <summary>
-    /// SHA-256 over the previous hash plus this entry's immutable content. Any tampering (edit,
-    /// delete, re-order, back-date) changes a hash and breaks every downstream link.
-    /// </summary>
-    private static string ComputeHash(string? prevHash, AuditEntry entry)
-    {
-        var payload = string.Join('|',
-            prevHash ?? string.Empty,
-            entry.TenantId,
-            entry.Action,
-            entry.EntityType,
-            entry.EntityId?.ToString() ?? string.Empty,
-            entry.ActorId?.ToString() ?? string.Empty,
-            entry.ActorType,
-            entry.OccurredAtUtc.UtcDateTime.ToString("O"),
-            entry.BeforeJson ?? string.Empty,
-            entry.AfterJson ?? string.Empty);
-
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(payload));
-        return Convert.ToHexStringLower(hash);
     }
 
     private static string? Serialize(object? obj)

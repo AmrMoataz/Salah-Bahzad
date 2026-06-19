@@ -13,6 +13,8 @@ using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
 using SalahBahazad.Infrastructure.Persistence;
+using SalahBahazad.Infrastructure.Services;
+using Testcontainers.Minio;
 using Testcontainers.PostgreSql;
 
 namespace SalahBahazad.IntegrationTests;
@@ -33,21 +35,29 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         .WithImage("postgres:16-alpine")
         .Build();
 
+    // MinIO emulates Cloudflare R2 so the IFileStorage → R2FileStorage path is exercised offline.
+    private readonly MinioContainer _minio = new MinioBuilder().Build();
+
+    public const string TestBucket = "sb-test-private";
+
     public async Task InitializeAsync()
     {
-        await _postgres.StartAsync();
+        await Task.WhenAll(_postgres.StartAsync(), _minio.StartAsync());
 
         // Touching Services builds the host (running ConfigureWebHost, which needs the started
-        // container's connection string), then we apply the real migrations.
+        // containers' connection details), then we apply the real migrations and create the bucket.
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await db.Database.MigrateAsync();
+
+        await ObjectStorageInitializer.EnsureBucketsAsync(Services);
     }
 
     async Task IAsyncLifetime.DisposeAsync()
     {
         await base.DisposeAsync();
         await _postgres.DisposeAsync();
+        await _minio.DisposeAsync();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -57,6 +67,13 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         builder.UseSetting("Jwt:Secret", JwtSecret);
         builder.UseSetting("Jwt:Issuer", JwtIssuer);
         builder.UseSetting("Jwt:Audience", JwtAudience);
+
+        // Point object storage at the MinIO container (the real R2FileStorage path).
+        builder.UseSetting("R2:Endpoint", _minio.GetConnectionString());
+        builder.UseSetting("R2:AccessKeyId", _minio.GetAccessKey());
+        builder.UseSetting("R2:SecretAccessKey", _minio.GetSecretKey());
+        builder.UseSetting("R2:BucketPrivate", TestBucket);
+        builder.UseSetting("R2:SignedUrlTtlSeconds", "120");
 
         builder.ConfigureTestServices(services =>
         {
@@ -101,14 +118,83 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
     // ── Seeding helpers ──────────────────────────────────────────────────────
     // No HTTP context in these scopes → the tenant resolver yields Guid.Empty, so the audit
     // interceptor is a no-op and seeding never writes spurious AuditEntry rows.
-    public async Task<Guid> SeedTenantAsync()
+    public async Task<Guid> SeedTenantAsync() => (await SeedTenantEntityAsync()).Id;
+
+    /// <summary>Seeds a tenant and returns the entity (callers needing the slug, e.g. registration).</summary>
+    public async Task<Tenant> SeedTenantEntityAsync()
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var tenant = Tenant.Create($"Tenant {Guid.NewGuid():N}", $"t-{Guid.NewGuid():N}");
         db.Tenants.Add(tenant);
         await db.SaveChangesAsync();
-        return tenant.Id;
+        return tenant;
+    }
+
+    public async Task<Grade> SeedGradeAsync(Guid tenantId, string? name = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var grade = Grade.Create(tenantId, name ?? $"Grade {Guid.NewGuid():N}");
+        db.Grades.Add(grade);
+        await db.SaveChangesAsync();
+        return grade;
+    }
+
+    /// <summary>Returns a seeded (global) city + one of its regions from the Egypt reference dataset.</summary>
+    public async Task<(Guid CityId, Guid RegionId)> GetSeedLocationAsync()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var region = await db.Regions.AsNoTracking().FirstAsync();
+        return (region.CityId, region.Id);
+    }
+
+    public async Task<Student> SeedStudentAsync(
+        Guid tenantId,
+        Guid gradeId,
+        Guid cityId,
+        Guid regionId,
+        StudentStatus status = StudentStatus.Pending,
+        string? idImageKey = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var student = Student.Register(
+            tenantId, $"uid-{Guid.NewGuid():N}", "Seed Student", "01000000000", null,
+            gradeId, cityId, regionId, "Seed School", "v1", DateTimeOffset.UtcNow);
+
+        switch (status)
+        {
+            case StudentStatus.Active:
+                student.Approve();
+                break;
+            case StudentStatus.Rejected:
+                student.Reject("seeded rejection");
+                break;
+            case StudentStatus.Inactive:
+                student.Approve();
+                student.Deactivate();
+                break;
+        }
+
+        if (idImageKey is not null)
+            student.AttachIdImage(idImageKey);
+
+        db.Students.Add(student);
+        await db.SaveChangesAsync(); // no HTTP context → tenant resolves to Empty → no audit rows
+        return student;
+    }
+
+    public async Task<StudentDevice> SeedDeviceAsync(Guid tenantId, Guid studentId)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var device = StudentDevice.Bind(
+            tenantId, studentId, $"hash-{Guid.NewGuid():N}", "iOS 18 · Safari", DateTimeOffset.UtcNow);
+        db.StudentDevices.Add(device);
+        await db.SaveChangesAsync();
+        return device;
     }
 
     public async Task<Staff> SeedStaffAsync(Guid tenantId, StaffRole role, string? email = null)

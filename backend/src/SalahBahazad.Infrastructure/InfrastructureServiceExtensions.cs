@@ -36,6 +36,9 @@ public static class InfrastructureServiceExtensions
         // Audit interceptor (scoped — needs resolver)
         services.AddScoped<AuditSaveChangesInterceptor>();
 
+        // Explicit audit writer for read-access / anonymous entries the interceptor cannot capture.
+        services.AddScoped<IAuditWriter, AuditWriter>();
+
         // EF Core + PostgreSQL
         services.AddDbContext<AppDbContext>((sp, opts) =>
         {
