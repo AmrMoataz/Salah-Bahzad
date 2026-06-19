@@ -17,6 +17,7 @@ internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder.HasIndex(s => new { s.TenantId, s.FirebaseUid }).IsUnique();
 
         builder.Property(s => s.FullName).HasMaxLength(200).IsRequired();
+        builder.Property(s => s.PhoneNumber).HasMaxLength(32).IsRequired();
         builder.Property(s => s.ParentPhonePrimary).HasMaxLength(32).IsRequired();
         builder.Property(s => s.ParentPhoneSecondary).HasMaxLength(32);
         builder.Property(s => s.SchoolName).HasMaxLength(200).IsRequired();

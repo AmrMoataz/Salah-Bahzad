@@ -5,15 +5,19 @@ using AuditEntryEntity = SalahBahazad.Domain.Entities.AuditEntry;
 
 namespace SalahBahazad.Application.Features.Students.DTOs;
 
-/// <summary>A student list row for the admin triage table (FR-ADM-STU-001).</summary>
+/// <summary>A student list row for the admin triage table (FR-ADM-STU-001). <see cref="ActiveDeviceSummary"/>
+/// is the bound device's label (or a generic placeholder) when one is active, else null.</summary>
 public sealed record StudentListDto(
     Guid Id,
     string FullName,
+    string PhoneNumber,
     StudentStatus Status,
     Guid GradeId,
     string? GradeName,
+    string? CityName,
     string SchoolName,
     string ParentPhonePrimary,
+    string? ActiveDeviceSummary,
     DateTimeOffset CreatedAtUtc,
     DateTimeOffset? LastSeenAtUtc);
 
@@ -32,6 +36,7 @@ public sealed record StudentDeviceDto(
 public sealed record StudentDetailDto(
     Guid Id,
     string FullName,
+    string PhoneNumber,
     StudentStatus Status,
     string? RejectionReason,
     Guid GradeId,
@@ -71,14 +76,18 @@ public sealed record StudentRegistrationResultDto(Guid StudentId, StudentStatus 
 /// <summary>Manual entity → DTO mappings (no AutoMapper, per backend/CLAUDE.md).</summary>
 public static class StudentMappings
 {
-    public static StudentListDto ToListDto(this StudentEntity s, string? gradeName) => new(
+    public static StudentListDto ToListDto(
+        this StudentEntity s, string? gradeName, string? cityName, string? activeDeviceSummary) => new(
         s.Id,
         s.FullName,
+        s.PhoneNumber,
         s.Status,
         s.GradeId,
         gradeName,
+        cityName,
         s.SchoolName,
         s.ParentPhonePrimary,
+        activeDeviceSummary,
         s.CreatedAtUtc,
         s.LastSeenAtUtc);
 
@@ -98,6 +107,7 @@ public static class StudentMappings
         StudentDeviceEntity? activeDevice) => new(
         s.Id,
         s.FullName,
+        s.PhoneNumber,
         s.Status,
         s.RejectionReason,
         s.GradeId,

@@ -168,7 +168,7 @@ internal sealed class StudentEndpoints : IEndpointGroup
         Guid id, [FromBody] UpdateStudentContactRequest request, ISender sender, CancellationToken cancellationToken)
         => Results.Ok(await sender.Send(
             new UpdateStudentContactCommand(
-                id, request.GradeId, request.ParentPhonePrimary, request.ParentPhoneSecondary),
+                id, request.GradeId, request.PhoneNumber, request.ParentPhonePrimary, request.ParentPhoneSecondary),
             cancellationToken));
 
     private static async Task<IResult> ClearDeviceAsync(
@@ -179,6 +179,7 @@ internal sealed class StudentEndpoints : IEndpointGroup
         [FromForm] string firebaseIdToken,
         [FromForm] string tenantSlug,
         [FromForm] string fullName,
+        [FromForm] string phoneNumber,
         [FromForm] string parentPhonePrimary,
         [FromForm] Guid gradeId,
         [FromForm] Guid cityId,
@@ -197,6 +198,7 @@ internal sealed class StudentEndpoints : IEndpointGroup
                 firebaseIdToken,
                 tenantSlug,
                 fullName,
+                phoneNumber,
                 parentPhonePrimary,
                 parentPhoneSecondary,
                 gradeId,
@@ -220,9 +222,9 @@ internal sealed record RejectStudentRequest(string Reason);
 /// <summary>Request body for activating/deactivating a student.</summary>
 internal sealed record SetStudentActiveRequest(bool IsActive);
 
-/// <summary>Request body for correcting a student's grade and parent contact numbers.</summary>
+/// <summary>Request body for correcting a student's grade and contact numbers.</summary>
 internal sealed record UpdateStudentContactRequest(
-    Guid GradeId, string ParentPhonePrimary, string? ParentPhoneSecondary);
+    Guid GradeId, string PhoneNumber, string ParentPhonePrimary, string? ParentPhoneSecondary);
 
 /// <summary>Request body for clearing a student's bound device.</summary>
 internal sealed record ClearStudentDeviceRequest(string Reason);
@@ -232,6 +234,7 @@ internal sealed record RegisterStudentForm(
     string FirebaseIdToken,
     string TenantSlug,
     string FullName,
+    string PhoneNumber,
     string ParentPhonePrimary,
     string? ParentPhoneSecondary,
     Guid GradeId,

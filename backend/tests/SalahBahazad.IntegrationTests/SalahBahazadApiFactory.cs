@@ -161,7 +161,7 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var student = Student.Register(
-            tenantId, $"uid-{Guid.NewGuid():N}", "Seed Student", "01000000000", null,
+            tenantId, $"uid-{Guid.NewGuid():N}", "Seed Student", "01055555555", "01000000000", null,
             gradeId, cityId, regionId, "Seed School", "v1", DateTimeOffset.UtcNow);
 
         switch (status)

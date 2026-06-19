@@ -11,6 +11,7 @@ public class StudentTests
         tenantId: Guid.NewGuid(),
         firebaseUid: "fb-uid",
         fullName: "  Mariam Adel  ",
+        phoneNumber: "  01099999999 ",
         parentPhonePrimary: "  01000000000 ",
         parentPhoneSecondary: "  ",
         gradeId: Guid.NewGuid(),
@@ -27,6 +28,7 @@ public class StudentTests
 
         student.Status.Should().Be(StudentStatus.Pending);
         student.FullName.Should().Be("Mariam Adel");
+        student.PhoneNumber.Should().Be("01099999999");
         student.ParentPhonePrimary.Should().Be("01000000000");
         student.ParentPhoneSecondary.Should().BeNull(); // blank → null
         student.SchoolName.Should().Be("Nile School");
@@ -42,7 +44,7 @@ public class StudentTests
     public void Register_throws_when_fullName_blank(string fullName)
     {
         var act = () => StudentEntity.Register(
-            Guid.NewGuid(), "fb", fullName, "0100", null,
+            Guid.NewGuid(), "fb", fullName, "0111", "0100", null,
             Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
 
         act.Should().Throw<ArgumentException>();
@@ -52,7 +54,7 @@ public class StudentTests
     public void Register_throws_when_grade_missing()
     {
         var act = () => StudentEntity.Register(
-            Guid.NewGuid(), "fb", "Name", "0100", null,
+            Guid.NewGuid(), "fb", "Name", "0111", "0100", null,
             Guid.Empty, Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
 
         act.Should().Throw<ArgumentException>();
@@ -166,9 +168,10 @@ public class StudentTests
         var student = NewPending();
         var newGrade = Guid.NewGuid();
 
-        student.UpdateContactInfo(newGrade, " 01111111111 ", " 01222222222 ");
+        student.UpdateContactInfo(newGrade, " 01999999999 ", " 01111111111 ", " 01222222222 ");
 
         student.GradeId.Should().Be(newGrade);
+        student.PhoneNumber.Should().Be("01999999999");
         student.ParentPhonePrimary.Should().Be("01111111111");
         student.ParentPhoneSecondary.Should().Be("01222222222");
     }
@@ -178,7 +181,7 @@ public class StudentTests
     {
         var student = NewPending();
 
-        var act = () => student.UpdateContactInfo(Guid.NewGuid(), "  ", null);
+        var act = () => student.UpdateContactInfo(Guid.NewGuid(), "0111", "  ", null);
 
         act.Should().Throw<ArgumentException>();
     }

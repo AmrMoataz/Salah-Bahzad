@@ -1,0 +1,32 @@
+> ng run admin-portal:build:production
+
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-6LKEBEV5.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m236.75 kB[39m[2m | [22m               [36m60.28 kB[39m
+[32mchunk-4KJRY3EB.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m151.17 kB[39m[2m | [22m               [36m44.99 kB[39m
+[32mchunk-EUEWGQFB.js[39m    [2m | [22m[2m-[22m            [2m | [22m [36m64.51 kB[39m[2m | [22m               [36m13.79 kB[39m
+[32mpolyfills-YMBILSHJ.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mchunk-NT722RRV.js[39m    [2m | [22m[2m-[22m            [2m | [22m  [36m8.57 kB[39m[2m | [22m                [36m2.70 kB[39m
+[32mstyles-RHIZSWYY.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m  [36m6.53 kB[39m[2m | [22m                [36m1.73 kB[39m
+[32mmain-GIG3X542.js[39m     [2m | [22m[2mmain[22m         [2m | [22m  [36m5.22 kB[39m[2m | [22m                [36m1.87 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m[1m[93m507.34 kB[39m[22m[2m | [22m              [1m136.70 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-GRCBXHSC.js[39m    [2m | [22m[2mbrowser[22m      [2m | [22m [36m67.57 kB[39m[2m | [22m               [36m17.73 kB[39m
+[32mchunk-72ALQB7P.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m52.02 kB[39m[2m | [22m               [36m10.79 kB[39m
+[32mchunk-UTBLUEKK.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m22.28 kB[39m[2m | [22m                [36m5.43 kB[39m
+[32mchunk-SZJWFS4O.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m19.37 kB[39m[2m | [22m                [36m5.41 kB[39m
+[32mchunk-Z4KOJOCH.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m18.37 kB[39m[2m | [22m                [36m4.60 kB[39m
+[32mchunk-MP2D4SXM.js[39m    [2m | [22m[2mindex[22m        [2m | [22m  [36m8.73 kB[39m[2m | [22m                [36m2.76 kB[39m
+[32mchunk-I2GVYGNK.js[39m    [2m | [22m[2mindex[22m        [2m | [22m  [36m5.17 kB[39m[2m | [22m                [36m1.81 kB[39m
+[32mchunk-CXHHHLWD.js[39m    [2m | [22m[2mindex[22m        [2m | [22m[36m183 bytes[39m[2m | [22m              [36m183 bytes[39m
+
+Application bundle generation complete. [6.943 seconds] - 2026-06-19T13:15:35.405Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 500.00 kB was not met by 7.34 kB with a total of 507.34 kB.[0m
+
+[39m[22m
+Output location: C:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\dist\apps\admin-portal
+

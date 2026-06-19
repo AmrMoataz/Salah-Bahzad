@@ -2,13 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
-import { AuthStore } from '@sb/shared/data-access';
+import { AuthStore, PendingApprovalsStore } from '@sb/shared/data-access';
+import { ToastOutletComponent } from '@sb/shared/ui';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { TopbarComponent } from '../topbar/topbar.component';
 import { NavGroup } from '../nav-item.model';
@@ -58,7 +60,7 @@ const ROUTE_META: Record<string, readonly [string, string]> = {
 @Component({
   selector: 'sb-shell',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, TopbarComponent],
+  imports: [RouterOutlet, SidebarComponent, TopbarComponent, ToastOutletComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="shell">
@@ -85,6 +87,8 @@ const ROUTE_META: Record<string, readonly [string, string]> = {
         </main>
       </div>
     </div>
+
+    <sb-toast-outlet />
   `,
   styles: [`
     .shell {
@@ -129,20 +133,36 @@ const ROUTE_META: Record<string, readonly [string, string]> = {
 export class ShellComponent {
   readonly #auth = inject(AuthStore);
   readonly #router = inject(Router);
+  readonly #pendingApprovals = inject(PendingApprovalsStore);
 
   readonly mobileNavOpen = signal(false);
+
+  /** Live pending-approvals count for the sidebar badge (hidden when zero). */
+  readonly approvalsBadge = (): number | null => this.#pendingApprovals.count() || null;
 
   /** Nav groups with permission- and role-gated items removed (empty groups dropped). */
   readonly navGroups = computed<NavGroup[]>(() =>
     NAV_GROUPS.map((group) => ({
       ...group,
-      items: group.items.filter((item) => {
-        if (item.permission && !this.#auth.hasPermission(item.permission)) return false;
-        if (item.teacherOnly && this.#auth.role() !== 'Teacher') return false;
-        return true;
-      }),
+      items: group.items
+        .filter((item) => {
+          if (item.permission && !this.#auth.hasPermission(item.permission)) return false;
+          if (item.teacherOnly && this.#auth.role() !== 'Teacher') return false;
+          return true;
+        })
+        .map((item) =>
+          item.route === '/approvals' ? { ...item, badgeSignal: this.approvalsBadge } : item,
+        ),
     })).filter((group) => group.items.length > 0),
   );
+
+  constructor() {
+    // Keep the badge live: re-read the server count on first load and on every navigation.
+    effect(() => {
+      this.#currentUrl();
+      void this.#pendingApprovals.refresh();
+    });
+  }
 
   readonly #currentUrl = toSignal(
     this.#router.events.pipe(

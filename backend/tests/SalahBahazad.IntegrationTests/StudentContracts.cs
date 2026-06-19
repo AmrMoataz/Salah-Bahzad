@@ -2,7 +2,7 @@ namespace SalahBahazad.IntegrationTests;
 
 /// <summary>Loosely-typed mirrors of the student API responses (kept separate from the production DTOs).</summary>
 public sealed record StudentListItem(
-    Guid Id, string FullName, string Status, Guid GradeId, string? GradeName, string SchoolName, string ParentPhonePrimary);
+    Guid Id, string FullName, string PhoneNumber, string Status, Guid GradeId, string? GradeName, string SchoolName, string ParentPhonePrimary);
 
 public sealed record PagedStudentResponse(List<StudentListItem> Items, int Total, int Page, int PageSize);
 
@@ -12,6 +12,7 @@ public sealed record StudentDeviceItem(
 public sealed record StudentDetailResponse(
     Guid Id,
     string FullName,
+    string PhoneNumber,
     string Status,
     string? RejectionReason,
     Guid GradeId,

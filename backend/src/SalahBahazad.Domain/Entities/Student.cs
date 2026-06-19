@@ -17,6 +17,9 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
     public string FirebaseUid { get; private set; } = string.Empty;
     public string FullName { get; private set; } = string.Empty;
 
+    /// <summary>The student's own contact phone number (FR-STU-REG-004).</summary>
+    public string PhoneNumber { get; private set; } = string.Empty;
+
     /// <summary>Required parent/guardian phone for supervision (FR-STU-REG-004).</summary>
     public string ParentPhonePrimary { get; private set; } = string.Empty;
 
@@ -69,6 +72,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         Guid tenantId,
         string firebaseUid,
         string fullName,
+        string phoneNumber,
         string parentPhonePrimary,
         string? parentPhoneSecondary,
         Guid gradeId,
@@ -80,6 +84,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(firebaseUid);
         ArgumentException.ThrowIfNullOrWhiteSpace(fullName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
         ArgumentException.ThrowIfNullOrWhiteSpace(parentPhonePrimary);
         ArgumentException.ThrowIfNullOrWhiteSpace(schoolName);
         ArgumentException.ThrowIfNullOrWhiteSpace(termsVersion);
@@ -91,6 +96,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         {
             FirebaseUid = firebaseUid,
             FullName = fullName.Trim(),
+            PhoneNumber = phoneNumber.Trim(),
             ParentPhonePrimary = parentPhonePrimary.Trim(),
             ParentPhoneSecondary = string.IsNullOrWhiteSpace(parentPhoneSecondary) ? null : parentPhoneSecondary.Trim(),
             GradeId = gradeId,
@@ -159,13 +165,16 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         AddDomainEvent(new StudentReactivatedEvent(Id));
     }
 
-    /// <summary>Staff correction of grade and parent contact numbers (FR-ADM-STU-005).</summary>
-    public void UpdateContactInfo(Guid gradeId, string parentPhonePrimary, string? parentPhoneSecondary)
+    /// <summary>Staff correction of grade and the student/parent contact numbers (FR-ADM-STU-005).</summary>
+    public void UpdateContactInfo(
+        Guid gradeId, string phoneNumber, string parentPhonePrimary, string? parentPhoneSecondary)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
         ArgumentException.ThrowIfNullOrWhiteSpace(parentPhonePrimary);
         if (gradeId == Guid.Empty) throw new ArgumentException("A student must have a grade.", nameof(gradeId));
 
         GradeId = gradeId;
+        PhoneNumber = phoneNumber.Trim();
         ParentPhonePrimary = parentPhonePrimary.Trim();
         ParentPhoneSecondary = string.IsNullOrWhiteSpace(parentPhoneSecondary) ? null : parentPhoneSecondary.Trim();
     }

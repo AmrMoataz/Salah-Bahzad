@@ -10,6 +10,9 @@ internal sealed class RegisterStudentValidator : AbstractValidator<RegisterStude
         RuleFor(x => x.TenantSlug).NotEmpty();
 
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.PhoneNumber)
+            .NotEmpty().WithMessage("A phone number is required.")
+            .MaximumLength(32);
         RuleFor(x => x.ParentPhonePrimary)
             .NotEmpty().WithMessage("A parent/guardian phone number is required.")
             .MaximumLength(32);

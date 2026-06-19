@@ -7,5 +7,6 @@ namespace SalahBahazad.Application.Features.Students.Commands.UpdateStudentConta
 public sealed record UpdateStudentContactCommand(
     Guid Id,
     Guid GradeId,
+    string PhoneNumber,
     string ParentPhonePrimary,
     string? ParentPhoneSecondary) : IRequest<StudentDetailDto>;

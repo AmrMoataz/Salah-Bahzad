@@ -20,7 +20,8 @@ internal sealed class UpdateStudentContactHandler(IAppDbContext db)
         if (!gradeExists)
             throw new NotFoundException("Grade", command.GradeId);
 
-        student.UpdateContactInfo(command.GradeId, command.ParentPhonePrimary, command.ParentPhoneSecondary);
+        student.UpdateContactInfo(
+            command.GradeId, command.PhoneNumber, command.ParentPhonePrimary, command.ParentPhoneSecondary);
         await db.SaveChangesAsync(cancellationToken);
 
         return await StudentDetailLoader.LoadAsync(db, student.Id, cancellationToken)

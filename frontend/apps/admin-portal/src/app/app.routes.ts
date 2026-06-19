@@ -25,6 +25,21 @@ export const appRoutes: Routes = [
           import('@sb/admin-portal/feature-dashboard').then((m) => m.DashboardComponent),
       },
       {
+        path: 'approvals',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-students').then((m) => m.ApprovalsQueueComponent),
+      },
+      {
+        path: 'students',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-students').then((m) => m.StudentListComponent),
+      },
+      {
+        path: 'students/:id',
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-students').then((m) => m.StudentDetailComponent),
+      },
+      {
         path: 'staff',
         loadComponent: () =>
           import('@sb/admin-portal/feature-staff').then((m) => m.StaffListComponent),

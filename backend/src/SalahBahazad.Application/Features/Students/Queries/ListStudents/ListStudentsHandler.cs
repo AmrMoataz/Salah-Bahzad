@@ -46,8 +46,32 @@ internal sealed class ListStudentsHandler(IAppDbContext db)
             .Where(g => gradeIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, g => g.Name, cancellationToken);
 
+        // City names (global reference data — no tenant filter).
+        var cityIds = items.Select(s => s.CityId).Distinct().ToList();
+        var cityNames = await db.Cities
+            .Where(c => cityIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, c => c.NameEn, cancellationToken);
+
+        // Active bound device per student (one active per student) — surface a label, never the token hash.
+        var studentIds = items.Select(s => s.Id).ToList();
+        var devices = await db.StudentDevices
+            .AsNoTracking()
+            .Where(d => studentIds.Contains(d.StudentId) && d.IsActive)
+            .Select(d => new { d.StudentId, d.FingerprintSummary })
+            .ToListAsync(cancellationToken);
+        var deviceByStudent = devices
+            .GroupBy(d => d.StudentId)
+            .ToDictionary(
+                g => g.Key,
+                g => string.IsNullOrWhiteSpace(g.First().FingerprintSummary)
+                    ? "Bound device"
+                    : g.First().FingerprintSummary!);
+
         var dtos = items
-            .Select(s => s.ToListDto(gradeNames.GetValueOrDefault(s.GradeId)))
+            .Select(s => s.ToListDto(
+                gradeNames.GetValueOrDefault(s.GradeId),
+                cityNames.GetValueOrDefault(s.CityId),
+                deviceByStudent.GetValueOrDefault(s.Id)))
             .ToList();
 
         return new PagedResult<StudentListDto>(dtos, total, query.Page, query.PageSize);

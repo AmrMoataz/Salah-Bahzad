@@ -64,6 +64,7 @@ internal sealed class RegisterStudentHandler(
             tenant.Id,
             claims.Uid,
             command.FullName,
+            command.PhoneNumber,
             command.ParentPhonePrimary,
             command.ParentPhoneSecondary,
             command.GradeId,

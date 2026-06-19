@@ -14,6 +14,7 @@ public sealed record RegisterStudentCommand(
     string FirebaseIdToken,
     string TenantSlug,
     string FullName,
+    string PhoneNumber,
     string ParentPhonePrimary,
     string? ParentPhoneSecondary,
     Guid GradeId,
