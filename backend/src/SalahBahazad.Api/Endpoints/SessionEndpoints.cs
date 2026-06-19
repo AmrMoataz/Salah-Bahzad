@@ -1,6 +1,9 @@
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Net.Http.Headers;
 using SalahBahazad.Api.Authorization;
+using SalahBahazad.Api.Endpoints.Internal;
 using SalahBahazad.Application.Common.Models;
 using SalahBahazad.Application.Features.Sessions.Commands.AddSessionMaterial;
 using SalahBahazad.Application.Features.Sessions.Commands.AddSessionVideo;
@@ -246,48 +249,118 @@ internal sealed class SessionEndpoints : IEndpointGroup
         [FromQuery] int pageSize = 20)
         => Results.Ok(await sender.Send(new ListSessionActivityQuery(id, page, pageSize), cancellationToken));
 
+    // Videos are streamed straight to R2 via a MultipartReader rather than bound as IFormFile, which would
+    // spool the multi-GB source to a temp file on disk first (docs/05 §6). The file part MUST come last in
+    // the form so the metadata fields are read before the source stream is handed to the handler.
     private static async Task<IResult> AddVideoAsync(
         Guid id,
-        [FromForm] string title,
-        [FromForm] int lengthMinutes,
-        [FromForm] int accessCount,
-        IFormFile file,
+        HttpRequest request,
         ISender sender,
         CancellationToken cancellationToken)
     {
-        await using var content = file.OpenReadStream();
-        var result = await sender.Send(
-            new AddSessionVideoCommand(
-                id, title, lengthMinutes, accessCount, content, file.ContentType, file.Length, file.FileName),
-            cancellationToken);
-        return Results.Created($"/api/sessions/{id}/videos/{result.Id}", result);
+        if (!MultipartUpload.IsMultipart(request.ContentType))
+            return Results.BadRequest("Expected multipart/form-data.");
+
+        var reader = new MultipartReader(MultipartUpload.GetBoundary(request.ContentType!), request.Body);
+
+        string? title = null;
+        var lengthMinutes = 0;
+        var accessCount = 0;
+
+        MultipartSection? section;
+        while ((section = await reader.ReadNextSectionAsync(cancellationToken)) is not null)
+        {
+            if (!ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var disposition))
+                continue;
+
+            if (MultipartUpload.IsFile(disposition))
+            {
+                if (title is null)
+                    return Results.BadRequest("Video metadata must be sent before the file.");
+
+                // Cap the source mid-stream; ContentLength is the cheap pre-check the validator also sees.
+                await using var capped = new LengthLimitingStream(section.Body, AddSessionVideoCommand.MaxBytes);
+                var result = await sender.Send(
+                    new AddSessionVideoCommand(
+                        id, title, lengthMinutes, accessCount,
+                        capped, section.ContentType ?? "application/octet-stream",
+                        request.ContentLength ?? 0,
+                        HeaderUtilities.RemoveQuotes(disposition.FileName).Value ?? "video"),
+                    cancellationToken);
+                return Results.Created($"/api/sessions/{id}/videos/{result.Id}", result);
+            }
+
+            if (MultipartUpload.IsFormField(disposition))
+            {
+                var name = HeaderUtilities.RemoveQuotes(disposition.Name).Value;
+                var value = await MultipartUpload.ReadFieldValueAsync(section, cancellationToken);
+                switch (name)
+                {
+                    case "title": title = value; break;
+                    case "lengthMinutes": int.TryParse(value, out lengthMinutes); break;
+                    case "accessCount": int.TryParse(value, out accessCount); break;
+                }
+            }
+        }
+
+        return Results.BadRequest("No video file was provided.");
     }
 
     private static async Task<IResult> UpdateVideoAsync(
         Guid id,
         Guid videoId,
-        [FromForm] string title,
-        [FromForm] int lengthMinutes,
-        [FromForm] int accessCount,
+        HttpRequest request,
         ISender sender,
-        CancellationToken cancellationToken,
-        IFormFile? file = null)
+        CancellationToken cancellationToken)
     {
-        Stream? content = file?.OpenReadStream();
-        try
+        if (!MultipartUpload.IsMultipart(request.ContentType))
+            return Results.BadRequest("Expected multipart/form-data.");
+
+        var reader = new MultipartReader(MultipartUpload.GetBoundary(request.ContentType!), request.Body);
+
+        string? title = null;
+        var lengthMinutes = 0;
+        var accessCount = 0;
+
+        MultipartSection? section;
+        while ((section = await reader.ReadNextSectionAsync(cancellationToken)) is not null)
         {
-            var result = await sender.Send(
-                new UpdateSessionVideoCommand(
-                    id, videoId, title, lengthMinutes, accessCount,
-                    content, file?.ContentType, file?.Length, file?.FileName),
-                cancellationToken);
-            return Results.Ok(result);
+            if (!ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var disposition))
+                continue;
+
+            if (MultipartUpload.IsFile(disposition))
+            {
+                // Replacement source supplied — stream it through (file part is last, after metadata).
+                await using var capped = new LengthLimitingStream(section.Body, AddSessionVideoCommand.MaxBytes);
+                var replaced = await sender.Send(
+                    new UpdateSessionVideoCommand(
+                        id, videoId, title ?? string.Empty, lengthMinutes, accessCount,
+                        capped, section.ContentType ?? "application/octet-stream",
+                        request.ContentLength ?? 0,
+                        HeaderUtilities.RemoveQuotes(disposition.FileName).Value ?? "video"),
+                    cancellationToken);
+                return Results.Ok(replaced);
+            }
+
+            if (MultipartUpload.IsFormField(disposition))
+            {
+                var name = HeaderUtilities.RemoveQuotes(disposition.Name).Value;
+                var value = await MultipartUpload.ReadFieldValueAsync(section, cancellationToken);
+                switch (name)
+                {
+                    case "title": title = value; break;
+                    case "lengthMinutes": int.TryParse(value, out lengthMinutes); break;
+                    case "accessCount": int.TryParse(value, out accessCount); break;
+                }
+            }
         }
-        finally
-        {
-            if (content is not null)
-                await content.DisposeAsync();
-        }
+
+        // No file part: a metadata-only edit (the file fields stay null).
+        var result = await sender.Send(
+            new UpdateSessionVideoCommand(
+                id, videoId, title ?? string.Empty, lengthMinutes, accessCount, null, null, null, null),
+            cancellationToken);
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> ReorderVideosAsync(

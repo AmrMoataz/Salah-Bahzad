@@ -94,6 +94,8 @@ VideoProcessingStatus = "Pending" | "Processing" | "Ready" | "Failed"
 `text`(editor)→`bodyLatex` · `quizEligible`→`isValidForQuiz` · `hint`→`hintUrl` ·
 `options:string[]`+`correct:index` → `options:[{text,isCorrect}]`.
 
+**Image-only questions & variations (#20 / #24):** create accepts an optional inline `imageBase64`(+`imageContentType`, one of `image/jpeg|png|webp`, ≤ 5 MB) so a question **or variation** with **only** an image can be created in a single call (`bodyLatex` is then optional); the server uploads it to R2 before persisting. The image can still be replaced/cleared afterwards via #22 / #26.
+
 **Invariants (400 on violation):** `validityDays` 0–365 · `price` ≥ 0 · video `lengthMinutes` ≥ 0 ·
 `accessCount` ≥ 0 · quiz `timeLimitMinutes` 5–60, `questionCount` 5–30, `attemptCount` 1–5, `minPassPercent` 40–100 ·
 `mark` > 0 · options ≥ 2 with **exactly one** `isCorrect` · question/variation body `bodyLatex` **and/or** image required ·
@@ -140,11 +142,11 @@ quiz `questionCount` ≤ `quizEligibleQuestionCount` (client warns per `FR-ADM-Q
 | # | Method & path | Perm | Request | Response |
 |---|---|---|---|---|
 | 19 | `GET /api/sessions/{id}/questions` | QuestionsRead | query `page pageSize` | `PagedResult<QuestionDto>` |
-| 20 | `POST /api/sessions/{id}/questions` | QuestionsCreate | `{ bodyLatex?, mark, isValidForQuiz, hintUrl?, options:[{text,isCorrect}] }` | `201 QuestionDto` |
+| 20 | `POST /api/sessions/{id}/questions` | QuestionsCreate | `{ bodyLatex?, mark, isValidForQuiz, hintUrl?, options:[{text,isCorrect}], imageBase64?, imageContentType? }` | `201 QuestionDto` |
 | 21 | `PUT /api/sessions/{id}/questions/{questionId}` | QuestionsEdit | `{ bodyLatex?, mark, isValidForQuiz, hintUrl?, options:[{id?,text,isCorrect}] }` | `QuestionDto` |
 | 22 | `PUT /api/sessions/{id}/questions/{questionId}/image` | QuestionsEdit | multipart `file` (DELETE same path clears) | `QuestionDto` |
 | 23 | `DELETE /api/sessions/{id}/questions/{questionId}` | QuestionsDelete | — | `204` (soft, "Detach") |
-| 24 | `POST /api/sessions/{id}/questions/{questionId}/variations` | QuestionsEdit | `{ bodyLatex?, options:[{text,isCorrect}] }` | `201 QuestionVariationDto` |
+| 24 | `POST /api/sessions/{id}/questions/{questionId}/variations` | QuestionsEdit | `{ bodyLatex?, options:[{text,isCorrect}], imageBase64?, imageContentType? }` | `201 QuestionVariationDto` |
 | 25 | `PUT …/variations/{variationId}` | QuestionsEdit | `{ bodyLatex?, options:[{id?,text,isCorrect}] }` | `QuestionVariationDto` |
 | 26 | `PUT …/variations/{variationId}/image` | QuestionsEdit | multipart `file` | `QuestionVariationDto` |
 | 27 | `DELETE …/variations/{variationId}` | QuestionsEdit | — | `204` |

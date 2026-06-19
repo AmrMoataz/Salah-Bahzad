@@ -52,6 +52,38 @@ public sealed class SessionContentTests(SalahBahazadApiFactory factory)
     }
 
     [Fact]
+    public async Task Add_large_video_streams_through_a_multipart_upload()
+    {
+        var tenant = await factory.SeedTenantAsync();
+        var (gradeId, _, specId) = await factory.SeedTaxonomyAsync(tenant);
+        var session = await factory.SeedSessionAsync(tenant, gradeId, specId);
+        var client = factory.CreateClientFor(StaffRole.Teacher, tenant);
+
+        // 20 MB > the 8 MB part size, so the source is uploaded as multiple parts (Initiate/UploadPart×3/
+        // Complete) rather than a single PUT — the path multi-GB sources take, exercised against MinIO.
+        var bytes = new byte[20 * 1024 * 1024];
+        Random.Shared.NextBytes(bytes);
+
+        using var form = new MultipartFormDataContent
+        {
+            { new StringContent("Big lesson"), "title" },
+            { new StringContent("90"), "lengthMinutes" },
+            { new StringContent("2"), "accessCount" },
+        };
+        var file = new ByteArrayContent(bytes);
+        file.Headers.ContentType = new MediaTypeHeaderValue("video/mp4");
+        form.Add(file, "file", "big.mp4"); // file LAST: metadata must precede the streamed source
+
+        var response = await client.PostAsync($"/api/sessions/{session.Id}/videos", form);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var detail = await client.GetFromJsonAsync<SessionDetailResponse>(
+            $"/api/sessions/{session.Id}", TestJson.Options);
+        detail!.Videos.Should().ContainSingle();
+        detail.Videos[0].ProcessingStatus.Should().Be("Ready");
+    }
+
+    [Fact]
     public async Task Add_material_then_signed_url_serves_the_stored_bytes()
     {
         var tenant = await factory.SeedTenantAsync();

@@ -18,34 +18,44 @@ internal sealed class UpdateSessionVideoHandler(
     public async ValueTask<SessionVideoDto> Handle(
         UpdateSessionVideoCommand command, CancellationToken cancellationToken)
     {
-        var session = await db.Sessions
-            .Include(s => s.Videos)
-            .FirstOrDefaultAsync(s => s.Id == command.SessionId, cancellationToken)
-            ?? throw new NotFoundException("Session", command.SessionId);
-
-        if (session.Videos.All(v => v.Id != command.VideoId))
+        // Validate the target exists (tenant-filtered IDOR gate) before any expensive upload, so replacing
+        // the source of a bad/forbidden video id never streams an orphan into R2.
+        var videoExists = await db.Sessions
+            .Where(s => s.Id == command.SessionId)
+            .SelectMany(s => s.Videos)
+            .AnyAsync(v => v.Id == command.VideoId, cancellationToken);
+        if (!videoExists)
             throw new NotFoundException("Video", command.VideoId);
 
+        // Stream the replacement source to R2 BEFORE opening a transaction (see AddSessionVideoHandler).
         string? newObjectKey = null;
         if (command.HasNewSource)
         {
             newObjectKey = StorageKeys.SessionVideo(currentUser.TenantId, command.ContentType!);
-            await fileStorage.UploadPrivateAsync(
+            await fileStorage.UploadPrivateStreamingAsync(
                 newObjectKey, command.Content!, command.ContentType!, cancellationToken);
         }
 
-        var video = session.UpdateVideo(
-            command.VideoId, command.Title, command.LengthMinutes, command.AccessCount, newObjectKey);
-        await db.SaveChangesAsync(cancellationToken);
+        return await db.ExecuteInTransactionAsync(async () =>
+        {
+            var session = await db.Sessions
+                .Include(s => s.Videos)
+                .FirstOrDefaultAsync(s => s.Id == command.SessionId, cancellationToken)
+                ?? throw new NotFoundException("Session", command.SessionId);
 
-        await auditWriter.WriteAsync(
-            new AuditWriteRequest("SessionVideoUpdated", "Session", session.Id, $"Video updated: {video.Title}"),
-            cancellationToken);
+            var video = session.UpdateVideo(
+                command.VideoId, command.Title, command.LengthMinutes, command.AccessCount, newObjectKey);
+            await db.SaveChangesAsync(cancellationToken);
 
-        var dto = video.ToDto();
-        if (newObjectKey is not null)
-            await videoQueue.EnqueueTranscodeAsync(video.Id, newObjectKey, cancellationToken);
+            await auditWriter.WriteAsync(
+                new AuditWriteRequest("SessionVideoUpdated", "Session", session.Id, $"Video updated: {video.Title}"),
+                cancellationToken);
 
-        return dto;
+            var dto = video.ToDto();
+            if (newObjectKey is not null)
+                await videoQueue.EnqueueTranscodeAsync(video.Id, newObjectKey, cancellationToken);
+
+            return dto;
+        }, cancellationToken);
     }
 }

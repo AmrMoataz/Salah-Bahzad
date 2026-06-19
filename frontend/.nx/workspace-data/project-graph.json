@@ -18,6 +18,42 @@
         "targets": {}
       }
     },
+    "admin-portal-feature-sessions": {
+      "name": "admin-portal-feature-sessions",
+      "type": "lib",
+      "data": {
+        "root": "libs/admin-portal/feature-sessions",
+        "name": "admin-portal-feature-sessions",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/admin-portal/feature-sessions/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:admin-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/admin-portal/feature-sessions"
+            ],
+            "options": {
+              "jestConfig": "libs/admin-portal/feature-sessions/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-settings": {
       "name": "admin-portal-feature-settings",
       "type": "lib",
@@ -15731,6 +15767,48 @@
         "type": "static"
       }
     ],
+    "admin-portal-feature-sessions": [
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "shared-data-access",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-sessions",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-settings": [
       {
         "source": "admin-portal-feature-settings",
@@ -16014,6 +16092,11 @@
       {
         "source": "admin-portal",
         "target": "admin-portal-feature-students",
+        "type": "dynamic"
+      },
+      {
+        "source": "admin-portal",
+        "target": "admin-portal-feature-sessions",
         "type": "dynamic"
       },
       {
@@ -38295,5 +38378,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1781880215259
+  "computedAt": 1781899532358
 }

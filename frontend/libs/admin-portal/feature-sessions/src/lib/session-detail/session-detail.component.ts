@@ -26,6 +26,7 @@ import {
 } from '@sb/shared/ui';
 import {
   QuestionDto,
+  SessionActivityDto,
   SessionDetailDto,
   SessionMaterialDto,
   SessionVideoDto,
@@ -46,7 +47,8 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
  * Session 360° detail (FR-ADM-SES-007/008, mockup `scrSessionDetail`). Header with the subject-tinted
  * icon tile, title + status pill, and Edit / Delete actions; tabbed body for Overview, Videos,
  * Materials (on-demand signed-URL download), the Question bank (paged, with edit/delete + links to the
- * editor and quiz settings), and Phase-4 placeholders (Enrolled, Activity, manual unlock).
+ * editor and quiz settings), the Activity audit feed (paged, FR-PLAT-SES-009), and the Phase-4
+ * placeholders that still need enrollment (Enrolled, manual unlock).
  */
 @Component({
   selector: 'sb-session-detail',
@@ -91,8 +93,8 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
               <sb-status-pill [variant]="pillFor(s.status)">{{ s.status }}</sb-status-pill>
             </div>
             <div class="sd__sub">
-              @if (s.specializationName) { <sb-tag [label]="s.specializationName" [subject]="accent()" /> }
-              <span>{{ s.gradeName ?? '—' }} · {{ price(s.price) }} · {{ s.validityDays }}-day access</span>
+              @if (s.subjectName) { <sb-tag [label]="s.subjectName" subject="blue" /> }
+              <span>{{ s.gradeName ?? '—' }} · {{ s.specializationName ?? '—' }}</span>
             </div>
           </div>
         </div>
@@ -111,7 +113,10 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
             </sb-button>
           }
           @if (canDelete()) {
-            <sb-button variant="danger-ghost" (clicked)="deleteOpen.set(true)">Delete</sb-button>
+            <button type="button" class="sd__icon-danger" title="Delete session" aria-label="Delete session" (click)="deleteOpen.set(true)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            </button>
           }
         </div>
       </div>
@@ -124,17 +129,53 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
       @if (activeTab() === 'overview') {
         <div class="sd__overview">
           <div class="sd__tiles">
-            <div class="sd__stat"><span class="sd__stat-label">Enrolled</span><span class="sd__stat-value">{{ s.enrolledCount }}</span><span class="sd__stat-sub">students (Phase 4)</span></div>
-            <div class="sd__stat"><span class="sd__stat-label">Videos</span><span class="sd__stat-value">{{ s.videos.length }}</span><span class="sd__stat-sub">in pipeline</span></div>
-            <div class="sd__stat"><span class="sd__stat-label">Questions</span><span class="sd__stat-value">{{ s.questionCount }}</span><span class="sd__stat-sub">{{ s.quizEligibleQuestionCount }} quiz-eligible</span></div>
-            <div class="sd__stat"><span class="sd__stat-label">Materials</span><span class="sd__stat-value">{{ s.materials.length }}</span><span class="sd__stat-sub">attachments</span></div>
+            <div class="sd__stat">
+              <div class="sd__stat-top">
+                <span class="sd__stat-label">Enrolled</span>
+                <span class="sd__stat-ic" style="background: var(--sb-subject-blue-bg); color: var(--sb-subject-blue-deep)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+              </div>
+              <span class="sd__stat-value">{{ s.enrolledCount }}</span>
+              <span class="sd__stat-sub">students (Phase 4)</span>
+            </div>
+            <div class="sd__stat">
+              <div class="sd__stat-top">
+                <span class="sd__stat-label">Videos</span>
+                <span class="sd__stat-ic" style="background: var(--sb-subject-mint-bg); color: var(--sb-subject-mint-deep)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 7l-7 5 7 5V7zM14 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/></svg>
+                </span>
+              </div>
+              <span class="sd__stat-value">{{ s.videos.length }}</span>
+              <span class="sd__stat-sub">in pipeline</span>
+            </div>
+            <div class="sd__stat">
+              <div class="sd__stat-top">
+                <span class="sd__stat-label">Questions</span>
+                <span class="sd__stat-ic" style="background: var(--sb-subject-purple-bg); color: var(--sb-subject-purple-deep)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v2H9zM8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M9 12l2 2 4-4"/></svg>
+                </span>
+              </div>
+              <span class="sd__stat-value">{{ s.questionCount }}</span>
+              <span class="sd__stat-sub">{{ s.quizEligibleQuestionCount }} quiz-eligible</span>
+            </div>
+            <div class="sd__stat">
+              <div class="sd__stat-top">
+                <span class="sd__stat-label">Materials</span>
+                <span class="sd__stat-ic" style="background: var(--sb-subject-mustard-bg); color: var(--sb-subject-mustard-deep)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/></svg>
+                </span>
+              </div>
+              <span class="sd__stat-value">{{ s.materials.length }}</span>
+              <span class="sd__stat-sub">attachments</span>
+            </div>
           </div>
           <sb-card title="Details">
             <dl class="sd__kv">
               <div><dt>Grade</dt><dd>{{ s.gradeName ?? '—' }}</dd></div>
+              <div><dt>Subject</dt><dd>{{ s.subjectName ?? '—' }}</dd></div>
               <div><dt>Specialization</dt><dd>{{ s.specializationName ?? '—' }}</dd></div>
               <div><dt>Price</dt><dd>{{ price(s.price) }}</dd></div>
-              <div><dt>Validity</dt><dd>{{ s.validityDays }} days</dd></div>
               <div><dt>Prerequisite</dt><dd>{{ s.prerequisiteTitle ?? 'None' }}</dd></div>
               <div><dt>Gating quiz</dt><dd>{{ quizSummary() }}</dd></div>
             </dl>
@@ -157,6 +198,7 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
             <sb-table [columns]="videoColumns" [rows]="s.videos" [rowKey]="videoKey">
               <ng-template sbTableCell="order" let-v>{{ v.order + 1 }}</ng-template>
               <ng-template sbTableCell="title" let-v><span class="sd__strong">{{ v.title }}</span></ng-template>
+              <ng-template sbTableCell="length" let-v>{{ v.lengthMinutes }} min</ng-template>
               <ng-template sbTableCell="status" let-v>
                 <sb-status-pill [variant]="vPill(v.processingStatus)">{{ v.processingStatus }}</sb-status-pill>
               </ng-template>
@@ -253,9 +295,51 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
         <div class="sd__empty">Enrolled students, progress and refunds arrive in Phase 4 (enrollment &amp; codes).</div>
       }
 
-      <!-- ACTIVITY (placeholder until audit wiring) -->
+      <!-- ACTIVITY (audit feed for the session and its content) -->
       @if (activeTab() === 'activity') {
-        <div class="sd__empty">Per-session activity will appear here once the audit feed is wired in.</div>
+        @if (activity().length === 0 && !activityLoading()) {
+          <div class="sd__empty">No activity recorded for this session yet.</div>
+        } @else {
+          <sb-card title="Session activity" [padding]="false">
+            <ul class="sd__activity">
+              @for (a of activity(); track a.id) {
+                <li class="sd__act">
+                  <span class="sd__act-ic" [style.background]="actBg(a)" [style.color]="actFg(a)" aria-hidden="true">
+                    @switch (actCategory(a.action)) {
+                      @case ('question') {
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v2H9zM8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M9 12l2 2 4-4"/></svg>
+                      }
+                      @case ('video') {
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7zM14 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/></svg>
+                      }
+                      @case ('material') {
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/></svg>
+                      }
+                      @default {
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                      }
+                    }
+                  </span>
+                  <div class="sd__act-body">
+                    <div class="sd__act-text">{{ a.summary ?? a.action }}</div>
+                    <div class="sd__act-meta">{{ actorLabel(a) }} · {{ at(a.occurredAtUtc) }}</div>
+                  </div>
+                </li>
+              }
+            </ul>
+            @if (activityTotal() > activityPageSize) {
+              <div class="sd__bank-pager">
+                <sb-pagination
+                  [page]="activityPage()"
+                  [pageCount]="activityPageCount()"
+                  [total]="activityTotal()"
+                  [pageSize]="activityPageSize"
+                  (pageChange)="onActivityPage($event)"
+                />
+              </div>
+            }
+          </sb-card>
+        }
       }
     } @else {
       <p class="sd__loading">Loading…</p>
@@ -300,12 +384,16 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
     .sd__name { margin: 0; font-size: var(--sb-heading-lg-size); font-weight: 800; letter-spacing: -0.01em; color: var(--sb-text); }
     .sd__sub { margin-top: var(--sb-space-1); display: flex; align-items: center; gap: var(--sb-space-2); flex-wrap: wrap; color: var(--sb-text-muted); font-size: var(--sb-body-md-size); }
     .sd__actions { display: flex; gap: var(--sb-space-2); flex-wrap: wrap; align-items: center; }
+    .sd__icon-danger { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--sb-border); background: var(--sb-surface); border-radius: var(--sb-radius-md); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--sb-danger); transition: background var(--sb-timing-fast) var(--sb-easing-standard), border-color var(--sb-timing-fast) var(--sb-easing-standard); }
+    .sd__icon-danger:hover { background: var(--sb-danger-bg); border-color: var(--sb-danger-border); }
 
     .sd__tabs { margin-bottom: var(--sb-space-4); }
 
     .sd__overview { display: flex; flex-direction: column; gap: var(--sb-space-4); }
     .sd__tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--sb-space-3); }
     .sd__stat { background: var(--sb-surface); border: 1px solid var(--sb-border); border-radius: var(--sb-radius-lg); padding: var(--sb-space-4); display: flex; flex-direction: column; gap: var(--sb-space-1); box-shadow: var(--sb-shadow-sm); }
+    .sd__stat-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sb-space-2); }
+    .sd__stat-ic { width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--sb-radius-sm); display: inline-flex; align-items: center; justify-content: center; }
     .sd__stat-label { font-size: var(--sb-body-sm-size); color: var(--sb-text-muted); font-weight: 600; }
     .sd__stat-value { font-size: var(--sb-heading-lg-size); font-weight: 800; line-height: 1; color: var(--sb-text); }
     .sd__stat-sub { font-size: var(--sb-body-sm-size); color: var(--sb-text-subtle); }
@@ -335,6 +423,14 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
 
     .sd__empty { background: var(--sb-surface); border: 1px dashed var(--sb-border-strong); border-radius: var(--sb-radius-lg); padding: var(--sb-space-10); text-align: center; color: var(--sb-text-muted); font-size: var(--sb-body-md-size); }
     .sd__empty-inline { margin: 0; padding: var(--sb-space-8); text-align: center; color: var(--sb-text-muted); }
+
+    .sd__activity { list-style: none; margin: 0; padding: 0; }
+    .sd__act { display: flex; gap: var(--sb-space-3); align-items: flex-start; padding: var(--sb-space-3) var(--sb-space-5); border-bottom: 1px solid var(--sb-border); }
+    .sd__act:last-child { border-bottom: none; }
+    .sd__act-ic { width: 30px; height: 30px; flex-shrink: 0; border-radius: var(--sb-radius-circle); display: inline-flex; align-items: center; justify-content: center; }
+    .sd__act-body { flex: 1; min-width: 0; }
+    .sd__act-text { font-size: var(--sb-body-md-size); color: var(--sb-text); }
+    .sd__act-meta { font-size: var(--sb-body-sm-size); color: var(--sb-text-subtle); margin-top: 2px; }
   `],
 })
 export class SessionDetailComponent {
@@ -357,6 +453,16 @@ export class SessionDetailComponent {
   readonly questionsPageSize = 10;
   readonly questionsPageCount = computed(() =>
     Math.max(1, Math.ceil(this.questionsTotal() / this.questionsPageSize)),
+  );
+
+  readonly activity = signal<SessionActivityDto[]>([]);
+  readonly activityTotal = signal(0);
+  readonly activityPage = signal(1);
+  readonly activityLoading = signal(false);
+  readonly #activityLoaded = signal(false);
+  readonly activityPageSize = 15;
+  readonly activityPageCount = computed(() =>
+    Math.max(1, Math.ceil(this.activityTotal() / this.activityPageSize)),
   );
 
   readonly downloadingId = signal<string | null>(null);
@@ -386,6 +492,7 @@ export class SessionDetailComponent {
   readonly videoColumns: readonly SbTableColumn[] = [
     { key: 'order', header: '#', width: '1%' },
     { key: 'title', header: 'Video' },
+    { key: 'length', header: 'Length' },
     { key: 'status', header: 'Status' },
     { key: 'access', header: 'Access count', align: 'right' },
   ];
@@ -426,6 +533,10 @@ export class SessionDetailComponent {
     this.questions.set([]);
     this.questionsTotal.set(0);
     this.questionsPage.set(1);
+    this.activity.set([]);
+    this.activityTotal.set(0);
+    this.activityPage.set(1);
+    this.#activityLoaded.set(false);
     try {
       this.session.set(await this.#service.getById(id));
     } catch {
@@ -437,6 +548,7 @@ export class SessionDetailComponent {
     const tab = id as DetailTab;
     this.activeTab.set(tab);
     if (tab === 'bank' && this.questions().length === 0) void this.#loadQuestions(1);
+    if (tab === 'activity' && !this.#activityLoaded()) void this.#loadActivity(1);
   }
 
   async #loadQuestions(page: number): Promise<void> {
@@ -455,6 +567,25 @@ export class SessionDetailComponent {
 
   onQuestionsPage(page: number): void {
     void this.#loadQuestions(page);
+  }
+
+  async #loadActivity(page: number): Promise<void> {
+    this.activityLoading.set(true);
+    try {
+      const res = await this.#service.listActivity(this.id(), page, this.activityPageSize);
+      this.activity.set(res.items);
+      this.activityTotal.set(res.total);
+      this.activityPage.set(page);
+      this.#activityLoaded.set(true);
+    } catch {
+      this.#toast.error(this.#service.error() ?? 'Could not load the activity feed.');
+    } finally {
+      this.activityLoading.set(false);
+    }
+  }
+
+  onActivityPage(page: number): void {
+    void this.#loadActivity(page);
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────────
@@ -540,5 +671,28 @@ export class SessionDetailComponent {
     const body = (q.bodyLatex ?? '').trim();
     if (body) return body.length > 90 ? `${body.slice(0, 90)}…` : body;
     return q.imageUrl ? 'Image question' : 'Untitled question';
+  }
+
+  // ── Activity presentation ───────────────────────────────────────────────────────
+  /** Coarse category for an audit action name → drives the row's icon + accent. */
+  actCategory(action: string): 'question' | 'video' | 'material' | 'session' {
+    const a = action.toLowerCase();
+    if (a.includes('question') || a.includes('variation')) return 'question';
+    if (a.includes('video')) return 'video';
+    if (a.includes('material')) return 'material';
+    return 'session';
+  }
+  readonly #activityAccent: Record<'question' | 'video' | 'material' | 'session', string> = {
+    question: 'purple',
+    video: 'mint',
+    material: 'mustard',
+    session: 'blue',
+  };
+  actBg = (a: SessionActivityDto): string =>
+    `var(--sb-subject-${this.#activityAccent[this.actCategory(a.action)]}-bg)`;
+  actFg = (a: SessionActivityDto): string =>
+    `var(--sb-subject-${this.#activityAccent[this.actCategory(a.action)]}-deep)`;
+  actorLabel(a: SessionActivityDto): string {
+    return a.actorRole || a.actorType || 'System';
   }
 }

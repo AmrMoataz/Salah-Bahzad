@@ -26,34 +26,12 @@ export interface UploadedFile {
   standalone: true,
   imports: [ProgressComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.fu--button]': "variant() === 'button'" },
   template: `
-    @if (label()) {
-      <label class="fu__label">{{ label() }}</label>
-    }
-
-    <div
-      class="fu__zone"
-      [class.fu__zone--drag]="dragging()"
-      [class.fu__zone--disabled]="disabled()"
-      role="button"
-      tabindex="0"
-      [attr.aria-label]="label() || 'Upload a file'"
-      [attr.aria-disabled]="disabled() || null"
-      (click)="open()"
-      (keydown.enter)="open()"
-      (keydown.space)="$event.preventDefault(); open()"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave()"
-      (drop)="onDrop($event)"
-    >
-      <span class="fu__glyph" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 19V5M5 12l7-7 7 7"/>
-        </svg>
-      </span>
-      <span class="fu__copy"><b>Click to upload</b> or drag &amp; drop</span>
-      <span class="fu__hint">{{ hint() }}</span>
+    @if (variant() === 'button') {
+      <button type="button" class="fu__btn" [disabled]="disabled()" (click)="open()" [attr.aria-label]="label() || 'Upload a file'">
+        <ng-content select="[fuLabel]" />
+      </button>
       <input
         #input
         type="file"
@@ -63,33 +41,92 @@ export interface UploadedFile {
         [disabled]="disabled()"
         (change)="onChange($event)"
       />
-    </div>
+    } @else {
+      @if (label()) {
+        <label class="fu__label">{{ label() }}</label>
+      }
 
-    @if (files().length > 0) {
-      <div class="fu__list">
-        @for (file of files(); track $index; let i = $index) {
-          <div class="fu__file">
-            <span class="fu__file-badge" aria-hidden="true">{{ ext(file.name) }}</span>
-            <span class="fu__file-name">{{ file.name }}</span>
-            @if (file.sizeBytes != null) {
-              <span class="fu__file-size">{{ sizeLabel(file.sizeBytes) }}</span>
-            }
-            <button type="button" class="fu__file-remove" aria-label="Remove" (click)="remove.emit(i)">×</button>
-          </div>
-        }
+      <div
+        class="fu__zone"
+        [class.fu__zone--drag]="dragging()"
+        [class.fu__zone--disabled]="disabled()"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="label() || 'Upload a file'"
+        [attr.aria-disabled]="disabled() || null"
+        (click)="open()"
+        (keydown.enter)="open()"
+        (keydown.space)="$event.preventDefault(); open()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+      >
+        <span class="fu__glyph" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </span>
+        <span class="fu__copy"><b>Click to upload</b> or drag &amp; drop</span>
+        <span class="fu__hint">{{ hint() }}</span>
+        <input
+          #input
+          type="file"
+          class="fu__input"
+          [accept]="accept()"
+          [multiple]="multiple()"
+          [disabled]="disabled()"
+          (change)="onChange($event)"
+        />
       </div>
-    }
 
-    @if (progress() != null) {
-      <div class="fu__progress">
-        <sb-progress [value]="progress() ?? 0" [showValue]="true" label="Uploading…" />
-      </div>
-    }
+      @if (files().length > 0) {
+        <div class="fu__list">
+          @for (file of files(); track $index; let i = $index) {
+            <div class="fu__file">
+              <span class="fu__file-badge" aria-hidden="true">{{ ext(file.name) }}</span>
+              <span class="fu__file-name">{{ file.name }}</span>
+              @if (file.sizeBytes != null) {
+                <span class="fu__file-size">{{ sizeLabel(file.sizeBytes) }}</span>
+              }
+              <button type="button" class="fu__file-remove" aria-label="Remove" (click)="remove.emit(i)">×</button>
+            </div>
+          }
+        </div>
+      }
 
-    <ng-content />
+      @if (progress() != null) {
+        <div class="fu__progress">
+          <sb-progress [value]="progress() ?? 0" [showValue]="true" label="Uploading…" />
+        </div>
+      }
+
+      <ng-content />
+    }
   `,
   styles: [`
     :host { display: block; font-family: var(--sb-font-sans); width: 100%; }
+    :host(.fu--button) { display: inline-flex; width: auto; }
+
+    /* Compact trigger button (variant="button") */
+    .fu__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sb-space-2);
+      height: 32px;
+      padding: 0 var(--sb-space-3);
+      font-family: var(--sb-font-sans);
+      font-size: var(--sb-body-sm-size);
+      font-weight: 700;
+      color: var(--sb-text);
+      background: var(--sb-surface);
+      border: 1px solid var(--sb-border-strong);
+      border-radius: var(--sb-radius-md);
+      cursor: pointer;
+      transition: background var(--sb-timing-fast) var(--sb-easing-standard);
+    }
+    .fu__btn:hover:not(:disabled) { background: var(--sb-surface-sunken); }
+    .fu__btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
     .fu__label {
       display: block;
@@ -157,6 +194,9 @@ export interface UploadedFile {
 })
 export class FileUploadComponent {
   readonly label = input<string>('');
+  /** `'dropzone'` (default) renders the dashed drag-drop target; `'button'` renders a compact trigger
+   *  button (project the label/icon via a `[fuLabel]` element) for "Add file" actions. */
+  readonly variant = input<'dropzone' | 'button'>('dropzone');
   readonly accept = input<string>('');
   readonly multiple = input<boolean>(false);
   readonly hint = input<string>('PNG, JPG or WebP · up to 5 MB');

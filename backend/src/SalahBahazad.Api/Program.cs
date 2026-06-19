@@ -36,6 +36,20 @@ try
         .WriteTo.Console(outputTemplate:
             "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"));
 
+    // ── Upload limits (large source-video uploads) ──────────────────────────
+    // Defaults silently reset the connection (no HTTP response) for big uploads: Kestrel caps the request
+    // body at ~28.6 MB and the multipart form parser at 128 MB. Source videos are capped at 2 GB
+    // (AddSessionVideoCommand.MaxBytes); allow that plus headroom for the multipart boundary + metadata
+    // fields. The exact source-size cap is enforced app-side while streaming. Override via
+    // Uploads:MaxRequestBodyBytes.
+    var maxUploadBytes = builder.Configuration.GetValue<long?>("Uploads:MaxRequestBodyBytes")
+        ?? SalahBahazad.Application.Features.Sessions.Commands.AddSessionVideo.AddSessionVideoCommand.MaxBytes
+           + (32L * 1024 * 1024);
+
+    builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = maxUploadBytes);
+    builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
+        o.MultipartBodyLengthLimit = maxUploadBytes);
+
     // ── Infrastructure (EF, Firebase, JWT, Redis, Auth) ─────────────────────
     builder.Services.AddInfrastructure(builder.Configuration);
 

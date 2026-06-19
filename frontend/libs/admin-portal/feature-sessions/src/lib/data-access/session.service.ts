@@ -15,6 +15,7 @@ import {
   SaveQuestionRequest,
   SaveSessionRequest,
   SaveVariationRequest,
+  SessionActivityDto,
   SessionDetailDto,
   SessionListDto,
   SessionListQuery,
@@ -193,11 +194,13 @@ export class SessionService {
     accessCount: number,
     onProgress?: (percent: number) => void,
   ): Promise<SessionVideoDto> {
+    // Metadata first, file LAST: the backend streams the source straight to R2 with a MultipartReader
+    // and needs the title/length/access fields before it reaches the (multi-GB) file part.
     const form = new FormData();
-    form.append('file', file);
     form.append('title', title);
     form.append('lengthMinutes', String(lengthMinutes));
     form.append('accessCount', String(accessCount));
+    form.append('file', file);
     const req = new HttpRequest('POST', `${this.#api()}/api/sessions/${id}/videos`, form, {
       reportProgress: true,
     });
@@ -259,6 +262,18 @@ export class SessionService {
     );
   }
 
+  // ── Activity (per-session audit feed, §2.27) ─────────────────────────────────
+  /** Paged audit history for the session — every question/video/material/lifecycle event keyed to it. */
+  listActivity(id: string, page = 1, pageSize = 20): Promise<PagedResult<SessionActivityDto>> {
+    const params = new HttpParams().set('page', String(page)).set('pageSize', String(pageSize));
+    return firstValueFrom(
+      this.#http.get<PagedResult<SessionActivityDto>>(
+        `${this.#api()}/api/sessions/${id}/activity`,
+        { params },
+      ),
+    );
+  }
+
   // ── Question bank (§2.18–§2.22) ──────────────────────────────────────────────
   listQuestions(id: string, page = 1, pageSize = 20): Promise<PagedResult<QuestionDto>> {
     const params = new HttpParams().set('page', String(page)).set('pageSize', String(pageSize));
@@ -269,10 +284,34 @@ export class SessionService {
     );
   }
 
-  createQuestion(id: string, request: SaveQuestionRequest): Promise<QuestionDto> {
+  /** Create a question. Pass `image` to create an **image-only** question (or any question with an image)
+   * in a single call — it is sent inline as base64 (§2.19); the body may then be omitted. */
+  async createQuestion(
+    id: string,
+    request: SaveQuestionRequest,
+    image?: File | null,
+  ): Promise<QuestionDto> {
+    const body: SaveQuestionRequest = { ...request };
+    if (image) {
+      body.imageBase64 = await this.#toBase64(image);
+      body.imageContentType = image.type;
+    }
     return firstValueFrom(
-      this.#http.post<QuestionDto>(`${this.#api()}/api/sessions/${id}/questions`, request),
+      this.#http.post<QuestionDto>(`${this.#api()}/api/sessions/${id}/questions`, body),
     );
+  }
+
+  /** Reads a File as bare base64 (strips the `data:<type>;base64,` prefix from the data URL). */
+  #toBase64(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error);
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.slice(result.indexOf(',') + 1));
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   updateQuestion(
@@ -314,15 +353,23 @@ export class SessionService {
   }
 
   // ── Variations (§2.23–§2.26) ─────────────────────────────────────────────────
-  addVariation(
+  /** Add a variation. Pass `image` to create an **image-only** variation (or any with an image) in one
+   * call — sent inline as base64 (§2.24); the body may then be omitted. */
+  async addVariation(
     id: string,
     questionId: string,
     request: SaveVariationRequest,
+    image?: File | null,
   ): Promise<QuestionVariationDto> {
+    const body: SaveVariationRequest = { ...request };
+    if (image) {
+      body.imageBase64 = await this.#toBase64(image);
+      body.imageContentType = image.type;
+    }
     return firstValueFrom(
       this.#http.post<QuestionVariationDto>(
         `${this.#api()}/api/sessions/${id}/questions/${questionId}/variations`,
-        request,
+        body,
       ),
     );
   }

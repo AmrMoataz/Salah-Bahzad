@@ -69,6 +69,72 @@ public sealed class QuestionBankTests(SalahBahazadApiFactory factory)
         after!.Items.Should().NotContain(q => q.Id == question.Id);
     }
 
+    [Fact]
+    public async Task Create_allows_an_image_only_question()
+    {
+        var tenant = await factory.SeedTenantAsync();
+        var (gradeId, _, specId) = await factory.SeedTaxonomyAsync(tenant);
+        var session = await factory.SeedSessionAsync(tenant, gradeId, specId);
+        var client = factory.CreateClientFor(StaffRole.Teacher, tenant);
+
+        // No LaTeX body — content is supplied as an inline image instead (FR-PLAT-QB-002).
+        var create = await client.PostAsJsonAsync(
+            $"/api/sessions/{session.Id}/questions",
+            new SaveQuestionBody(null, 1, true, null,
+                [new OptionBody("3", false), new OptionBody("4", true)],
+                Convert.ToBase64String(PngBytes), "image/png"),
+            TestJson.Options);
+
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+        var question = await create.Content.ReadFromJsonAsync<QuestionResponse>(TestJson.Options);
+        question!.BodyLatex.Should().BeNull();
+        question.ImageUrl.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task Add_variation_allows_an_image_only_variation()
+    {
+        var tenant = await factory.SeedTenantAsync();
+        var (gradeId, _, specId) = await factory.SeedTaxonomyAsync(tenant);
+        var session = await factory.SeedSessionAsync(tenant, gradeId, specId);
+        var client = factory.CreateClientFor(StaffRole.Teacher, tenant);
+
+        var create = await client.PostAsJsonAsync(
+            $"/api/sessions/{session.Id}/questions",
+            new SaveQuestionBody("base", 1, true, null, [new OptionBody("a", true), new OptionBody("b", false)]),
+            TestJson.Options);
+        var question = await create.Content.ReadFromJsonAsync<QuestionResponse>(TestJson.Options);
+
+        // Variation with no LaTeX body — content is the inline image (FR-PLAT-QB-002).
+        var addVariation = await client.PostAsJsonAsync(
+            $"/api/sessions/{session.Id}/questions/{question!.Id}/variations",
+            new SaveVariationBody(null, [new OptionBody("a", true), new OptionBody("b", false)],
+                Convert.ToBase64String(PngBytes), "image/png"),
+            TestJson.Options);
+
+        addVariation.StatusCode.Should().Be(HttpStatusCode.Created);
+        var variation = await addVariation.Content.ReadFromJsonAsync<VariationResponse>(TestJson.Options);
+        variation!.BodyLatex.Should().BeNull();
+        variation.ImageUrl.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task Create_rejects_a_question_with_neither_body_nor_image()
+    {
+        var tenant = await factory.SeedTenantAsync();
+        var (gradeId, _, specId) = await factory.SeedTaxonomyAsync(tenant);
+        var session = await factory.SeedSessionAsync(tenant, gradeId, specId);
+        var client = factory.CreateClientFor(StaffRole.Teacher, tenant);
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/sessions/{session.Id}/questions",
+            new SaveQuestionBody(null, 1, true, null,
+                [new OptionBody("3", false), new OptionBody("4", true)]),
+            TestJson.Options);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
     [Theory]
     [InlineData(1, true)]   // only one option
     [InlineData(2, false)]  // two options, none correct

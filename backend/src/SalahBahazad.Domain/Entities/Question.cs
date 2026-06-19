@@ -41,18 +41,21 @@ public sealed class Question : TenantEntityBase, ISoftDeletable
         int mark,
         bool isValidForQuiz,
         string? hintUrl,
-        IReadOnlyList<QuestionOptionDraft> optionDrafts)
+        IReadOnlyList<QuestionOptionDraft> optionDrafts,
+        string? imageObjectKey = null)
     {
         if (sessionId == Guid.Empty)
             throw new ArgumentException("A question must belong to a session.", nameof(sessionId));
         ValidateMark(mark);
-        // Image is uploaded separately (no file on the create call), so the body must be LaTeX here.
-        QuestionRules.RequireBody(bodyLatex, imageObjectKey: null);
+        // A question needs LaTeX text and/or an image; an image-only question is allowed (FR-PLAT-QB-002).
+        // The image (if any) is uploaded to storage *before* this call so its key is set atomically here.
+        QuestionRules.RequireBody(bodyLatex, imageObjectKey);
 
         var question = new Question
         {
             SessionId = sessionId,
             BodyLatex = QuestionRules.Normalize(bodyLatex),
+            ImageObjectKey = QuestionRules.Normalize(imageObjectKey),
             Mark = mark,
             IsValidForQuiz = isValidForQuiz,
             HintUrl = QuestionRules.Normalize(hintUrl),
@@ -94,9 +97,10 @@ public sealed class Question : TenantEntityBase, ISoftDeletable
         ImageObjectKey = null;
     }
 
-    public QuestionVariation AddVariation(string? bodyLatex, IReadOnlyList<QuestionOptionDraft> optionDrafts)
+    public QuestionVariation AddVariation(
+        string? bodyLatex, IReadOnlyList<QuestionOptionDraft> optionDrafts, string? imageObjectKey = null)
     {
-        var variation = QuestionVariation.Create(Id, bodyLatex, optionDrafts);
+        var variation = QuestionVariation.Create(Id, bodyLatex, optionDrafts, imageObjectKey);
         _variations.Add(variation);
         return variation;
     }

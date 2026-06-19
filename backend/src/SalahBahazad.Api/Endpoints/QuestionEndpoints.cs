@@ -130,7 +130,7 @@ internal sealed class QuestionEndpoints : IEndpointGroup
         var result = await sender.Send(
             new CreateQuestionCommand(
                 sessionId, request.BodyLatex, request.Mark, request.IsValidForQuiz, request.HintUrl,
-                request.ToOptionInputs()),
+                request.ToOptionInputs(), request.ImageBase64, request.ImageContentType),
             cancellationToken);
         return Results.Created($"/api/sessions/{sessionId}/questions/{result.Id}", result);
     }
@@ -175,7 +175,9 @@ internal sealed class QuestionEndpoints : IEndpointGroup
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(
-            new AddQuestionVariationCommand(sessionId, questionId, request.BodyLatex, request.ToOptionInputs()),
+            new AddQuestionVariationCommand(
+                sessionId, questionId, request.BodyLatex, request.ToOptionInputs(),
+                request.ImageBase64, request.ImageContentType),
             cancellationToken);
         return Results.Created(
             $"/api/sessions/{sessionId}/questions/{questionId}/variations/{result.Id}", result);
@@ -220,20 +222,29 @@ internal sealed class QuestionEndpoints : IEndpointGroup
 /// reassigns option identity server-side).</summary>
 internal sealed record OptionRequest(string Text, bool IsCorrect, Guid? Id = null);
 
-/// <summary>Request body for create/update question (#20 / #21).</summary>
+/// <summary>Request body for create/update question (#20 / #21). On create, an image may be supplied
+/// inline as base64 (<paramref name="ImageBase64"/> + <paramref name="ImageContentType"/>) so an
+/// image-only question can be created in one call; it can still be replaced later via the image endpoint.</summary>
 internal sealed record SaveQuestionRequest(
     string? BodyLatex,
     int Mark,
     bool IsValidForQuiz,
     string? HintUrl,
-    IReadOnlyList<OptionRequest>? Options)
+    IReadOnlyList<OptionRequest>? Options,
+    string? ImageBase64 = null,
+    string? ImageContentType = null)
 {
     public IReadOnlyList<QuestionOptionInput> ToOptionInputs()
         => (Options ?? []).Select(o => new QuestionOptionInput(o.Text, o.IsCorrect)).ToList();
 }
 
-/// <summary>Request body for create/update variation (#24 / #25).</summary>
-internal sealed record SaveVariationRequest(string? BodyLatex, IReadOnlyList<OptionRequest>? Options)
+/// <summary>Request body for create/update variation (#24 / #25). On add, an image may be supplied inline
+/// as base64 (so an image-only variation can be created in one call); ignored on update.</summary>
+internal sealed record SaveVariationRequest(
+    string? BodyLatex,
+    IReadOnlyList<OptionRequest>? Options,
+    string? ImageBase64 = null,
+    string? ImageContentType = null)
 {
     public IReadOnlyList<QuestionOptionInput> ToOptionInputs()
         => (Options ?? []).Select(o => new QuestionOptionInput(o.Text, o.IsCorrect)).ToList();

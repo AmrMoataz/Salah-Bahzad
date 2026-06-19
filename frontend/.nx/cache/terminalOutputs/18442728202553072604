@@ -1,0 +1,76 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/data-access/[22m[1msession.service.spec.ts[22m
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/session-list/[22m[1msession-list.component.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    ReferenceError: fetch is not defined
+
+    [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m signal[33m,[39m computed[33m,[39m inject } [36mfrom[39m [32m'@angular/core'[39m[33m;[39m
+     [90m 2 |[39m [36mimport[39m { [33mRouter[39m } [36mfrom[39m [32m'@angular/router'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mAuth[39m[33m,[39m sendPasswordResetEmail[33m,[39m signInWithEmailAndPassword[33m,[39m signOut } [36mfrom[39m [32m'@angular/fire/auth'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 4 |[39m [36mimport[39m { [33mHttpClient[39m } [36mfrom[39m [32m'@angular/common/http'[39m[33m;[39m
+     [90m 5 |[39m [36mimport[39m { firstValueFrom } [36mfrom[39m [32m'rxjs'[39m[33m;[39m
+     [90m 6 |[39m [36mimport[39m { [33mAuthState[39m[33m,[39m [33mAuthTokenResponse[39m[33m,[39m [33mStaffInfo[39m } [36mfrom[39m [32m'./auth.models'[39m[33m;[39m[0m
+
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/src/platform_node/index.ts[2m:33:26)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/dist/node/index.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/firebase/auth/dist/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/rxfire/auth/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@angular/fire/fesm2022/angular-fire-auth.mjs[2m:9:80)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/lib/auth/auth.store.ts[2m:3:1)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/index.ts[2m:1:1)[22m
+      [2mat Object.<anonymous> ([22m[0m[36msrc/lib/session-list/session-list.component.spec.ts[39m[0m[2m:4:1)[22m
+
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/session-form/[22m[1msession-form.component.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    ReferenceError: fetch is not defined
+
+    [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m signal[33m,[39m computed[33m,[39m inject } [36mfrom[39m [32m'@angular/core'[39m[33m;[39m
+     [90m 2 |[39m [36mimport[39m { [33mRouter[39m } [36mfrom[39m [32m'@angular/router'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mAuth[39m[33m,[39m sendPasswordResetEmail[33m,[39m signInWithEmailAndPassword[33m,[39m signOut } [36mfrom[39m [32m'@angular/fire/auth'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 4 |[39m [36mimport[39m { [33mHttpClient[39m } [36mfrom[39m [32m'@angular/common/http'[39m[33m;[39m
+     [90m 5 |[39m [36mimport[39m { firstValueFrom } [36mfrom[39m [32m'rxjs'[39m[33m;[39m
+     [90m 6 |[39m [36mimport[39m { [33mAuthState[39m[33m,[39m [33mAuthTokenResponse[39m[33m,[39m [33mStaffInfo[39m } [36mfrom[39m [32m'./auth.models'[39m[33m;[39m[0m
+
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/src/platform_node/index.ts[2m:33:26)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/dist/node/index.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/firebase/auth/dist/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/rxfire/auth/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@angular/fire/fesm2022/angular-fire-auth.mjs[2m:9:80)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/lib/auth/auth.store.ts[2m:3:1)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/index.ts[2m:1:1)[22m
+      [2mat Object.<anonymous> ([22m[0m[36msrc/lib/session-form/session-form.component.spec.ts[39m[0m[2m:4:1)[22m
+
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m admin-portal-feature-sessions [39m[27m[0m [2mlibs/admin-portal/feature-sessions/src/lib/question-editor/[22m[1mquestion-editor.component.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    ReferenceError: fetch is not defined
+
+    [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m signal[33m,[39m computed[33m,[39m inject } [36mfrom[39m [32m'@angular/core'[39m[33m;[39m
+     [90m 2 |[39m [36mimport[39m { [33mRouter[39m } [36mfrom[39m [32m'@angular/router'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mAuth[39m[33m,[39m sendPasswordResetEmail[33m,[39m signInWithEmailAndPassword[33m,[39m signOut } [36mfrom[39m [32m'@angular/fire/auth'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 4 |[39m [36mimport[39m { [33mHttpClient[39m } [36mfrom[39m [32m'@angular/common/http'[39m[33m;[39m
+     [90m 5 |[39m [36mimport[39m { firstValueFrom } [36mfrom[39m [32m'rxjs'[39m[33m;[39m
+     [90m 6 |[39m [36mimport[39m { [33mAuthState[39m[33m,[39m [33mAuthTokenResponse[39m[33m,[39m [33mStaffInfo[39m } [36mfrom[39m [32m'./auth.models'[39m[33m;[39m[0m
+
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/src/platform_node/index.ts[2m:33:26)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@firebase/auth/dist/node/index.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/firebase/auth/dist/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/rxfire/auth/index.cjs.js[2m:5:12)[22m
+      [2mat Object.<anonymous> ([22m../../../node_modules/@angular/fire/fesm2022/angular-fire-auth.mjs[2m:9:80)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/lib/auth/auth.store.ts[2m:3:1)[22m
+      [2mat Object.<anonymous> ([22m../../shared/data-access/src/index.ts[2m:1:1)[22m
+      [2mat Object.<anonymous> ([22m[0m[36msrc/lib/question-editor/question-editor.component.spec.ts[39m[0m[2m:4:1)[22m
+
+[1mTest Suites: [22m[1m[31m3 failed[39m[22m, [1m[32m1 passed[39m[22m, 4 total
+[1mTests:       [22m[1m[32m16 passed[39m[22m, 16 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        6.531 s
+[2mRan all test suites[22m[2m.[22m

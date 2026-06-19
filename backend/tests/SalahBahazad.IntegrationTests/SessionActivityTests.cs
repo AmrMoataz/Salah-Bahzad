@@ -59,4 +59,51 @@ public sealed class SessionActivityTests(SalahBahazadApiFactory factory)
         feed.Items.Should().Contain(i => i.Summary == "Video added: Lesson 1");
         feed.Items.Should().OnlyContain(i => i.ActorType == "Staff");
     }
+
+    [Fact]
+    public async Task Activity_feed_reads_root_edits_semantically()
+    {
+        var tenant = await factory.SeedTenantAsync();
+        var (gradeId, _, specId) = await factory.SeedTaxonomyAsync(tenant);
+        var client = factory.CreateClientFor(StaffRole.Teacher, tenant);
+
+        var prereqCreate = await client.PostAsJsonAsync(
+            "/api/sessions",
+            new SaveSessionBody("Prerequisite", null, 0m, 30, gradeId, specId),
+            TestJson.Options);
+        var prereq = await prereqCreate.Content.ReadFromJsonAsync<SessionDetailResponse>(TestJson.Options);
+
+        var create = await client.PostAsJsonAsync(
+            "/api/sessions",
+            new SaveSessionBody("Main", null, 0m, 30, gradeId, specId),
+            TestJson.Options);
+        var session = await create.Content.ReadFromJsonAsync<SessionDetailResponse>(TestJson.Options);
+
+        // Edit details → SessionUpdated (not the interceptor's generic "Updated Session")
+        await client.PutAsJsonAsync(
+            $"/api/sessions/{session!.Id}",
+            new SaveSessionBody("Main (renamed)", "a description", 50m, 60, gradeId, specId),
+            TestJson.Options);
+
+        // Set a prerequisite → SessionPrerequisiteChanged
+        await client.PutAsJsonAsync(
+            $"/api/sessions/{session.Id}/prerequisite",
+            new PrerequisiteBody(prereq!.Id),
+            TestJson.Options);
+
+        // Upload a thumbnail → SessionThumbnailUpdated
+        using var form = new MultipartFormDataContent();
+        var img = new ByteArrayContent([0x89, 0x50, 0x4E, 0x47, 1, 2, 3, 4]);
+        img.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        form.Add(img, "file", "thumb.png");
+        await client.PutAsync($"/api/sessions/{session.Id}/thumbnail", form);
+
+        var feed = await client.GetFromJsonAsync<PagedSessionActivityResponse>(
+            $"/api/sessions/{session.Id}/activity?pageSize=50", TestJson.Options);
+        var actions = feed!.Items.Select(i => i.Action).ToList();
+
+        actions.Should().Contain("SessionUpdated");
+        actions.Should().Contain("SessionPrerequisiteChanged");
+        actions.Should().Contain("SessionThumbnailUpdated");
+    }
 }

@@ -15,6 +15,7 @@ import {
   AlertComponent,
   ButtonComponent,
   CardComponent,
+  ComboboxComponent,
   FileUploadComponent,
   FormFieldComponent,
   SelectComponent,
@@ -49,6 +50,7 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
     CardComponent,
     ButtonComponent,
     SelectComponent,
+    ComboboxComponent,
     StatusPillComponent,
     FormFieldComponent,
     FileUploadComponent,
@@ -148,8 +150,17 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
             } @else {
               <ul class="sf__list">
                 @for (v of videos(); track v.id; let i = $index) {
-                  <li class="sf__item">
-                    <span class="sf__grip" aria-hidden="true">⠿</span>
+                  <li
+                    class="sf__item"
+                    [class.sf__item--over]="dragOver() === i"
+                    [class.sf__item--dragging]="dragFrom() === i"
+                    draggable="true"
+                    (dragstart)="onDragStart(i, $event)"
+                    (dragover)="onDragOver(i, $event)"
+                    (drop)="onDrop(i, $event)"
+                    (dragend)="onDragEnd()"
+                  >
+                    <span class="sf__grip" title="Drag to reorder" (mousedown)="grabAt(i)" (mouseup)="releaseGrip()">⠿</span>
                     <span class="sf__vicon" aria-hidden="true">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7zM14 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/></svg>
@@ -157,13 +168,12 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
                     <span class="sf__vbody">
                       <span class="sf__vtitle">{{ i + 1 }}. {{ v.title }}</span>
                       <span class="sf__vsub">
+                        <span class="sf__vmeta">{{ v.lengthMinutes }} min · secure HLS</span>
                         <sb-status-pill [variant]="vPill(v.processingStatus)">{{ v.processingStatus }}</sb-status-pill>
                       </span>
                     </span>
                     <span class="sf__vaccess">Access <strong>{{ v.accessCount }}×</strong></span>
                     <span class="sf__vactions">
-                      <button type="button" class="sf__iconbtn" title="Move up" [disabled]="i === 0 || reordering()" (click)="move(i, -1)" aria-label="Move up">↑</button>
-                      <button type="button" class="sf__iconbtn" title="Move down" [disabled]="i === videos().length - 1 || reordering()" (click)="move(i, 1)" aria-label="Move down">↓</button>
                       <button type="button" class="sf__iconbtn" title="Edit video" (click)="openEditVideo(v)" aria-label="Edit video">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
                       </button>
@@ -180,11 +190,19 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
           <!-- Materials -->
           <sb-card title="Materials" [padding]="false">
             @if (canEditContent()) {
-              <sb-button cardActions variant="secondary" size="sm" [loading]="materialBusy()" (clicked)="pickMaterial()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                Add
-              </sb-button>
+              <sb-file-upload
+                cardActions
+                variant="button"
+                accept="application/pdf,text/csv,image/png,image/jpeg"
+                [disabled]="materialBusy()"
+                (filesPicked)="onMaterialPicked($event)"
+              >
+                <span fuLabel style="display: inline-flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  Add
+                </span>
+              </sb-file-upload>
             }
             @if (!session()) {
               <p class="sf__panel-hint">Save the session first to add materials.</p>
@@ -244,8 +262,8 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
           <sb-card title="Gating">
             <div class="sf__gating">
               <sb-form-field label="Prerequisite session" fieldId="sf-prereq" hint="Students must finish it before enrolling.">
-                <sb-select inputId="sf-prereq" [options]="prerequisiteOptions()" [formControl]="prereqControl"
-                           placeholder="No prerequisite" />
+                <sb-combobox inputId="sf-prereq" [options]="prerequisiteOptions()" [formControl]="prereqControl"
+                             placeholder="Search sessions…" emptyText="No matching sessions" />
               </sb-form-field>
 
               <div class="sf__gating-quiz">
@@ -305,14 +323,18 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
 
 
     .sf__list { list-style: none; margin: 0; padding: 0; }
-    .sf__item { display: flex; align-items: center; gap: var(--sb-space-3); padding: var(--sb-space-3) var(--sb-space-5); border-bottom: 1px solid var(--sb-border); }
+    .sf__item { display: flex; align-items: center; gap: var(--sb-space-3); padding: var(--sb-space-3) var(--sb-space-5); border-bottom: 1px solid var(--sb-border); transition: background var(--sb-timing-fast) var(--sb-easing-standard); }
     .sf__item:last-child { border-bottom: none; }
-    .sf__grip { color: var(--sb-text-subtle); cursor: grab; font-size: 16px; }
+    .sf__item--dragging { opacity: 0.45; }
+    .sf__item--over { background: var(--sb-primary-50); }
+    .sf__grip { color: var(--sb-text-subtle); cursor: grab; font-size: 16px; user-select: none; padding: 0 var(--sb-space-1); }
+    .sf__grip:active { cursor: grabbing; color: var(--sb-text-muted); }
     .sf__vicon { width: 34px; height: 34px; flex-shrink: 0; border-radius: var(--sb-radius-sm); background: var(--sb-info-bg); color: var(--sb-info-fg); display: inline-flex; align-items: center; justify-content: center; }
     .sf__micon { width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--sb-radius-sm); background: var(--sb-surface-sunken); color: var(--sb-text-muted); display: inline-flex; align-items: center; justify-content: center; }
     .sf__vbody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
     .sf__vtitle, .sf__mtitle { font-weight: 700; font-size: var(--sb-body-md-size); color: var(--sb-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .sf__vsub { display: inline-flex; }
+    .sf__vsub { display: inline-flex; align-items: center; gap: var(--sb-space-2); flex-wrap: wrap; }
+    .sf__vmeta { font-size: var(--sb-body-sm-size); color: var(--sb-text-muted); }
     .sf__msub { font-size: var(--sb-body-sm-size); color: var(--sb-text-subtle); }
     .sf__vaccess { font-size: var(--sb-body-sm-size); color: var(--sb-text-muted); white-space: nowrap; }
     .sf__vaccess strong { color: var(--sb-text); font-variant-numeric: tabular-nums; }
@@ -320,6 +342,7 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
     .sf__iconbtn { width: 30px; height: 30px; border: 1px solid var(--sb-border); background: var(--sb-surface); border-radius: var(--sb-radius-md); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--sb-text-muted); font-size: 14px; }
     .sf__iconbtn:hover:not(:disabled) { background: var(--sb-surface-sunken); color: var(--sb-text); }
     .sf__iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sf__iconbtn--danger { color: var(--sb-danger); }
     .sf__iconbtn--danger:hover:not(:disabled) { color: var(--sb-danger-fg); background: var(--sb-danger-bg); }
 
     .sf__panel-hint { margin: 0; padding: var(--sb-space-5); color: var(--sb-text-muted); font-size: var(--sb-body-md-size); }
@@ -362,6 +385,11 @@ export class SessionFormComponent {
   readonly publishBusy = signal(false);
   readonly materialBusy = signal(false);
   readonly reordering = signal(false);
+
+  // Drag-to-reorder (native HTML5 DnD, initiated from the grip handle only).
+  readonly grabbing = signal<number | null>(null);
+  readonly dragFrom = signal<number | null>(null);
+  readonly dragOver = signal<number | null>(null);
 
   /** A just-picked thumbnail file — drives the dropzone list and (in create mode) the upload on save. */
   readonly #pickedThumb = signal<File | null>(null);
@@ -412,12 +440,12 @@ export class SessionFormComponent {
       .map((s) => ({ value: s.id, label: s.name }));
   });
 
-  readonly prerequisiteOptions = computed<SelectOption[]>(() => [
-    { value: '', label: 'No prerequisite' },
-    ...this.#allSessions()
+  // No synthetic "none" row — the combobox's placeholder + clear (×) express the empty state.
+  readonly prerequisiteOptions = computed<SelectOption[]>(() =>
+    this.#allSessions()
       .filter((s) => s.id !== this.id())
       .map((s) => ({ value: s.id, label: s.title })),
-  ]);
+  );
 
   readonly quizSummary = computed(() => {
     const q = this.session()?.quizSetting;
@@ -510,8 +538,17 @@ export class SessionFormComponent {
 
   async #loadPrerequisiteCandidates(): Promise<void> {
     try {
-      const result = await this.#service.listRaw({ pageSize: 1000, page: 1 });
-      this.#allSessions.set(result.items.map((x) => ({ id: x.id, title: x.title })));
+      // The API caps pageSize at 100, so page through to gather every candidate.
+      const all: { id: string; title: string }[] = [];
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const result = await this.#service.listRaw({ pageSize: 100, page });
+        all.push(...result.items.map((x) => ({ id: x.id, title: x.title })));
+        totalPages = result.totalPages;
+        page++;
+      } while (page <= totalPages);
+      this.#allSessions.set(all);
     } catch {
       /* a missing candidate list just leaves the picker with the current value */
     }
@@ -677,12 +714,58 @@ export class SessionFormComponent {
     }
   }
 
-  async move(index: number, delta: number): Promise<void> {
+  // ── Drag-to-reorder (grip handle → native HTML5 DnD) ───────────────────────────
+  /** Arm dragging for this row — the `<li>` is only `draggable` while its grip is pressed. */
+  grabAt(index: number): void {
+    if (!this.reordering()) this.grabbing.set(index);
+  }
+  releaseGrip(): void {
+    this.grabbing.set(null);
+  }
+
+  onDragStart(index: number, event: DragEvent): void {
+    if (this.grabbing() !== index) {
+      event.preventDefault(); // not started from the grip
+      return;
+    }
+    this.dragFrom.set(index);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(index));
+    }
+  }
+
+  onDragOver(index: number, event: DragEvent): void {
+    if (this.dragFrom() === null) return;
+    event.preventDefault(); // allow drop
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    if (this.dragOver() !== index) this.dragOver.set(index);
+  }
+
+  onDrop(index: number, event: DragEvent): void {
+    event.preventDefault();
+    const from = this.dragFrom();
+    this.#resetDrag();
+    if (from === null || from === index) return;
+    void this.#reorder(from, index);
+  }
+
+  onDragEnd(): void {
+    this.#resetDrag();
+  }
+
+  #resetDrag(): void {
+    this.grabbing.set(null);
+    this.dragFrom.set(null);
+    this.dragOver.set(null);
+  }
+
+  async #reorder(from: number, to: number): Promise<void> {
     const id = this.id();
     const list = [...this.videos()];
-    const target = index + delta;
-    if (!id || target < 0 || target >= list.length) return;
-    [list[index], list[target]] = [list[target], list[index]];
+    if (!id || from < 0 || to < 0 || from >= list.length || to >= list.length) return;
+    const [moved] = list.splice(from, 1);
+    list.splice(to, 0, moved);
     this.reordering.set(true);
     try {
       const reordered = await this.#service.reorderVideos(id, list.map((v) => v.id));
@@ -699,15 +782,9 @@ export class SessionFormComponent {
   }
 
   // ── Materials ─────────────────────────────────────────────────────────────────
-  pickMaterial(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/pdf,text/csv,image/png,image/jpeg';
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (file) void this.#uploadMaterial(file);
-    };
-    input.click();
+  onMaterialPicked(files: File[]): void {
+    const file = files[0];
+    if (file) void this.#uploadMaterial(file);
   }
 
   async #uploadMaterial(file: File): Promise<void> {

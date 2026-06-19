@@ -22,15 +22,20 @@ public sealed class QuestionVariation : EntityBase
     public IReadOnlyCollection<QuestionOption> Options => _options.AsReadOnly();
 
     internal static QuestionVariation Create(
-        Guid questionId, string? bodyLatex, IReadOnlyList<QuestionOptionDraft> optionDrafts)
+        Guid questionId,
+        string? bodyLatex,
+        IReadOnlyList<QuestionOptionDraft> optionDrafts,
+        string? imageObjectKey = null)
     {
-        // Image is uploaded in a separate step (no file on the create call), so the body must be LaTeX here.
-        QuestionRules.RequireBody(bodyLatex, imageObjectKey: null);
+        // A variation needs LaTeX text and/or an image; an image-only variation is allowed (FR-PLAT-QB-002).
+        // The image (if any) is uploaded to storage *before* this call so its key is set atomically here.
+        QuestionRules.RequireBody(bodyLatex, imageObjectKey);
 
         var variation = new QuestionVariation
         {
             QuestionId = questionId,
             BodyLatex = QuestionRules.Normalize(bodyLatex),
+            ImageObjectKey = QuestionRules.Normalize(imageObjectKey),
         };
         variation._options.AddRange(QuestionRules.BuildOptions(optionDrafts));
         return variation;

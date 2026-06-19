@@ -154,6 +154,22 @@ export interface SpecializationRef {
   subjectName: string | null;
 }
 
+/**
+ * One audit row for the session detail's Activity tab (FR-PLAT-SES-009, §2.27). Every question/video/
+ * material/image/lifecycle action is recorded against the session id, so this is the session's full
+ * history. `summary` is the human-readable line; `action` is the machine event name.
+ */
+export interface SessionActivityDto {
+  id: string;
+  action: string;
+  summary: string | null;
+  actorId: string | null;
+  actorRole: string | null;
+  actorType: string;
+  ipAddress: string | null;
+  occurredAtUtc: string;
+}
+
 // ── Request payloads ───────────────────────────────────────────────────────────────────────────
 
 /** Create/update body for a session (§2.2 / §2.4). Subject is derived server-side from the specialization. */
@@ -180,12 +196,23 @@ export interface SaveQuestionRequest {
   isValidForQuiz: boolean;
   hintUrl?: string | null;
   options: OptionInput[];
+  /**
+   * Inline image for an image-only question on **create** (§2.19): base64 (no data-URL prefix) plus its
+   * content type. Lets a question with only an image be created in one call; ignored on update (use the
+   * dedicated image endpoint to replace afterwards).
+   */
+  imageBase64?: string | null;
+  imageContentType?: string | null;
 }
 
 /** Create/update body for a variation (§2.23 / §2.24). */
 export interface SaveVariationRequest {
   bodyLatex?: string | null;
   options: OptionInput[];
+  /** Inline image for an image-only variation on **add** (§2.24): base64 (no data-URL prefix) + content
+   * type. Lets a variation with only an image be created in one call; ignored on update. */
+  imageBase64?: string | null;
+  imageContentType?: string | null;
 }
 
 /** Query params for the paged/filterable sessions list (§2.1: search + grade + subject + status). */

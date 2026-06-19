@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, of, shareReplay } from 'rxjs';
 import { AuthState, AuthTokenResponse, StaffInfo } from './auth.models';
 
 const TOKEN_KEY = 'sb_access_token';
@@ -22,6 +22,9 @@ export class AuthStore {
     error: null,
   });
 
+  /** Shared in-flight refresh so a burst of concurrent 401s triggers exactly one refresh call. */
+  #refreshInFlight: Observable<string | null> | null = null;
+
   readonly staff = computed(() => this.#state().staff);
   readonly isAuthenticated = computed(() => this.#state().staff !== null);
   readonly isLoading = computed(() => this.#state().isLoading);
@@ -34,6 +37,52 @@ export class AuthStore {
 
   getAccessToken(): string | null {
     return this.#state().accessToken ?? sessionStorage.getItem(TOKEN_KEY);
+  }
+
+  getRefreshToken(): string | null {
+    return this.#state().refreshToken ?? sessionStorage.getItem(REFRESH_KEY);
+  }
+
+  /**
+   * Exchanges the stored refresh token for a fresh access+refresh pair (FR-PLAT-AUTH-002). Concurrent
+   * callers — typically a burst of API calls that all 401 at once the moment the access token expires —
+   * share a single in-flight request, so the server is hit only once. Emits the new access token, or
+   * `null` when there is no refresh token or the server rejects it; in that failure case the session is
+   * cleared and the user is redirected to the login page.
+   */
+  refreshAccessToken(): Observable<string | null> {
+    if (this.#refreshInFlight) return this.#refreshInFlight;
+
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      this.#handleRefreshFailure();
+      return of(null);
+    }
+
+    const apiUrl = this.#getApiUrl();
+    this.#refreshInFlight = this.#http
+      .post<AuthTokenResponse>(`${apiUrl}/api/auth/refresh`, { refreshToken })
+      .pipe(
+        map((response) => {
+          this.#applyTokenResponse(response);
+          this.#refreshInFlight = null;
+          return response.accessToken;
+        }),
+        catchError(() => {
+          this.#refreshInFlight = null;
+          this.#handleRefreshFailure();
+          return of<string | null>(null);
+        }),
+        shareReplay(1),
+      );
+
+    return this.#refreshInFlight;
+  }
+
+  /** Refresh is no longer possible — drop the dead session and send the user back to sign in. */
+  #handleRefreshFailure(): void {
+    this.#clearSession();
+    void this.#router.navigate(['/login']);
   }
 
   async signIn(email: string, password: string): Promise<void> {
@@ -102,13 +151,14 @@ export class AuthStore {
 
   restoreSession(): boolean {
     const accessToken = sessionStorage.getItem(TOKEN_KEY);
+    const refreshToken = sessionStorage.getItem(REFRESH_KEY);
     const staffJson = sessionStorage.getItem('sb_staff');
 
     if (!accessToken || !staffJson) return false;
 
     try {
       const staff = JSON.parse(staffJson) as StaffInfo;
-      this.#state.update((s) => ({ ...s, staff, accessToken }));
+      this.#state.update((s) => ({ ...s, staff, accessToken, refreshToken }));
       return true;
     } catch {
       return false;

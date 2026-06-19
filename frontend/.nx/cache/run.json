@@ -1,62 +1,18 @@
 {
   "run": {
-    "command": "nx run-many -t test --all --skip-nx-cache",
-    "startTime": "2026-06-19T14:43:35.292Z",
-    "endTime": "2026-06-19T14:43:42.810Z",
+    "command": "nx build admin-portal",
+    "startTime": "2026-06-19T19:56:15.554Z",
+    "endTime": "2026-06-19T19:56:21.123Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "admin-portal-feature-students:test",
-      "target": "test",
-      "projectName": "admin-portal-feature-students",
-      "hash": "11631436220783637488",
-      "startTime": "2026-06-19T14:43:35.312Z",
-      "endTime": "2026-06-19T14:43:39.837Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    },
-    {
-      "taskId": "shared-ui:test",
-      "target": "test",
-      "projectName": "shared-ui",
-      "hash": "5940885295315235678",
-      "startTime": "2026-06-19T14:43:35.312Z",
-      "endTime": "2026-06-19T14:43:40.986Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    },
-    {
-      "taskId": "admin-portal-feature-taxonomy:test",
-      "target": "test",
-      "projectName": "admin-portal-feature-taxonomy",
-      "hash": "4432540413103843167",
-      "startTime": "2026-06-19T14:43:39.839Z",
-      "endTime": "2026-06-19T14:43:41.153Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    },
-    {
-      "taskId": "admin-portal-feature-settings:test",
-      "target": "test",
-      "projectName": "admin-portal-feature-settings",
-      "hash": "10791667933836072613",
-      "startTime": "2026-06-19T14:43:40.988Z",
-      "endTime": "2026-06-19T14:43:41.862Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    },
-    {
-      "taskId": "admin-portal-feature-staff:test",
-      "target": "test",
-      "projectName": "admin-portal-feature-staff",
-      "hash": "6016892060870864477",
-      "startTime": "2026-06-19T14:43:35.312Z",
-      "endTime": "2026-06-19T14:43:42.808Z",
+      "taskId": "admin-portal:build:production",
+      "target": "build",
+      "projectName": "admin-portal",
+      "hash": "6636892961480248807",
+      "startTime": "2026-06-19T19:56:15.569Z",
+      "endTime": "2026-06-19T19:56:21.084Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

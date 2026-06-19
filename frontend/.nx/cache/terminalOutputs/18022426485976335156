@@ -1,0 +1,42 @@
+> ng run admin-portal:build:production
+
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-CJ647KHU.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m237.88 kB[39m[2m | [22m               [36m60.59 kB[39m
+[32mchunk-7LLVJQEH.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m153.53 kB[39m[2m | [22m               [36m45.65 kB[39m
+[32mchunk-Z3UO5JEL.js[39m    [2m | [22m[2m-[22m            [2m | [22m[36m102.72 kB[39m[2m | [22m               [36m19.97 kB[39m
+[32mpolyfills-YMBILSHJ.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mchunk-6OYHCK5D.js[39m    [2m | [22m[2m-[22m            [2m | [22m  [36m8.57 kB[39m[2m | [22m                [36m2.70 kB[39m
+[32mstyles-RHIZSWYY.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m  [36m6.53 kB[39m[2m | [22m                [36m1.73 kB[39m
+[32mmain-W32Z5HES.js[39m     [2m | [22m[2mmain[22m         [2m | [22m  [36m6.00 kB[39m[2m | [22m                [36m1.98 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m[1m[93m549.82 kB[39m[22m[2m | [22m              [1m143.96 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-LJTHHTJN.js[39m    [2m | [22m[2mindex[22m        [2m | [22m[36m109.75 kB[39m[2m | [22m               [36m21.37 kB[39m
+[32mchunk-M5GJXGFA.js[39m    [2m | [22m[2mbrowser[22m      [2m | [22m [36m67.57 kB[39m[2m | [22m               [36m17.71 kB[39m
+[32mchunk-GK2TYQ3D.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m55.58 kB[39m[2m | [22m               [36m11.95 kB[39m
+[32mchunk-KZV2DJZT.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m22.28 kB[39m[2m | [22m                [36m5.44 kB[39m
+[32mchunk-UDUU5AXD.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m19.37 kB[39m[2m | [22m                [36m5.41 kB[39m
+[32mchunk-RA66V3OJ.js[39m    [2m | [22m[2mindex[22m        [2m | [22m [36m18.66 kB[39m[2m | [22m                [36m4.72 kB[39m
+[32mchunk-TBYMVCCR.js[39m    [2m | [22m[2mindex[22m        [2m | [22m  [36m8.74 kB[39m[2m | [22m                [36m2.76 kB[39m
+[32mchunk-HDEWG36K.js[39m    [2m | [22m[2mindex[22m        [2m | [22m  [36m5.17 kB[39m[2m | [22m                [36m1.81 kB[39m
+[32mchunk-VC2QTUDA.js[39m    [2m | [22m[2mindex[22m        [2m | [22m[36m183 bytes[39m[2m | [22m              [36m183 bytes[39m
+
+Application bundle generation complete. [4.090 seconds] - 2026-06-19T19:48:47.409Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 500.00 kB was not met by 49.82 kB with a total of 549.82 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mangular:styles/component:css;b3bc6ac88d95be3a330e0e470e3ecb572fbbe09338fc8f71c355843092898914;C:/Users/Amr/source/repos/SalahBahazad/New System/Salah bahzad/frontend/libs/admin-portal/feature-sessions/src/lib/session-form/session-form.component.ts exceeded maximum budget. Budget 4.00 kB was not met by 922 bytes with a total of 4.92 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mangular:styles/component:css;5e7634206b09fa4cff556cdb52d3861f6a12f5b63cfc022ff9e7afc355775253;C:/Users/Amr/source/repos/SalahBahazad/New System/Salah bahzad/frontend/libs/admin-portal/feature-sessions/src/lib/session-detail/session-detail.component.ts exceeded maximum budget. Budget 4.00 kB was not met by 1.63 kB with a total of 5.63 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mangular:styles/component:css;93ca8a09ee25a14b2cd5e75283d6e15b310d6c6e4d5b29ffa5acb7794f74618d;C:/Users/Amr/source/repos/SalahBahazad/New System/Salah bahzad/frontend/libs/admin-portal/feature-sessions/src/lib/question-editor/question-editor.component.ts exceeded maximum budget. Budget 4.00 kB was not met by 1.78 kB with a total of 5.78 kB.[0m
+
+[39m[22m
+Output location: C:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\dist\apps\admin-portal
+

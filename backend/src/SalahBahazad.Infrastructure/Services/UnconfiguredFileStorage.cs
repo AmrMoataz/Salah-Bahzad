@@ -18,6 +18,10 @@ internal sealed class UnconfiguredFileStorage : IFileStorage
         string key, Stream content, string contentType, CancellationToken cancellationToken = default)
         => throw new InvalidOperationException(Message);
 
+    public Task UploadPrivateStreamingAsync(
+        string key, Stream content, string contentType, CancellationToken cancellationToken = default)
+        => throw new InvalidOperationException(Message);
+
     public Task<SignedUrl> GetSignedReadUrlAsync(
         string key, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         => throw new InvalidOperationException(Message);

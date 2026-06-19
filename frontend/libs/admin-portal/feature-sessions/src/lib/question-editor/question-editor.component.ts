@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -39,6 +40,9 @@ interface EditableUnit {
   id: string | null;
   bodyLatex: string;
   imageUrl: string | null;
+  /** A picked-but-not-yet-uploaded image (new-question flow) and its local preview object URL. */
+  pendingImage: File | null;
+  pendingPreview: string | null;
   options: EditableOption[];
 }
 
@@ -47,6 +51,8 @@ const blankUnit = (): EditableUnit => ({
   id: null,
   bodyLatex: '',
   imageUrl: null,
+  pendingImage: null,
+  pendingPreview: null,
   options: [blankOption(true), blankOption()],
 });
 
@@ -56,10 +62,11 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
 /**
  * Question editor (FR-ADM-QB-001..006, FR-ADM-QZ-002, mockup `scrQuestionEditor`). Authors MCQ
  * questions with a LaTeX body + dependency-free live preview, single-correct options, a per-question
- * mark / quiz-eligibility / hint URL, an optional image, and multiple variations (unit 1 is the base
- * question; units 2+ are variations with their own body/image/options). Variations and images need a
- * persisted question, so on a new question only the base is captured (POST) before landing in edit
- * mode — mirroring how a session is created before its content is added.
+ * mark / quiz-eligibility / hint URL, an optional image, and any number of variations (unit 1 is the base
+ * question; units 2+ are variations with their own body/image/options). A question may be **image-only**
+ * (no LaTeX) — the picked image is held locally and sent inline on create (FR-PLAT-QB-002). Variations can
+ * be authored on a brand-new question too: their drafts are persisted right after the base is created in
+ * the same "Save question" action (a variation needs text; its image can be added once it exists).
  */
 @Component({
   selector: 'sb-question-editor',
@@ -106,9 +113,7 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
             @if (i > 0 && u.id === null) { <span class="qe__draft">draft</span> }
           </button>
         }
-        @if (!isNew()) {
-          <button type="button" class="qe__vadd" (click)="addVariationDraft()">+ Add variation</button>
-        }
+        <button type="button" class="qe__vadd" (click)="addVariationDraft()">+ Add variation</button>
       </div>
 
       @if (activeUnit(); as unit) {
@@ -126,25 +131,21 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
                 ></textarea>
 
                 <div class="qe__image">
-                  @if (unit.imageUrl) {
+                  @if (unit.pendingPreview ?? unit.imageUrl; as preview) {
                     <div class="qe__image-preview">
-                      <img [src]="unit.imageUrl" alt="Question image" />
-                      @if (activeIndex() === 0) {
-                        <sb-button variant="danger-ghost" size="sm" [loading]="imageBusy()" (clicked)="clearImage()">Remove image</sb-button>
+                      <img [src]="preview" alt="Question image" />
+                      @if (unit.pendingImage || (activeIndex() === 0 && unit.imageUrl)) {
+                        <sb-button variant="danger-ghost" size="sm" [loading]="imageBusy()" (clicked)="removeImage()">Remove image</sb-button>
                       }
                     </div>
                   }
-                  @if (unit.id) {
                     <sb-file-upload
-                      [label]="unit.imageUrl ? 'Replace image' : 'Question image (optional)'"
+                      [label]="(unit.pendingPreview ?? unit.imageUrl) ? 'Replace image' : 'Question image (optional)'"
                       accept="image/jpeg,image/png,image/webp"
                       hint="JPG, PNG or WebP · max 5 MB"
                       [progress]="imageBusy() ? 100 : null"
-                      (filesPicked)="uploadImage($event)"
+                      (filesPicked)="onImagePicked($event)"
                     />
-                  } @else {
-                    <p class="qe__hint">Save the question to attach an image.</p>
-                  }
                 </div>
               </div>
             </sb-card>
@@ -179,9 +180,13 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
 
             @if (activeIndex() > 0) {
               <div class="qe__variation-actions">
-                <sb-button variant="primary" size="sm" [loading]="variationBusy()" (clicked)="saveVariation()">
-                  {{ unit.id ? 'Save variation' : 'Add variation' }}
-                </sb-button>
+                @if (isNew()) {
+                  <span class="qe__muted">Saved with the question.</span>
+                } @else {
+                  <sb-button variant="primary" size="sm" [loading]="variationBusy()" (clicked)="saveVariation()">
+                    {{ unit.id ? 'Save variation' : 'Add variation' }}
+                  </sb-button>
+                }
                 <sb-button variant="danger-ghost" size="sm" (clicked)="removeVariation()">Remove variation</sb-button>
               </div>
             }
@@ -191,8 +196,8 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
           <div class="qe__col qe__col--side">
             <sb-card title="Live preview">
               <div class="qe__preview">
-                @if (unit.imageUrl) {
-                  <img class="qe__preview-img" [src]="unit.imageUrl" alt="Question image" />
+                @if (unit.pendingPreview ?? unit.imageUrl; as preview) {
+                  <img class="qe__preview-img" [src]="preview" alt="Question image" />
                 }
                 <sb-latex-preview [latex]="unit.bodyLatex" placeholder="Type a question body to preview it here." />
                 <div class="qe__preview-options">
@@ -272,7 +277,7 @@ const letter = (i: number): string => String.fromCharCode(65 + i);
     .qe__addopt:disabled { color: var(--sb-text-subtle); cursor: not-allowed; }
     .qe__error { margin: var(--sb-space-1) 0 0; color: var(--sb-danger-fg); font-size: var(--sb-body-sm-size); font-weight: 600; }
 
-    .qe__variation-actions { display: flex; gap: var(--sb-space-2); }
+    .qe__variation-actions { display: flex; gap: var(--sb-space-3); align-items: center; }
 
     .qe__preview { background: var(--sb-surface-sunken); border: 1px solid var(--sb-border); border-radius: var(--sb-radius-md); padding: var(--sb-space-4); }
     .qe__preview-img { max-width: 100%; max-height: 200px; border-radius: var(--sb-radius-sm); margin-bottom: var(--sb-space-3); display: block; }
@@ -328,10 +333,12 @@ export class QuestionEditorComponent {
       const qid = this.questionId();
       queueMicrotask(() => void this.#load(qid));
     });
+    inject(DestroyRef).onDestroy(() => this.#revokePreviews());
   }
 
   async #load(questionId: string | undefined): Promise<void> {
     if (this.loadError()) return;
+    this.#revokePreviews();
     this.activeIndex.set(0);
     this.showErrors.set(false);
     if (!questionId) {
@@ -340,9 +347,16 @@ export class QuestionEditorComponent {
       return;
     }
     try {
-      // No single-question GET in the contract — fetch the bank page and find it.
-      const res = await this.#service.listQuestions(this.id(), 1, 200);
-      const q = res.items.find((x) => x.id === questionId);
+      // No single-question GET in the contract — page through the bank (pageSize capped at 100) and find it.
+      let q: QuestionDto | undefined;
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const res = await this.#service.listQuestions(this.id(), page, 100);
+        q = res.items.find((x) => x.id === questionId);
+        totalPages = res.totalPages;
+        page++;
+      } while (!q && page <= totalPages);
       if (!q) {
         this.loadError.set('This question no longer exists in the bank.');
         return;
@@ -358,6 +372,8 @@ export class QuestionEditorComponent {
       id: q.id,
       bodyLatex: q.bodyLatex ?? '',
       imageUrl: q.imageUrl,
+      pendingImage: null,
+      pendingPreview: null,
       options: q.options.map((o) => ({ id: o.id, text: o.text, isCorrect: o.isCorrect })),
     };
     const variations: EditableUnit[] = q.variations.map((v) => this.#unitFromVariation(v));
@@ -370,6 +386,8 @@ export class QuestionEditorComponent {
       id: v.id,
       bodyLatex: v.bodyLatex ?? '',
       imageUrl: v.imageUrl,
+      pendingImage: null,
+      pendingPreview: null,
       options: v.options.map((o) => ({ id: o.id, text: o.text, isCorrect: o.isCorrect })),
     };
   }
@@ -418,7 +436,8 @@ export class QuestionEditorComponent {
     if (unit.options.length < 2) return 'Add at least two options.';
     if (unit.options.some((o) => !o.text.trim())) return 'Every option needs text.';
     if (unit.options.filter((o) => o.isCorrect).length !== 1) return 'Mark exactly one option as correct.';
-    if (!unit.bodyLatex.trim() && !unit.imageUrl) return 'Add a question body (LaTeX) and/or an image.';
+    if (!unit.bodyLatex.trim() && !unit.imageUrl && !unit.pendingImage)
+      return 'Add a question body (LaTeX) and/or an image.';
     return null;
   }
 
@@ -439,10 +458,23 @@ export class QuestionEditorComponent {
     this.activeIndex.set(0);
     this.showErrors.set(true);
     this.settings.markAllAsTouched();
-    const base = this.units()[0];
+    const units = this.units();
+    const base = units[0];
     if (this.settings.invalid || this.unitError(base)) {
       this.#toast.error('Please fix the highlighted fields.');
       return;
+    }
+    // On a new question we persist the variation drafts immediately after the base, so validate them
+    // up-front (never half-persist). A variation may be text and/or image-only — same rule as the base.
+    if (this.isNew()) {
+      for (let i = 1; i < units.length; i++) {
+        const vErr = this.unitError(units[i]);
+        if (vErr) {
+          this.activeIndex.set(i);
+          this.#toast.error(`Variation ${i + 1}: ${vErr}`);
+          return;
+        }
+      }
     }
     const s = this.settings.getRawValue();
     const payload: SaveQuestionRequest = {
@@ -455,14 +487,27 @@ export class QuestionEditorComponent {
     this.saving.set(true);
     try {
       if (this.isNew()) {
-        const created = await this.#service.createQuestion(this.id(), payload);
+        // Create the base (with an inline image when there's no body — an image-only question).
+        const created = await this.#service.createQuestion(this.id(), payload, base.pendingImage);
+        // Persist any variation drafts authored alongside it — each carries its own held image inline,
+        // so an image-only variation is created in a single call too.
+        for (let i = 1; i < units.length; i++) {
+          const v = units[i];
+          await this.#service.addVariation(
+            this.id(),
+            created.id,
+            { bodyLatex: v.bodyLatex.trim() || null, options: this.#toOptionInputs(v) },
+            v.pendingImage,
+          );
+        }
+        this.#revokePreviews();
         this.#toast.success('Question added to the bank');
         void this.#router.navigate(['/sessions', this.id(), 'questions', created.id, 'edit']);
       } else {
         const updated = await this.#service.updateQuestion(this.id(), this.questionId()!, payload);
         // Refresh only the base unit so unsaved variation drafts survive.
         this.units.update((list) => [
-          { id: updated.id, bodyLatex: updated.bodyLatex ?? '', imageUrl: updated.imageUrl, options: updated.options.map((o) => ({ id: o.id, text: o.text, isCorrect: o.isCorrect })) },
+          { id: updated.id, bodyLatex: updated.bodyLatex ?? '', imageUrl: updated.imageUrl, pendingImage: null, pendingPreview: null, options: updated.options.map((o) => ({ id: o.id, text: o.text, isCorrect: o.isCorrect })) },
           ...list.slice(1),
         ]);
         this.showErrors.set(false);
@@ -499,7 +544,7 @@ export class QuestionEditorComponent {
     try {
       const saved = unit.id
         ? await this.#service.updateVariation(this.id(), this.questionId()!, unit.id, payload)
-        : await this.#service.addVariation(this.id(), this.questionId()!, payload);
+        : await this.#service.addVariation(this.id(), this.questionId()!, payload, unit.pendingImage);
       this.units.update((list) => list.map((u, idx) => (idx === i ? this.#unitFromVariation(saved) : u)));
       this.showErrors.set(false);
       this.#toast.success(unit.id ? 'Variation saved' : 'Variation added');
@@ -524,7 +569,33 @@ export class QuestionEditorComponent {
     }
   }
 
-  // ── Image (active unit, persisted only) ────────────────────────────────────────────
+  // ── Image (active unit) ────────────────────────────────────────────────────────────
+  /** Persisted unit → upload now; unsaved unit (new question or new variation) → hold the file + a local
+   *  preview and send it inline when the unit is created. */
+  onImagePicked(files: File[]): void {
+    const unit = this.activeUnit();
+    const file = files[0];
+    if (!unit || !file) return;
+    if (unit.id) {
+      void this.uploadImage([file]);
+      return;
+    }
+    if (unit.pendingPreview) URL.revokeObjectURL(unit.pendingPreview);
+    this.#patchActive((u) => ({ ...u, pendingImage: file, pendingPreview: URL.createObjectURL(file) }));
+  }
+
+  /** Drop a held (not-yet-uploaded) image, or clear a persisted base image via the server. */
+  removeImage(): void {
+    const unit = this.activeUnit();
+    if (!unit) return;
+    if (unit.pendingImage) {
+      if (unit.pendingPreview) URL.revokeObjectURL(unit.pendingPreview);
+      this.#patchActive((u) => ({ ...u, pendingImage: null, pendingPreview: null }));
+      return;
+    }
+    void this.clearImage();
+  }
+
   async uploadImage(files: File[]): Promise<void> {
     const unit = this.activeUnit();
     const file = files[0];
@@ -563,6 +634,11 @@ export class QuestionEditorComponent {
 
   #setActiveImage(imageUrl: string | null): void {
     this.#patchActive((u) => ({ ...u, imageUrl }));
+  }
+
+  /** Release any object URLs created for unsaved-image previews (avoids leaks on reload/navigate). */
+  #revokePreviews(): void {
+    for (const u of this.units()) if (u.pendingPreview) URL.revokeObjectURL(u.pendingPreview);
   }
 
   back(): void {

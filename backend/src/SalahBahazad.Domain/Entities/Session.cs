@@ -101,6 +101,7 @@ public sealed class Session : TenantEntityBase, ISoftDeletable
         ValidityDays = validityDays;
         GradeId = gradeId;
         SpecializationId = specializationId;
+        AddDomainEvent(new SessionDetailsUpdatedEvent(Id, Title));
     }
 
     /// <summary>Records the R2 key of the uploaded thumbnail (FR-ADM-SES-002).</summary>
@@ -108,6 +109,7 @@ public sealed class Session : TenantEntityBase, ISoftDeletable
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(objectKey);
         ThumbnailObjectKey = objectKey;
+        AddDomainEvent(new SessionThumbnailUpdatedEvent(Id));
     }
 
     /// <summary>
@@ -120,6 +122,7 @@ public sealed class Session : TenantEntityBase, ISoftDeletable
             throw new InvalidOperationException("A session cannot be its own prerequisite (FR-ADM-SES-005).");
 
         PrerequisiteSessionId = prerequisiteSessionId == Guid.Empty ? null : prerequisiteSessionId;
+        AddDomainEvent(new SessionPrerequisiteChangedEvent(Id, PrerequisiteSessionId is null));
     }
 
     /// <summary>Sets/replaces the gating-quiz configuration (FR-PLAT-SES-006, FR-ADM-QZ-001).</summary>

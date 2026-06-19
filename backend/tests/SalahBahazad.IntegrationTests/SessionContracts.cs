@@ -99,6 +99,9 @@ public sealed record QuizSettingsBody(int TimeLimitMinutes, int QuestionCount, i
 public sealed record OptionBody(string Text, bool IsCorrect);
 
 public sealed record SaveQuestionBody(
-    string? BodyLatex, int Mark, bool IsValidForQuiz, string? HintUrl, List<OptionBody> Options);
+    string? BodyLatex, int Mark, bool IsValidForQuiz, string? HintUrl, List<OptionBody> Options,
+    string? ImageBase64 = null, string? ImageContentType = null);
 
-public sealed record SaveVariationBody(string? BodyLatex, List<OptionBody> Options);
+public sealed record SaveVariationBody(
+    string? BodyLatex, List<OptionBody> Options,
+    string? ImageBase64 = null, string? ImageContentType = null);

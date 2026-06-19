@@ -14,9 +14,20 @@ public interface IFileStorage
 {
     /// <summary>
     /// Uploads <paramref name="content"/> to the private bucket under <paramref name="key"/>.
-    /// The object is private by default — never public-read (FR-PLAT-AST-001/003).
+    /// The object is private by default — never public-read (FR-PLAT-AST-001/003). Suited to small
+    /// assets (images, materials) whose bytes fit comfortably in a single request.
     /// </summary>
     Task UploadPrivateAsync(
+        string key, Stream content, string contentType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Streams a large <paramref name="content"/> (e.g. a multi-GB source video, FR-PLAT-VID-007) to the
+    /// private bucket under <paramref name="key"/> using a chunked multipart upload, so memory stays
+    /// bounded (≈ one part) and nothing is buffered to the app server's disk (docs/05 §6). Works with a
+    /// forward-only, non-seekable stream — the live request body — so the upload happens as the bytes
+    /// arrive. The object is private by default (FR-PLAT-AST-001/003).
+    /// </summary>
+    Task UploadPrivateStreamingAsync(
         string key, Stream content, string contentType, CancellationToken cancellationToken = default);
 
     /// <summary>

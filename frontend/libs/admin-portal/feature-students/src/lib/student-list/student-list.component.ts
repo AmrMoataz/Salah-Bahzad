@@ -331,9 +331,18 @@ export class StudentListComponent implements OnInit {
   async exportCsv(): Promise<void> {
     this.exporting.set(true);
     try {
-      const result = await this.#service.listRaw({ ...this.#query(1000), page: 1 });
-      this.#downloadCsv(result.items);
-      this.#toast.success(`Exported ${result.items.length} students`);
+      // The API caps pageSize at 100, so page through to export every matching student.
+      const items: StudentListItem[] = [];
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const result = await this.#service.listRaw({ ...this.#query(100), page });
+        items.push(...result.items);
+        totalPages = result.totalPages;
+        page++;
+      } while (page <= totalPages);
+      this.#downloadCsv(items);
+      this.#toast.success(`Exported ${items.length} students`);
     } catch {
       this.#toast.error('Export failed. Please try again.');
     } finally {

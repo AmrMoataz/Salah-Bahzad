@@ -12,6 +12,7 @@ export type { AvatarSize, AvatarStatus } from './lib/avatar/avatar.component';
 export { EmptyStateComponent } from './lib/empty-state/empty-state.component';
 export { SelectComponent } from './lib/select/select.component';
 export type { SelectOption } from './lib/select/select.component';
+export { ComboboxComponent } from './lib/combobox/combobox.component';
 export { TabsComponent } from './lib/tabs/tabs.component';
 export type { SbTab } from './lib/tabs/tabs.component';
 export { TableComponent, TableCellDirective } from './lib/table/table.component';
