@@ -21,8 +21,8 @@ export type PillVariant = 'success' | 'danger' | 'warning' | 'info' | 'neutral';
       padding: 3px 10px;
       border-radius: var(--sb-radius-pill);
       border: 1px solid transparent;
-      font-size: var(--sb-text-xs);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-body-sm-size);
+      font-weight: 700;
       text-transform: capitalize;
       white-space: nowrap;
     }

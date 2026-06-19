@@ -25,8 +25,8 @@ export type AvatarStatus = 'none' | 'active' | 'inactive' | 'pending';
       justify-content: center;
       border-radius: var(--sb-radius-circle);
       border: 1px solid var(--sb-border);
-      font-family: var(--sb-font-ui);
-      font-weight: var(--sb-weight-extrabold);
+      font-family: var(--sb-font-sans);
+      font-weight: 800;
       user-select: none;
       text-transform: uppercase;
     }

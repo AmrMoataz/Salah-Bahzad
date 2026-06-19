@@ -15506,6 +15506,11 @@
       },
       {
         "source": "admin-portal-feature-dashboard",
+        "target": "npm:@angular/platform-browser",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-dashboard",
         "target": "shared-data-access",
         "type": "static"
       }
@@ -37842,5 +37847,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1781766632863
+  "computedAt": 1781829797107
 }

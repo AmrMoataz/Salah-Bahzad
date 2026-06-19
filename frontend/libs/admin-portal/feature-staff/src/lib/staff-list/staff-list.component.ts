@@ -206,12 +206,12 @@ interface ConfirmState {
     }
     .staff__title {
       margin: 0 0 var(--sb-space-1);
-      font-size: var(--sb-text-2xl);
-      font-weight: var(--sb-weight-extrabold);
-      letter-spacing: var(--sb-tracking-tight);
+      font-size: var(--sb-heading-xl-size);
+      font-weight: 800;
+      letter-spacing: -0.01em;
       color: var(--sb-text);
     }
-    .staff__subtitle { margin: 0; color: var(--sb-text-muted); font-size: var(--sb-text-sm); }
+    .staff__subtitle { margin: 0; color: var(--sb-text-muted); font-size: var(--sb-body-md-size); }
 
     .staff__table-wrap {
       border: 1px solid var(--sb-border);
@@ -225,10 +225,10 @@ interface ConfirmState {
       top: 0;
       background: var(--sb-surface-sunken);
       text-align: left;
-      font-size: var(--sb-text-xs);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-body-sm-size);
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: var(--sb-tracking-wide);
+      letter-spacing: 0.02em;
       color: var(--sb-text-muted);
       padding: var(--sb-space-3) var(--sb-space-4);
       white-space: nowrap;
@@ -241,9 +241,9 @@ interface ConfirmState {
     .staff__table tbody tr:hover { background: var(--sb-primary-50); }
 
     .staff__member { display: flex; align-items: center; gap: var(--sb-space-3); }
-    .staff__name { font-weight: var(--sb-weight-bold); font-size: var(--sb-text-sm); color: var(--sb-text); }
-    .staff__email { font-size: var(--sb-text-xs); color: var(--sb-text-muted); }
-    .staff__muted { color: var(--sb-text-muted); font-size: var(--sb-text-sm); white-space: nowrap; }
+    .staff__name { font-weight: 700; font-size: var(--sb-body-md-size); color: var(--sb-text); }
+    .staff__email { font-size: var(--sb-body-sm-size); color: var(--sb-text-muted); }
+    .staff__muted { color: var(--sb-text-muted); font-size: var(--sb-body-md-size); white-space: nowrap; }
 
     .staff__col-actions { width: 1%; }
     .staff__actions { display: inline-flex; gap: var(--sb-space-2); justify-content: flex-end; align-items: center; }
@@ -259,7 +259,7 @@ interface ConfirmState {
       background: var(--sb-surface);
       color: var(--sb-danger);
       cursor: pointer;
-      transition: background var(--sb-dur) var(--sb-ease-standard);
+      transition: background var(--sb-timing) var(--sb-easing-standard);
     }
     .staff__icon-btn:hover { background: var(--sb-primary-50); }
     .staff__icon-btn:focus-visible { box-shadow: var(--sb-shadow-focus); outline: none; }
@@ -285,15 +285,15 @@ interface ConfirmState {
     }
     .staff__rolegate-title {
       margin: 0 0 var(--sb-space-1);
-      font-size: var(--sb-text-md);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-heading-sm-size);
+      font-weight: 700;
       color: var(--sb-text);
     }
     .staff__rolegate-text {
       margin: 0 auto;
       max-width: 380px;
       color: var(--sb-text-muted);
-      font-size: var(--sb-text-sm);
+      font-size: var(--sb-body-md-size);
     }
 
     .sr-only {

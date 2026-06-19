@@ -24,7 +24,7 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
       padding: var(--sb-space-3) var(--sb-space-4);
       border-radius: var(--sb-radius-md);
       border: 1px solid transparent;
-      font-size: var(--sb-text-sm);
+      font-size: var(--sb-body-md-size);
     }
 
     .sb-alert__icon {
@@ -35,15 +35,15 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: var(--sb-text-xs);
-      font-weight: var(--sb-weight-extrabold);
+      font-size: var(--sb-body-sm-size);
+      font-weight: 800;
       line-height: 1;
       margin-top: 1px;
     }
 
-    .sb-alert__content { flex: 1; line-height: var(--sb-leading-normal); }
-    .sb-alert__title { margin: 0 0 2px; font-weight: var(--sb-weight-bold); }
-    .sb-alert__body { line-height: var(--sb-leading-snug); }
+    .sb-alert__content { flex: 1; line-height: 1.5; }
+    .sb-alert__title { margin: 0 0 2px; font-weight: 700; }
+    .sb-alert__body { line-height: 1.3; }
 
     .sb-alert--info {
       background: var(--sb-info-bg); border-color: var(--sb-info-border); color: var(--sb-info-fg);

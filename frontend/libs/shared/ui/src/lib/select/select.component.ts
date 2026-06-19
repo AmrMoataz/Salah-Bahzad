@@ -101,16 +101,16 @@ export interface SelectOption {
       height: 40px;
       padding: 0 12px;
       text-align: left;
-      font-family: var(--sb-font-ui);
-      font-size: var(--sb-text-sm);
+      font-family: var(--sb-font-sans);
+      font-size: var(--sb-body-md-size);
       color: var(--sb-text);
       border: 1px solid var(--sb-border-strong);
       border-radius: var(--sb-radius-md);
       background: var(--sb-surface);
       cursor: pointer;
       outline: none;
-      transition: border-color var(--sb-dur-fast) var(--sb-ease-standard),
-                  box-shadow var(--sb-dur-fast) var(--sb-ease-standard);
+      transition: border-color var(--sb-timing-fast) var(--sb-easing-standard),
+                  box-shadow var(--sb-timing-fast) var(--sb-easing-standard);
     }
     .sb-select__trigger--open { border-color: var(--sb-primary); box-shadow: var(--sb-shadow-focus); }
     .sb-select__trigger--invalid { border-color: var(--sb-danger); }
@@ -133,7 +133,7 @@ export interface SelectOption {
     .sb-select__chevron {
       display: inline-flex;
       color: var(--sb-text-muted);
-      transition: transform var(--sb-dur-fast) var(--sb-ease-standard);
+      transition: transform var(--sb-timing-fast) var(--sb-easing-standard);
     }
     .sb-select__chevron--open { transform: rotate(180deg); }
 
@@ -169,14 +169,14 @@ export interface SelectOption {
     .sb-select__option-body { flex: 1; min-width: 0; }
     .sb-select__option-label {
       display: block;
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-regular);
+      font-size: var(--sb-body-md-size);
+      font-weight: 400;
       line-height: 1.3;
     }
-    .sb-select__option-label--selected { font-weight: var(--sb-weight-bold); }
+    .sb-select__option-label--selected { font-weight: 700; }
     .sb-select__option-desc {
       display: block;
-      font-size: var(--sb-text-xs);
+      font-size: var(--sb-body-sm-size);
       color: var(--sb-text-muted);
       line-height: 1.3;
     }

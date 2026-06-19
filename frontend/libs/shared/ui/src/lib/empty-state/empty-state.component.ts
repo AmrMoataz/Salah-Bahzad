@@ -31,14 +31,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .sb-empty__img { width: 140px; height: auto; margin-bottom: var(--sb-space-2); }
     .sb-empty__headline {
       margin: 0;
-      font-size: var(--sb-text-lg);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-heading-md-size);
+      font-weight: 700;
       color: var(--sb-text);
     }
     .sb-empty__desc {
       margin: 0;
       color: var(--sb-text-muted);
-      line-height: var(--sb-leading-normal);
+      line-height: 1.5;
     }
     .sb-empty__action:empty { display: none; }
     .sb-empty__action { margin-top: var(--sb-space-2); }

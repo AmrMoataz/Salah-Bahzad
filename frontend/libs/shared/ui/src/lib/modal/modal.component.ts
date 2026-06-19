@@ -63,7 +63,7 @@ import {
       align-items: center;
       justify-content: center;
       padding: var(--sb-space-4);
-      animation: sb-modal-fade var(--sb-dur-fast) var(--sb-ease-out);
+      animation: sb-modal-fade var(--sb-timing-fast) var(--sb-easing-out);
     }
 
     .sb-modal {
@@ -75,7 +75,7 @@ import {
       display: flex;
       flex-direction: column;
       outline: none;
-      animation: sb-modal-pop var(--sb-dur) var(--sb-ease-standard);
+      animation: sb-modal-pop var(--sb-timing) var(--sb-easing-standard);
     }
 
     .sb-modal--confirm { max-width: 480px; }
@@ -92,8 +92,8 @@ import {
 
     .sb-modal__title {
       margin: 0;
-      font-size: var(--sb-text-md);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-heading-sm-size);
+      font-weight: 700;
       color: var(--sb-text);
     }
 
@@ -108,7 +108,7 @@ import {
       cursor: pointer;
       flex-shrink: 0;
       border-radius: var(--sb-radius-sm);
-      transition: color var(--sb-dur) var(--sb-ease-standard);
+      transition: color var(--sb-timing) var(--sb-easing-standard);
 
       &:hover { color: var(--sb-text); }
       &:focus-visible { box-shadow: var(--sb-shadow-focus); outline: none; }

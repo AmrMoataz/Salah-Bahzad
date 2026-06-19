@@ -1,4 +1,5 @@
 using Mediator;
+using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Staff.DTOs;
 using SalahBahazad.Domain.Enums;
 
@@ -9,4 +10,4 @@ public sealed record UpdateStaffCommand(
     Guid Id,
     string DisplayName,
     string Email,
-    StaffRole Role) : IRequest<StaffDto>;
+    StaffRole Role) : IRequest<StaffDto>, ITransactionalRequest;

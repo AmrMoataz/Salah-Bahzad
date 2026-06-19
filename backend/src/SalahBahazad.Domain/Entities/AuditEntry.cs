@@ -74,5 +74,6 @@ public sealed class AuditEntry
         };
     }
 
-    internal void SetHash(string hash) => Hash = hash;
+    /// <summary>Seals the entry with its computed tamper-evidence hash (set once by the audit interceptor).</summary>
+    public void SetHash(string hash) => Hash = hash;
 }

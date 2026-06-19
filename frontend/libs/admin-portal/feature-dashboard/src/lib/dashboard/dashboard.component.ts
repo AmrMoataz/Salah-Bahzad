@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthStore } from '@sb/shared/data-access';
+
+/** Inline outline icon (24×24 grid, ~1.8px stroke) matching the design-system iconography. */
+const icon = (d: string): string =>
+  `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
 
 /**
  * Phase 0 dashboard shell — KPI cards and activity feed added in Phase 5 (FR-ADM-DASH-001/002/003).
@@ -23,8 +28,13 @@ import { AuthStore } from '@sb/shared/data-access';
       <div class="dashboard__kpis" aria-label="Key metrics">
         @for (card of placeholderCards; track card.label) {
           <div class="kpi-card" [attr.aria-label]="card.label">
-            <div class="kpi-card__icon" [style.background]="card.iconBg" aria-hidden="true">
-              <span [innerHTML]="card.icon"></span>
+            <div
+              class="kpi-card__icon"
+              [style.background]="'var(--sb-subject-' + card.accent + '-bg)'"
+              [style.color]="'var(--sb-subject-' + card.accent + '-deep)'"
+              aria-hidden="true"
+            >
+              <span [innerHTML]="iconHtml(card.icon)"></span>
             </div>
             <div class="kpi-card__body">
               <div class="kpi-card__value">—</div>
@@ -40,20 +50,23 @@ import { AuthStore } from '@sb/shared/data-access';
         <div class="dashboard__action-list">
           <a href="/students?status=pending" class="action-card">
             <span class="action-card__label">Review approvals</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l3.25-3.25a.75.75 0 0 0 0-1.06L7.28 2.22a.75.75 0 0 0-1.06 1.06L9.44 6.5 6.22 9.72v-1z"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6"/>
             </svg>
           </a>
           <a href="/codes" class="action-card">
             <span class="action-card__label">Generate codes</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l3.25-3.25a.75.75 0 0 0 0-1.06L7.28 2.22a.75.75 0 0 0-1.06 1.06L9.44 6.5 6.22 9.72v-1z"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6"/>
             </svg>
           </a>
           <a href="/sessions/new" class="action-card">
             <span class="action-card__label">Create session</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l3.25-3.25a.75.75 0 0 0 0-1.06L7.28 2.22a.75.75 0 0 0-1.06 1.06L9.44 6.5 6.22 9.72v-1z"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6"/>
             </svg>
           </a>
         </div>
@@ -70,8 +83,8 @@ import { AuthStore } from '@sb/shared/data-access';
 
     .dashboard__header {}
     .dashboard__title {
-      font-size: var(--sb-text-2xl);
-      font-weight: var(--sb-weight-extrabold);
+      font-size: var(--sb-heading-xl-size);
+      font-weight: 800;
       color: var(--sb-text);
       margin-bottom: var(--sb-space-1);
     }
@@ -101,26 +114,25 @@ import { AuthStore } from '@sb/shared/data-access';
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      color: white;
     }
 
     .kpi-card__value {
-      font-size: var(--sb-text-2xl);
-      font-weight: var(--sb-weight-extrabold);
+      font-size: var(--sb-heading-xl-size);
+      font-weight: 800;
       color: var(--sb-text);
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
 
     .kpi-card__label {
-      font-size: var(--sb-text-sm);
+      font-size: var(--sb-body-md-size);
       color: var(--sb-text-muted);
       margin-top: var(--sb-space-1);
     }
 
     .dashboard__section-title {
-      font-size: var(--sb-text-base);
-      font-weight: var(--sb-weight-bold);
+      font-size: var(--sb-body-lg-size);
+      font-weight: 700;
       color: var(--sb-text);
       margin-bottom: var(--sb-space-4);
     }
@@ -141,9 +153,9 @@ import { AuthStore } from '@sb/shared/data-access';
       border-radius: var(--sb-radius-md);
       text-decoration: none;
       color: var(--sb-text);
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-semibold);
-      transition: all var(--sb-dur) var(--sb-ease-standard);
+      font-size: var(--sb-body-md-size);
+      font-weight: 600;
+      transition: all var(--sb-timing) var(--sb-easing-standard);
 
       &:hover {
         background: var(--sb-primary-50);
@@ -158,37 +170,27 @@ import { AuthStore } from '@sb/shared/data-access';
 })
 export class DashboardComponent {
   readonly #authStore = inject(AuthStore);
+  readonly #sanitizer = inject(DomSanitizer);
+  readonly #iconCache = new Map<string, SafeHtml>();
+
   readonly staff = this.#authStore.staff;
 
+  // Accent + outline icon mirror the prototype's StatCard treatment (tinted chip + deep icon),
+  // using the canonical design-system icon paths (inbox, users, ticket, clipboard).
   readonly placeholderCards = [
-    {
-      label: 'Pending approvals',
-      iconBg: 'var(--sb-warning)',
-      icon: `<svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 9a7 7 0 1 1 14 0H3z"/>
-      </svg>`,
-    },
-    {
-      label: 'Active students',
-      iconBg: 'var(--sb-accent)',
-      icon: `<svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM17 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 0 0-1.5-4.33A5 5 0 0 1 19 16v1h-6.07zM6 11a5 5 0 0 1 5 5v1H1v-1a5 5 0 0 1 5-5z"/>
-      </svg>`,
-    },
-    {
-      label: 'Active codes',
-      iconBg: 'var(--sb-primary)',
-      icon: `<svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-7-7A.997.997 0 0 1 2 10V5a3 3 0 0 1 3-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clip-rule="evenodd"/>
-      </svg>`,
-    },
-    {
-      label: 'Enrollments',
-      iconBg: 'var(--sb-purple)',
-      icon: `<svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M9 2a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2H9z"/>
-        <path fill-rule="evenodd" d="M4 5a2 2 0 0 1 2-2 3 3 0 0 0 3 3h2a3 3 0 0 0 3-3 2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5z" clip-rule="evenodd"/>
-      </svg>`,
-    },
+    { label: 'Pending approvals', accent: 'mustard', icon: icon('M3 12h5l2 3h4l2-3h5M5 5h14l3 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z') },
+    { label: 'Active students', accent: 'blue', icon: icon('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75') },
+    { label: 'Active codes', accent: 'green', icon: icon('M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2 2 2 0 0 0 0-4zM9 7v10') },
+    { label: 'Enrollments', accent: 'purple', icon: icon('M9 3h6v2H9zM8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M9 12l2 2 4-4') },
   ];
+
+  /** Bypass the HTML sanitizer for developer-authored constant SVG icon markup (see sidebar). */
+  iconHtml(svg: string): SafeHtml {
+    let trusted = this.#iconCache.get(svg);
+    if (!trusted) {
+      trusted = this.#sanitizer.bypassSecurityTrustHtml(svg);
+      this.#iconCache.set(svg, trusted);
+    }
+    return trusted;
+  }
 }

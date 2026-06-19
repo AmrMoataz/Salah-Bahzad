@@ -5,6 +5,8 @@ export interface NavItem {
   route: string;
   /** When set, the item is hidden unless the signed-in staff holds this permission. */
   permission?: string;
+  /** When true, the item is shown only to the Teacher role (matches the design's `isTeacher()` gate). */
+  teacherOnly?: boolean;
   /** Optional live badge count (e.g. pending approvals). Hidden when null/0. */
   badgeSignal?: () => number | null;
 }

@@ -1,7 +1,9 @@
 // ── Design tokens ─────────────────────────────────────────────────────────
-// Imported from the single source of truth in docs/tokens.css
-// Keep this as a forward-only import — never override tokens here.
-@import '../../../../docs/tokens.css';
+// Single source of truth: the Salah Bahzad design system exported under
+// `.claude/Salah Bahzad Teacher Portal/ds/tokens/`. `_design-tokens.scss`
+// is a faithful mirror of those files. Keep this forward-only — never
+// override token values here.
+@use 'styles/design-tokens';
 
 // ── Reset / base ──────────────────────────────────────────────────────────
 *,
@@ -17,9 +19,9 @@ html {
 
 body {
   margin: 0;
-  font-family: var(--sb-font-ui);
-  font-size: var(--sb-text-base);
-  line-height: var(--sb-leading-normal);
+  font-family: var(--sb-font-sans);
+  font-size: var(--sb-body-lg-size);
+  line-height: 1.5;
   color: var(--sb-text);
   background-color: var(--sb-bg);
   -webkit-font-smoothing: antialiased;
@@ -29,9 +31,9 @@ body {
 // ── Typography baseline ───────────────────────────────────────────────────
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  font-weight: var(--sb-weight-bold);
-  line-height: var(--sb-leading-tight);
-  letter-spacing: var(--sb-tracking-tight);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   color: var(--sb-text);
 }
 

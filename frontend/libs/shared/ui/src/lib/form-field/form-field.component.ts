@@ -25,8 +25,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .sb-field { display: flex; flex-direction: column; gap: 4px; }
 
     .sb-field__label {
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-semibold);
+      font-size: var(--sb-body-md-size);
+      font-weight: 600;
       color: var(--sb-text);
       user-select: none;
     }
@@ -34,14 +34,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .sb-field__required { color: var(--sb-danger); margin-left: 2px; }
 
     .sb-field__hint {
-      font-size: var(--sb-text-xs);
+      font-size: var(--sb-body-sm-size);
       color: var(--sb-text-muted);
     }
 
     .sb-field__error {
-      font-size: var(--sb-text-xs);
+      font-size: var(--sb-body-sm-size);
       color: var(--sb-danger-fg);
-      font-weight: var(--sb-weight-semibold);
+      font-weight: 600;
     }
   `],
 })

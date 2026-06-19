@@ -85,14 +85,14 @@ import { NavGroup } from '../nav-item.model';
     .sidebar__brand-text { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
 
     .sidebar__brand-name {
-      font-weight: var(--sb-weight-extrabold);
+      font-weight: 800;
       font-size: 15px;
       color: var(--sb-text);
     }
 
     .sidebar__brand-sub {
       font-size: 11px;
-      font-weight: var(--sb-weight-bold);
+      font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--sb-text-muted);
@@ -111,7 +111,7 @@ import { NavGroup } from '../nav-item.model';
       margin: 0;
       padding: 14px 12px 6px;
       font-size: 11px;
-      font-weight: var(--sb-weight-bold);
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--sb-text-subtle);
@@ -134,10 +134,10 @@ import { NavGroup } from '../nav-item.model';
       border-radius: var(--sb-radius-md);
       text-decoration: none;
       color: var(--sb-text);
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-semibold);
-      transition: background var(--sb-dur-fast) var(--sb-ease-standard),
-                  color var(--sb-dur-fast) var(--sb-ease-standard);
+      font-size: var(--sb-body-md-size);
+      font-weight: 600;
+      transition: background var(--sb-timing-fast) var(--sb-easing-standard),
+                  color var(--sb-timing-fast) var(--sb-easing-standard);
     }
 
     .sidebar__item:hover { background: var(--sb-primary-50); color: var(--sb-text); text-decoration: none; }
@@ -147,7 +147,7 @@ import { NavGroup } from '../nav-item.model';
     .sidebar__item.is-active:hover {
       background: var(--sb-primary);
       color: var(--sb-on-primary);
-      font-weight: var(--sb-weight-bold);
+      font-weight: 700;
       box-shadow: var(--sb-shadow-sm);
     }
 
@@ -174,7 +174,7 @@ import { NavGroup } from '../nav-item.model';
       background: var(--sb-danger);
       color: #fff;
       font-size: 11px;
-      font-weight: var(--sb-weight-extrabold);
+      font-weight: 800;
     }
 
     .sidebar__item.is-active .sidebar__item-badge { background: rgba(255, 255, 255, 0.25); }
@@ -188,7 +188,7 @@ import { NavGroup } from '../nav-item.model';
         z-index: var(--sb-z-overlay);
         height: 100dvh;
         transform: translateX(-100%);
-        transition: transform var(--sb-dur) var(--sb-ease-standard);
+        transition: transform var(--sb-timing) var(--sb-easing-standard);
       }
 
       .sidebar--open {

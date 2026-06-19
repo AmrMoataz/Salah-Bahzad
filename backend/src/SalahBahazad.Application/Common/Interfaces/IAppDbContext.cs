@@ -11,4 +11,12 @@ public interface IAppDbContext
     DbSet<AuditEntry> AuditEntries { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Runs <paramref name="action"/> inside a single database transaction, committing on success.
+    /// Buffered domain events are dispatched only after the commit. Used by the transaction pipeline
+    /// behaviour for <see cref="ITransactionalRequest"/> commands.
+    /// </summary>
+    Task<TResult> ExecuteInTransactionAsync<TResult>(
+        Func<Task<TResult>> action, CancellationToken cancellationToken = default);
 }

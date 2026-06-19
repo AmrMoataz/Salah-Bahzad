@@ -41,12 +41,12 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
       gap: var(--sb-space-2);
       border: none;
       border-radius: var(--sb-radius-md);
-      font-family: var(--sb-font-ui);
-      font-weight: var(--sb-weight-bold);
+      font-family: var(--sb-font-sans);
+      font-weight: 700;
       cursor: pointer;
-      transition: background-color var(--sb-dur) var(--sb-ease-standard),
-                  box-shadow var(--sb-dur) var(--sb-ease-standard),
-                  transform var(--sb-dur-fast) var(--sb-ease-standard);
+      transition: background-color var(--sb-timing) var(--sb-easing-standard),
+                  box-shadow var(--sb-timing) var(--sb-easing-standard),
+                  transform var(--sb-timing-fast) var(--sb-easing-standard);
       white-space: nowrap;
 
       &:active:not(:disabled) { transform: translateY(1px); }
@@ -55,9 +55,9 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     }
 
     /* Sizes */
-    .sb-btn--sm { height: 32px; padding: 0 12px; font-size: var(--sb-text-sm); }
-    .sb-btn--md { height: 40px; padding: 0 16px; font-size: var(--sb-text-sm); }
-    .sb-btn--lg { height: 48px; padding: 0 20px; font-size: var(--sb-text-base); }
+    .sb-btn--sm { height: 32px; padding: 0 12px; font-size: var(--sb-body-md-size); }
+    .sb-btn--md { height: 40px; padding: 0 16px; font-size: var(--sb-body-md-size); }
+    .sb-btn--lg { height: 48px; padding: 0 20px; font-size: var(--sb-body-lg-size); }
 
     /* Variants */
     .sb-btn--primary {

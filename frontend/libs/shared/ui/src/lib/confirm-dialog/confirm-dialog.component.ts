@@ -23,7 +23,7 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
     .sb-confirm__message {
       margin: 0;
       color: var(--sb-text-muted);
-      line-height: var(--sb-leading-normal);
+      line-height: 1.5;
     }
     .sb-confirm__actions {
       display: flex;

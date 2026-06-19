@@ -44,8 +44,11 @@ try
     builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
     // ── FluentValidation pipeline ────────────────────────────────────────────
+    // includeInternalTypes: validators are internal sealed, so FluentValidation must be told to
+    // register them (default scans public types only — otherwise the validation pipeline silently no-ops).
     builder.Services.AddValidatorsFromAssembly(
-        typeof(SalahBahazad.Application.Features.Auth.PermissionCatalog).Assembly);
+        typeof(SalahBahazad.Application.Features.Auth.PermissionCatalog).Assembly,
+        includeInternalTypes: true);
 
     builder.Services.AddTransient(
         typeof(IPipelineBehavior<,>),
@@ -54,6 +57,12 @@ try
     builder.Services.AddTransient(
         typeof(IPipelineBehavior<,>),
         typeof(ValidationBehavior<,>));
+
+    // Transaction scope (innermost behaviour: validation runs before a transaction is opened).
+    // Only wraps ITransactionalRequest commands; domain events dispatch after the commit.
+    builder.Services.AddTransient(
+        typeof(IPipelineBehavior<,>),
+        typeof(TransactionBehavior<,>));
 
     // ── ProblemDetails (RFC 7807) + global exception → HTTP status mapping ────
     builder.Services.AddProblemDetails();

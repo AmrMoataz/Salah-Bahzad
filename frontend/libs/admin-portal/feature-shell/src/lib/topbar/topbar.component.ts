@@ -127,8 +127,8 @@ import { AuthStore } from '@sb/shared/data-access';
     .topbar__heading { min-width: 0; flex-shrink: 1; }
 
     .topbar__title {
-      font-size: var(--sb-text-md);
-      font-weight: var(--sb-weight-extrabold);
+      font-size: var(--sb-heading-sm-size);
+      font-weight: 800;
       line-height: 1.1;
       color: var(--sb-text);
       white-space: nowrap;
@@ -201,8 +201,8 @@ import { AuthStore } from '@sb/shared/data-access';
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: var(--sb-weight-extrabold);
-      font-size: var(--sb-text-sm);
+      font-weight: 800;
+      font-size: var(--sb-body-md-size);
       text-transform: uppercase;
     }
 
@@ -215,7 +215,7 @@ import { AuthStore } from '@sb/shared/data-access';
 
     .topbar__user-name {
       font-size: 13.5px;
-      font-weight: var(--sb-weight-bold);
+      font-weight: 700;
       color: var(--sb-text);
     }
 
@@ -226,7 +226,7 @@ import { AuthStore } from '@sb/shared/data-access';
 
     .topbar__chevron {
       color: var(--sb-text-muted);
-      transition: transform var(--sb-dur-fast) var(--sb-ease-standard);
+      transition: transform var(--sb-timing-fast) var(--sb-easing-standard);
     }
     .topbar__chevron.is-open { transform: rotate(180deg); }
 
@@ -253,8 +253,8 @@ import { AuthStore } from '@sb/shared/data-access';
       background: none;
       border-radius: var(--sb-radius-sm);
       cursor: pointer;
-      font-size: var(--sb-text-sm);
-      font-weight: var(--sb-weight-semibold);
+      font-size: var(--sb-body-md-size);
+      font-weight: 600;
       color: var(--sb-text);
       text-decoration: none;
       text-align: left;

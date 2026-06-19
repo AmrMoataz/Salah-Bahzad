@@ -1,3 +1,4 @@
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using SalahBahazad.Application.Common.Interfaces;
@@ -29,12 +30,13 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
                 npgsql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
             .Options;
 
-        // Migrations only need the model + a connection; the tenant/user resolvers and the audit
-        // interceptor are never exercised by DDL, so design-time stubs are sufficient.
+        // Migrations only need the model + a connection; the tenant/user resolvers, audit
+        // interceptor, and event publisher are never exercised by DDL, so design-time stubs suffice.
         var tenantResolver = new DesignTimeTenantResolver();
-        var auditInterceptor = new AuditSaveChangesInterceptor(new DesignTimeUserResolver(), tenantResolver);
+        var auditInterceptor = new AuditSaveChangesInterceptor(
+            new DesignTimeUserResolver(), tenantResolver, new DesignTimeAuditContext(), TimeProvider.System);
 
-        return new AppDbContext(options, tenantResolver, auditInterceptor);
+        return new AppDbContext(options, tenantResolver, auditInterceptor, new DesignTimePublisher());
     }
 
     private sealed class DesignTimeTenantResolver : ICurrentTenantResolver
@@ -50,5 +52,20 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
         public StaffRole Role => StaffRole.None;
         public string? DeviceId => null;
         public bool IsAuthenticated => false;
+    }
+
+    private sealed class DesignTimeAuditContext : IAuditContextAccessor
+    {
+        public string? IpAddress => null;
+        public string? Portal => null;
+    }
+
+    private sealed class DesignTimePublisher : IPublisher
+    {
+        public ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+            where TNotification : INotification => ValueTask.CompletedTask;
+
+        public ValueTask Publish(object notification, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
     }
 }

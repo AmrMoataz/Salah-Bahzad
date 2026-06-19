@@ -29,6 +29,7 @@ public static class InfrastructureServiceExtensions
         // Scoped resolvers
         services.AddScoped<ICurrentTenantResolver, CurrentTenantResolver>();
         services.AddScoped<ICurrentUserResolver, CurrentUserResolver>();
+        services.AddScoped<IAuditContextAccessor, AuditContextAccessor>();
 
         // Audit interceptor (scoped — needs resolver)
         services.AddScoped<AuditSaveChangesInterceptor>();

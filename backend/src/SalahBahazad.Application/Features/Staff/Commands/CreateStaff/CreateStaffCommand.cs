@@ -1,4 +1,5 @@
 using Mediator;
+using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Staff.DTOs;
 using SalahBahazad.Domain.Enums;
 
@@ -11,4 +12,4 @@ namespace SalahBahazad.Application.Features.Staff.Commands.CreateStaff;
 public sealed record CreateStaffCommand(
     string DisplayName,
     string Email,
-    StaffRole Role) : IRequest<StaffDto>;
+    StaffRole Role) : IRequest<StaffDto>, ITransactionalRequest;
