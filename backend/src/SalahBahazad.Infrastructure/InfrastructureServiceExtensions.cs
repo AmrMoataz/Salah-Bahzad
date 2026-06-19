@@ -1,3 +1,5 @@
+using Amazon.Runtime;
+using Amazon.S3;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -111,6 +113,48 @@ public static class InfrastructureServiceExtensions
         // HybridCache (in-process L1 only for now; wire Redis L2 when the caching phase arrives)
         services.AddHybridCache();
 
+        // ── Object storage (R2 / MinIO) ─────────────────────────────────────────
+        AddObjectStorage(services, configuration);
+
         return services;
+    }
+
+    /// <summary>
+    /// Registers the object-storage seam from the <c>R2</c> configuration section (env only,
+    /// NFR-SEC-002). When configured (dev gets MinIO from the AppHost; staging/prod get real R2
+    /// credentials), wires a single S3 client + <see cref="R2FileStorage"/>; otherwise registers a
+    /// throwing stub so the app still boots (e.g. integration tests that don't touch storage).
+    /// </summary>
+    private static void AddObjectStorage(IServiceCollection services, IConfiguration configuration)
+    {
+        var options = configuration.GetSection(R2Options.SectionName).Get<R2Options>() ?? new R2Options();
+        services.AddSingleton(options);
+
+        if (!options.IsConfigured)
+        {
+            services.AddSingleton<IFileStorage, UnconfiguredFileStorage>();
+            return;
+        }
+
+        services.AddSingleton<IAmazonS3>(_ =>
+        {
+            var config = new AmazonS3Config
+            {
+                ServiceURL = options.Endpoint,
+                // Path-style addressing is required for MinIO and R2 custom endpoints (no virtual-host
+                // bucket DNS). R2 expects region "auto".
+                ForcePathStyle = true,
+                AuthenticationRegion = "auto",
+                // SDK v4 enables additional integrity checksums by default that R2 / older MinIO reject;
+                // restrict them to when the operation requires it, matching S3-compatible behaviour.
+                RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED,
+                ResponseChecksumValidation = ResponseChecksumValidation.WHEN_REQUIRED,
+            };
+
+            var credentials = new BasicAWSCredentials(options.AccessKeyId, options.SecretAccessKey);
+            return new AmazonS3Client(credentials, config);
+        });
+
+        services.AddSingleton<IFileStorage, R2FileStorage>();
     }
 }

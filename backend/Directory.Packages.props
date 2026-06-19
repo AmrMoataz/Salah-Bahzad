@@ -40,6 +40,11 @@
     <PackageVersion Include="StackExchange.Redis" Version="2.8.0" />
   </ItemGroup>
 
+  <!-- Object storage (Cloudflare R2 / MinIO via the AWS S3 SDK) -->
+  <ItemGroup>
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.25.2" />
+  </ItemGroup>
+
   <!-- API docs / OpenAPI -->
   <ItemGroup>
     <PackageVersion Include="Scalar.AspNetCore" Version="2.5.0" />

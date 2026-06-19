@@ -155,6 +155,17 @@ try
         {
             Log.Warning(seedEx, "Database seed failed (continuing startup)");
         }
+
+        // Ensure the local MinIO private bucket exists (dev only; staging/prod buckets are
+        // pre-created in Cloudflare R2). A failure is logged but never blocks startup.
+        try
+        {
+            await SalahBahazad.Infrastructure.Services.ObjectStorageInitializer.EnsureBucketsAsync(app.Services);
+        }
+        catch (Exception storageEx)
+        {
+            Log.Warning(storageEx, "Object storage bucket bootstrap failed (continuing startup)");
+        }
     }
 
     app.Run();
