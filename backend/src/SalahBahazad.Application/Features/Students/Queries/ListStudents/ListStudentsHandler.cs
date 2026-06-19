@@ -27,7 +27,7 @@ internal sealed class ListStudentsHandler(IAppDbContext db)
             students = students.Where(s =>
                 s.FullName.ToLower().Contains(term)
                 || s.SchoolName.ToLower().Contains(term)
-                || s.ParentPhonePrimary.Contains(term));
+                || s.PhoneNumber.Contains(term));
         }
 
         var total = await students.CountAsync(cancellationToken);
