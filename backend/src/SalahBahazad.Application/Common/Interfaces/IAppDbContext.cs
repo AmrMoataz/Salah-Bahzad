@@ -10,6 +10,10 @@ public interface IAppDbContext
     DbSet<Staff> Staff { get; }
     DbSet<AuditEntry> AuditEntries { get; }
 
+    // Students (tenant-owned) — FR-ADM-STU-*, FR-STU-REG-*
+    DbSet<Student> Students { get; }
+    DbSet<StudentDevice> StudentDevices { get; }
+
     // Taxonomy (tenant-owned, dynamic) — FR-PLAT-TAX-001
     DbSet<Grade> Grades { get; }
     DbSet<Subject> Subjects { get; }

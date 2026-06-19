@@ -26,6 +26,10 @@ public sealed class AppDbContext(
     public DbSet<Staff> Staff => Set<Staff>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
+    // Students (tenant-owned) — FR-ADM-STU-*, FR-STU-REG-*
+    public DbSet<Student> Students => Set<Student>();
+    public DbSet<StudentDevice> StudentDevices => Set<StudentDevice>();
+
     // Taxonomy (tenant-owned) — FR-PLAT-TAX-001
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Subject> Subjects => Set<Subject>();
