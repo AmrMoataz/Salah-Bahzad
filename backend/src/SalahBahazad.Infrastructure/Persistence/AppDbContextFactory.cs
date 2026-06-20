@@ -52,6 +52,7 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
         public StaffRole Role => StaffRole.None;
         public string? DeviceId => null;
         public bool IsAuthenticated => false;
+        public string ActorType => "System";
     }
 
     private sealed class DesignTimeAuditContext : IAuditContextAccessor

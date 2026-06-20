@@ -170,6 +170,56 @@ export interface SessionActivityDto {
   occurredAtUtc: string;
 }
 
+// ── Enrollment (Phase 4) ─────────────────────────────────────────────────────────────────────
+// Shapes mirror the FROZEN Phase 4 contract (`docs/contracts/phase4-codes-enrollment.md`). They are
+// duplicated here (not imported from feature-codes) to respect the Nx feature→feature boundary.
+
+/** Enrollment lifecycle state. */
+export type EnrollmentStatus = 'Active' | 'Expired' | 'Refunded';
+
+/** How an enrollment was granted. */
+export type EnrollmentMethod = 'Code' | 'Unlock';
+
+/**
+ * One row of the session-detail "Enrolled students" tab (contract §1 `EnrollmentListDto`, endpoint #8).
+ * `quizBestPercent` / `videosWatched` / `videosTotal` are Phase-5 placeholders (always 0 now).
+ */
+export interface EnrollmentListDto {
+  enrollmentId: string;
+  studentId: string;
+  studentName: string;
+  studentInitials: string;
+  method: EnrollmentMethod;
+  status: EnrollmentStatus;
+  enrolledAtUtc: string;
+  quizBestPercent: number;
+  videosWatched: number;
+  videosTotal: number;
+}
+
+/** Result of unlock (#9) / refund (#10) (contract §1 `EnrollmentDto`). */
+export interface EnrollmentDto {
+  id: string;
+  studentId: string;
+  studentName: string;
+  sessionId: string;
+  sessionTitle: string;
+  status: EnrollmentStatus;
+  method: EnrollmentMethod;
+  amount: number;
+  codeId: string | null;
+  codeSerial: string | null;
+  enrolledAtUtc: string;
+  expiresAtUtc: string | null;
+}
+
+/** Lightweight active-student row for the unlock picker (`GET /api/students?status=Active&search=`). */
+export interface StudentSearchRow {
+  id: string;
+  name: string;
+  phone: string;
+}
+
 // ── Request payloads ───────────────────────────────────────────────────────────────────────────
 
 /** Create/update body for a session (§2.2 / §2.4). Subject is derived server-side from the specialization. */

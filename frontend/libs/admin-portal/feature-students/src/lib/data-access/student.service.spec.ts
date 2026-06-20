@@ -160,4 +160,33 @@ describe('StudentService', () => {
 
     expect((await promise).total).toBe(0);
   });
+
+  it('listEnrollments() GETs the paged enrolments endpoint (#11)', async () => {
+    const promise = service.listEnrollments('1', 2, 10);
+
+    const req = http.expectOne((r) => r.url.endsWith('/api/students/1/enrollments'));
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('page')).toBe('2');
+    expect(req.request.params.get('pageSize')).toBe('10');
+    req.flush({
+      items: [
+        {
+          enrollmentId: 'e1',
+          sessionId: 's1',
+          sessionTitle: "Newton's Laws",
+          method: 'Code',
+          status: 'Active',
+          amount: 150,
+          enrolledAtUtc: '2026-06-20T09:00:00Z',
+          codeSerial: 'SB-1',
+        },
+      ],
+      total: 1,
+      page: 2,
+      pageSize: 10,
+      totalPages: 1,
+    });
+
+    expect((await promise).items[0].sessionTitle).toBe("Newton's Laws");
+  });
 });

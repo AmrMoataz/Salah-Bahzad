@@ -27,8 +27,12 @@ internal sealed class AuditWriter(
 
         var isAuthenticated = currentUser.IsAuthenticated;
         var actorId = isAuthenticated ? currentUser.UserId : (Guid?)null;
-        var actorRole = isAuthenticated ? currentUser.Role.ToString() : null;
-        var actorType = isAuthenticated ? "Staff" : (request.ActorType ?? "System");
+        // Authenticated actors are classified by the resolver (Staff/Student); anonymous flows (e.g. student
+        // self-registration) supply ActorType on the request and carry no actor role.
+        var actorType = isAuthenticated ? currentUser.ActorType : (request.ActorType ?? "System");
+        var actorRole = isAuthenticated
+            ? (currentUser.ActorType == "Student" ? "Student" : currentUser.Role.ToString())
+            : null;
 
         // Seed the chain from the tenant's most recent committed entry (Id is UUIDv7 = time-ordered).
         var prevHash = await db.AuditEntries

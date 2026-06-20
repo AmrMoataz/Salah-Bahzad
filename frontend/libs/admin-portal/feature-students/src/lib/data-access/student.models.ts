@@ -97,6 +97,31 @@ export interface StudentAuditEntry {
   occurredAtUtc: string;
 }
 
+// ── Enrollment (Phase 4) ─────────────────────────────────────────────────────────────────────
+// Shapes mirror the FROZEN Phase 4 contract (`docs/contracts/phase4-codes-enrollment.md`). Defined
+// here (not imported from feature-codes) to respect the Nx feature→feature boundary.
+
+/** Enrollment lifecycle state. */
+export type EnrollmentStatus = 'Active' | 'Expired' | 'Refunded';
+
+/** How an enrollment was granted. */
+export type EnrollmentMethod = 'Code' | 'Unlock';
+
+/**
+ * One row of the student-detail "Enrollments & transactions" tab (contract §1 `StudentEnrollmentDto`,
+ * endpoint #11). `amount` 0 renders as "Free".
+ */
+export interface StudentEnrollmentDto {
+  enrollmentId: string;
+  sessionId: string;
+  sessionTitle: string;
+  method: EnrollmentMethod;
+  status: EnrollmentStatus;
+  amount: number;
+  enrolledAtUtc: string;
+  codeSerial: string | null;
+}
+
 /** Query params for the paged/filterable student list (FR-ADM-STU-001). */
 export interface StudentListQuery {
   search?: string;

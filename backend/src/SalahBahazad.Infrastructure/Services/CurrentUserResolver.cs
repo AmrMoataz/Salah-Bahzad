@@ -17,9 +17,25 @@ internal sealed class CurrentUserResolver(IHttpContextAccessor httpContextAccess
     public Guid TenantId =>
         Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirstValue("tenant_id")!);
 
+    // A student-role token carries a role claim that is not a StaffRole; resolve those to None rather than
+    // throwing, so RequirePermission denies them (ForRole(None) is empty) and the audit interceptor still runs.
     public StaffRole Role =>
-        Enum.Parse<StaffRole>(httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Role)!);
+        Enum.TryParse<StaffRole>(httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role), out var role)
+            ? role
+            : StaffRole.None;
 
     public string? DeviceId =>
         httpContextAccessor.HttpContext?.User.FindFirstValue("device_id");
+
+    public string ActorType
+    {
+        get
+        {
+            if (!IsAuthenticated)
+                return "System";
+
+            var roleClaim = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Role);
+            return string.Equals(roleClaim, "Student", StringComparison.OrdinalIgnoreCase) ? "Student" : "Staff";
+        }
+    }
 }

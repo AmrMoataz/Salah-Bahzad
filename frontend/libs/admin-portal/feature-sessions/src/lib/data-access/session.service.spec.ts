@@ -306,4 +306,94 @@ describe('SessionService', () => {
 
     await service.loadGrades(); // cached → no second request (verified by afterEach)
   });
+
+  // ── Enrollment (Phase 4, contract §3) ──────────────────────────────────────────
+  it('listEnrollments() GETs the paged enrolled-students list (#8)', async () => {
+    const promise = service.listEnrollments('s1', 2, 10);
+    const req = http.expectOne((r) => r.url.endsWith('/api/sessions/s1/enrollments'));
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('page')).toBe('2');
+    expect(req.request.params.get('pageSize')).toBe('10');
+    req.flush({
+      items: [
+        {
+          enrollmentId: 'e1',
+          studentId: 'st1',
+          studentName: 'Mariam Adel',
+          studentInitials: 'MA',
+          method: 'Code',
+          status: 'Active',
+          enrolledAtUtc: '2026-06-20T09:00:00Z',
+          quizBestPercent: 0,
+          videosWatched: 0,
+          videosTotal: 0,
+        },
+      ],
+      total: 1,
+      page: 2,
+      pageSize: 10,
+      totalPages: 1,
+    });
+    expect((await promise).items[0].studentInitials).toBe('MA');
+  });
+
+  it('unlock() POSTs { studentId } to /api/sessions/{id}/unlock (#9)', async () => {
+    const promise = service.unlock('s1', 'st1');
+    const req = http.expectOne((r) => r.url.endsWith('/api/sessions/s1/unlock'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ studentId: 'st1' });
+    req.flush({
+      id: 'e1',
+      studentId: 'st1',
+      studentName: 'Mariam Adel',
+      sessionId: 's1',
+      sessionTitle: 'Kinematics',
+      status: 'Active',
+      method: 'Unlock',
+      amount: 0,
+      codeId: null,
+      codeSerial: null,
+      enrolledAtUtc: '2026-06-20T09:00:00Z',
+      expiresAtUtc: null,
+    });
+    expect((await promise).method).toBe('Unlock');
+  });
+
+  it('refund() POSTs { reason } to /api/enrollments/{id}/refund (#10)', async () => {
+    const promise = service.refund('e1', 'duplicate purchase');
+    const req = http.expectOne((r) => r.url.endsWith('/api/enrollments/e1/refund'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ reason: 'duplicate purchase' });
+    req.flush({
+      id: 'e1',
+      studentId: 'st1',
+      studentName: 'Mariam Adel',
+      sessionId: 's1',
+      sessionTitle: 'Kinematics',
+      status: 'Refunded',
+      method: 'Code',
+      amount: 150,
+      codeId: 'c1',
+      codeSerial: 'SB-1',
+      enrolledAtUtc: '2026-06-20T09:00:00Z',
+      expiresAtUtc: null,
+    });
+    expect((await promise).status).toBe('Refunded');
+  });
+
+  it('searchActiveStudents() GETs /api/students?status=Active&search and maps to { id, name, phone }', async () => {
+    const promise = service.searchActiveStudents('mar');
+    const req = http.expectOne((r) => r.url.endsWith('/api/students'));
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('status')).toBe('Active');
+    expect(req.request.params.get('search')).toBe('mar');
+    req.flush({
+      items: [{ id: 'st1', fullName: 'Mariam Adel', phoneNumber: '01000000000' }],
+      total: 1,
+      page: 1,
+      pageSize: 100,
+      totalPages: 1,
+    });
+    expect(await promise).toEqual([{ id: 'st1', name: 'Mariam Adel', phone: '01000000000' }]);
+  });
 });

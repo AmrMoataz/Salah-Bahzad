@@ -7,6 +7,8 @@ internal sealed class ListSessionsValidator : AbstractValidator<ListSessionsQuer
     public ListSessionsValidator()
     {
         RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-        RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+        // Reused as a filter dropdown by the codes screen (large page to list all sessions); the contract
+        // sets no pageSize ceiling.
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 1000);
     }
 }

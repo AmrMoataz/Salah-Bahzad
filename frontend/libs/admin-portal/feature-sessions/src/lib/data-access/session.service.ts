@@ -7,6 +7,8 @@ import {
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import {
+  EnrollmentDto,
+  EnrollmentListDto,
   GradeRef,
   PagedResult,
   QuestionDto,
@@ -23,6 +25,7 @@ import {
   SessionVideoDto,
   SignedUrlDto,
   SpecializationRef,
+  StudentSearchRow,
   SubjectRef,
 } from './session.models';
 
@@ -272,6 +275,56 @@ export class SessionService {
         { params },
       ),
     );
+  }
+
+  // ── Enrollment (Phase 4 — contract §3) ───────────────────────────────────────
+  /** Paged enrolled-students list for the session-detail "Enrolled" tab (#8). */
+  listEnrollments(
+    id: string,
+    page = 1,
+    pageSize = 20,
+    search?: string,
+  ): Promise<PagedResult<EnrollmentListDto>> {
+    let params = new HttpParams().set('page', String(page)).set('pageSize', String(pageSize));
+    if (search) params = params.set('search', search);
+    return firstValueFrom(
+      this.#http.get<PagedResult<EnrollmentListDto>>(
+        `${this.#api()}/api/sessions/${id}/enrollments`,
+        { params },
+      ),
+    );
+  }
+
+  /** Manually unlock the session for a student, bypassing code & price (#9); 409 if already-active. */
+  unlock(id: string, studentId: string): Promise<EnrollmentDto> {
+    return firstValueFrom(
+      this.#http.post<EnrollmentDto>(`${this.#api()}/api/sessions/${id}/unlock`, { studentId }),
+    );
+  }
+
+  /** Refund + revoke an enrollment (#10); returns the enrollment with status `Refunded`. */
+  refund(enrollmentId: string, reason?: string): Promise<EnrollmentDto> {
+    return firstValueFrom(
+      this.#http.post<EnrollmentDto>(`${this.#api()}/api/enrollments/${enrollmentId}/refund`, {
+        reason: reason ?? null,
+      }),
+    );
+  }
+
+  /**
+   * Active-student search for the unlock picker — reuses the Phase-2 `/api/students` list filtered to
+   * `status=Active`. Called from this slice's own service (no `feature-students` import — Nx boundary).
+   */
+  async searchActiveStudents(query = ''): Promise<StudentSearchRow[]> {
+    let params = new HttpParams().set('status', 'Active').set('page', '1').set('pageSize', '100');
+    if (query) params = params.set('search', query);
+    const result = await firstValueFrom(
+      this.#http.get<PagedResult<{ id: string; fullName: string; phoneNumber: string }>>(
+        `${this.#api()}/api/students`,
+        { params },
+      ),
+    );
+    return result.items.map((s) => ({ id: s.id, name: s.fullName, phone: s.phoneNumber }));
   }
 
   // ── Question bank (§2.18–§2.22) ──────────────────────────────────────────────

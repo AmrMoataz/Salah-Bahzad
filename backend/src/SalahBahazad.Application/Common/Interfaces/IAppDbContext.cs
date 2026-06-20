@@ -27,6 +27,12 @@ public interface IAppDbContext
     // Question bank (tenant-owned) — FR-PLAT-QB-*, FR-ADM-QB-*
     DbSet<Question> Questions { get; }
 
+    // Codes & enrollment (tenant-owned) — FR-PLAT-COD-*, FR-PLAT-ENR-*, FR-PLAT-PAY-*, FR-PLAT-ATT-*
+    DbSet<CodeBatch> CodeBatches { get; }
+    DbSet<Code> Codes { get; }
+    DbSet<Enrollment> Enrollments { get; }
+    DbSet<Attendance> Attendances { get; }
+
     // Location reference data (global, seeded, read-only) — FR-PLAT-TAX-003
     DbSet<City> Cities { get; }
     DbSet<Region> Regions { get; }

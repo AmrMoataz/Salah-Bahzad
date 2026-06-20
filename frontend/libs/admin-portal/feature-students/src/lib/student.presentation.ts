@@ -1,5 +1,5 @@
 import { AvatarStatus, PillVariant } from '@sb/shared/ui';
-import { StudentStatus } from './data-access/student.models';
+import { EnrollmentMethod, StudentStatus } from './data-access/student.models';
 
 /** Two-letter initials for the avatar (mirrors the staff list helper). */
 export function studentInitials(name: string): string {
@@ -36,6 +36,16 @@ export function statusDot(status: StudentStatus): AvatarStatus {
     default:
       return 'inactive';
   }
+}
+
+/** Enrollment method → pill variant (`Code` redemption vs manual `Unlock`). */
+export function methodPill(method: EnrollmentMethod): PillVariant {
+  return method === 'Unlock' ? 'warning' : 'info';
+}
+
+/** Egyptian-pound amount; "Free" when zero (enrollment transactions, matches the prototype). */
+export function amount(value: number): string {
+  return value > 0 ? `EGP ${value}` : 'Free';
 }
 
 /** Subject-accent key for a student's avatar — stable per id so the colours don't flicker.

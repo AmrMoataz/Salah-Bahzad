@@ -42,6 +42,13 @@ public static class InfrastructureServiceExtensions
         // Video transcode seam — stubbed in Phase 3 (marks Ready); Hangfire + HLS is Phase 5.
         services.AddScoped<IVideoProcessingQueue, StubVideoProcessingQueue>();
 
+        // Enrollment side-effect seam — stubbed in Phase 4 (logs intent); assignment/quiz snapshot
+        // generation is Phase 5 (FR-PLAT-ENR-005, FR-PLAT-ASG-001, FR-PLAT-QZ-001).
+        services.AddScoped<IEnrollmentSideEffects, StubEnrollmentSideEffects>();
+
+        // Synchronous CSV code export (FR-PLAT-COD-002); stateless.
+        services.AddSingleton<ICodeExporter, CsvCodeExporter>();
+
         // EF Core + PostgreSQL
         services.AddDbContext<AppDbContext>((sp, opts) =>
         {

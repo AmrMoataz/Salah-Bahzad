@@ -129,7 +129,21 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
 ### Phase 4 — Enrollment, codes & payments seam
 - **Backend:** Code batches — Teacher-only generate, **Excel export**, lifecycle disable/enable/delete (soft), register with full usage join (`FR-PLAT-COD-001..006`, `FR-ADM-COD-*`, fixes issue #1); enrollment by code (value==price, one-shot) + **staff unlock** + **refund/revoke** + re-enroll/extend resets counters (`FR-PLAT-ENR-001..008`); payment abstraction + `PaymentTransaction` seam, gateway disabled (`FR-PLAT-PAY-001/002`); enrollment side-effects: generate assignment, provision video counters, generate prerequisite quiz (`FR-PLAT-ENR-005`).
 - **Frontend:** Codes list (filter by status/batch/session) + Generate batch (Excel download); unlock-for-student and refund flows.
-- **Exit:** mint→export→redeem→refund a code, all audited; counters/expiry correct on re-enroll.
+- **Exit:** ✅ mint→export→redeem→refund a code, all audited; counters/expiry correct on re-enroll.
+  **Met (2026-06-20):** the wiring stream connected both streams against the running Aspire stack — an end-to-end
+  smoke (generate batch [value defaults to session price] → CSV export #3 + batch re-export #4 [documented columns] →
+  disable→`Inactive`→enable → **redeem #12 with a student JWT** [code→`Used`, enrollment `Active`/`Code`, per-video
+  counters provisioned, `Completed` `PaymentTransaction`, attendance shell, `EnrollmentCreated`] → Enrolled tab →
+  **unlock** a different student → **refund** [enrollment `Refunded`, code returns to `Active`, reversing payment] →
+  re-enroll **reuses the same row** with reset counters + pushed expiry [`FR-PLAT-ENR-004/005/006/008`] → student
+  enrollments → real `enrolledCount`) passed (58 assertions). Default-deny verified live (Assistant blocked on
+  generate/disable/delete but **allowed** unlock+refund per the `EnrollmentsRefund` catalog change; anonymous → 401;
+  student token → 403 on staff routes; staff token → 403 on #12); tenant isolation holds (`NFR-SEC-010`). Every
+  lifecycle action wrote a hash-chained `AuditEntry` — including the **read-only CSV export, audited explicitly**
+  (`FR-PLAT-AUD-002`) — redeem attributed to the `Student` actor, child rows suppressed. Frozen contract
+  (`docs/contracts/phase4-codes-enrollment.md`) matched on both sides with **zero drift**. Gates green:
+  `dotnet test -c Release` (132 unit + Phase-4 integration) and `nx build admin-portal` +
+  `nx test admin-portal-feature-codes` (22). Full log in `IMPLEMENTATION-PLAN-phase4-wiring.md`.
   **Planned (2026-06-20):** design-anchored to the `.claude` prototype (`scrCodes`/`scrCodesGenerate`/`scrSessionDetail`
   unlock+enrolled/`scrStudentDetail` enrollments) and split into three parallel-safe streams + a frozen contract, exactly
   like Phase 3 — `docs/contracts/phase4-codes-enrollment.md` (12 endpoints) and

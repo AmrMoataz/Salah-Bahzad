@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Common.Models;
 using SalahBahazad.Application.Features.Sessions.DTOs;
+using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Application.Features.Sessions.Queries.ListSessions;
 
@@ -78,6 +79,13 @@ internal sealed class ListSessionsHandler(IAppDbContext db)
             .Select(g => new { SessionId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.SessionId, x => x.Count, cancellationToken);
 
+        // Real active-enrollment counts (FR-ADM-SES-001; Phase 4 fills the Phase 3 placeholder).
+        var enrolledCounts = await db.Enrollments
+            .Where(e => sessionIds.Contains(e.SessionId) && e.Status == EnrollmentStatus.Active)
+            .GroupBy(e => e.SessionId)
+            .Select(g => new { SessionId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.SessionId, x => x.Count, cancellationToken);
+
         var dtos = items.Select(s =>
         {
             specById.TryGetValue(s.SpecializationId, out var spec);
@@ -87,7 +95,8 @@ internal sealed class ListSessionsHandler(IAppDbContext db)
                 subjectName,
                 spec?.Name,
                 questionCounts.GetValueOrDefault(s.Id),
-                videoCounts.GetValueOrDefault(s.Id));
+                videoCounts.GetValueOrDefault(s.Id),
+                enrolledCounts.GetValueOrDefault(s.Id));
         }).ToList();
 
         return new PagedResult<SessionListDto>(dtos, total, query.Page, query.PageSize);

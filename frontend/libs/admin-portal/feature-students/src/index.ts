@@ -15,4 +15,7 @@ export type {
   StudentAuditEntry,
   StudentListQuery,
   UpdateStudentContactRequest,
+  EnrollmentStatus,
+  EnrollmentMethod,
+  StudentEnrollmentDto,
 } from './lib/data-access/student.models';

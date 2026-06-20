@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "admin-portal-feature-codes",
+  "projectType": "library",
+  "sourceRoot": "libs/admin-portal/feature-codes/src",
+  "prefix": "sb",
+  "tags": ["scope:admin-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/admin-portal/feature-codes"],
+      "options": {
+        "jestConfig": "libs/admin-portal/feature-codes/jest.config.ts"
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@ import {
   PagedResult,
   StudentAuditEntry,
   StudentDetail,
+  StudentEnrollmentDto,
   StudentIdImageUrl,
   StudentListItem,
   StudentListQuery,
@@ -113,6 +114,17 @@ export class StudentService {
     return firstValueFrom(
       this.#http.get<PagedResult<StudentAuditEntry>>(
         `${this.#apiUrl()}/api/students/${id}/activity`,
+        { params },
+      ),
+    );
+  }
+
+  /** Paged enrolments & transactions for the detail's "Enrollments" tab (Phase 4, contract #11). */
+  listEnrollments(id: string, page = 1, pageSize = 20): Promise<PagedResult<StudentEnrollmentDto>> {
+    const params = new HttpParams().set('page', String(page)).set('pageSize', String(pageSize));
+    return firstValueFrom(
+      this.#http.get<PagedResult<StudentEnrollmentDto>>(
+        `${this.#apiUrl()}/api/students/${id}/enrollments`,
         { params },
       ),
     );

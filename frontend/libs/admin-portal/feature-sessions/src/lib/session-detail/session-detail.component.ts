@@ -8,15 +8,21 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AuthStore } from '@sb/shared/data-access';
 import {
   AlertComponent,
+  AvatarComponent,
   ButtonComponent,
   CardComponent,
+  ComboboxComponent,
   ConfirmDialogComponent,
+  ModalComponent,
   PaginationComponent,
+  ProgressComponent,
   SbTab,
   SbTableColumn,
+  SelectOption,
   StatusPillComponent,
   TableCellDirective,
   TableComponent,
@@ -25,11 +31,13 @@ import {
   ToastService,
 } from '@sb/shared/ui';
 import {
+  EnrollmentListDto,
   QuestionDto,
   SessionActivityDto,
   SessionDetailDto,
   SessionMaterialDto,
   SessionVideoDto,
+  StudentSearchRow,
 } from '../data-access/session.models';
 import { SessionService } from '../data-access/session.service';
 import {
@@ -54,6 +62,7 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
   selector: 'sb-session-detail',
   standalone: true,
   imports: [
+    ReactiveFormsModule,
     CardComponent,
     ButtonComponent,
     StatusPillComponent,
@@ -64,6 +73,10 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
     PaginationComponent,
     ConfirmDialogComponent,
     AlertComponent,
+    AvatarComponent,
+    ComboboxComponent,
+    ModalComponent,
+    ProgressComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -100,11 +113,13 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
         </div>
 
         <div class="sd__actions">
-          <sb-button variant="secondary" (clicked)="unlock()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM7 11V7a5 5 0 0 1 9.9-1"/></svg>
-            Unlock for student
-          </sb-button>
+          @if (canUnlock()) {
+            <sb-button variant="secondary" (clicked)="openUnlock()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              Unlock for student
+            </sb-button>
+          }
           @if (canEdit()) {
             <sb-button variant="primary" (clicked)="edit()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -292,7 +307,46 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
 
       <!-- ENROLLED (Phase 4) -->
       @if (activeTab() === 'enrolled') {
-        <div class="sd__empty">Enrolled students, progress and refunds arrive in Phase 4 (enrollment &amp; codes).</div>
+        <sb-card title="Enrolled students" [padding]="false">
+          @if (enrollments().length === 0 && !enrollmentsLoading()) {
+            <p class="sd__empty-inline">No students are enrolled in this session yet.</p>
+          } @else {
+            <sb-table [columns]="enrollmentColumns" [rows]="enrollments()" [rowKey]="enrollmentKey">
+              <ng-template sbTableCell="student" let-e>
+                <div class="sd__student">
+                  <sb-avatar size="sm" [initials]="e.studentInitials" [subject]="studentAccent(e.studentId)" />
+                  <div>
+                    <div class="sd__strong">{{ e.studentName }}</div>
+                    <div class="sd__act-meta">Enrolled {{ at(e.enrolledAtUtc) }}</div>
+                  </div>
+                </div>
+              </ng-template>
+              <ng-template sbTableCell="progress" let-e>
+                <div class="sd__progress"><sb-progress [value]="progressPercent(e)" variant="primary" /></div>
+              </ng-template>
+              <ng-template sbTableCell="quiz" let-e><strong>{{ e.quizBestPercent }}%</strong></ng-template>
+              <ng-template sbTableCell="actions" let-e>
+                <div class="sd__qactions">
+                  <sb-button variant="ghost" size="sm" [disabled]="true">Review</sb-button>
+                  @if (canRefund()) {
+                    <sb-button variant="secondary" size="sm" (clicked)="askRefund(e)">Refund</sb-button>
+                  }
+                </div>
+              </ng-template>
+            </sb-table>
+            @if (enrollmentsTotal() > enrollmentsPageSize) {
+              <div class="sd__bank-pager">
+                <sb-pagination
+                  [page]="enrollmentsPage()"
+                  [pageCount]="enrollmentsPageCount()"
+                  [total]="enrollmentsTotal()"
+                  [pageSize]="enrollmentsPageSize"
+                  (pageChange)="onEnrollmentsPage($event)"
+                />
+              </div>
+            }
+          }
+        </sb-card>
       }
 
       <!-- ACTIVITY (audit feed for the session and its content) -->
@@ -367,6 +421,37 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
         (confirm)="confirmDeleteQuestion()"
         (cancel)="deleteQuestionOpen.set(false)"
       />
+
+      <!-- Unlock for a student (#9) -->
+      <sb-modal [open]="unlockOpen()" title="Unlock for a student" size="form" (close)="closeUnlock()">
+        <p class="sd__muted">Grant access bypassing code &amp; price. Find the student by phone or name.</p>
+        <div class="sd__unlock-picker">
+          <sb-combobox
+            [formControl]="unlockStudent"
+            [options]="studentOptions()"
+            placeholder="Search by name or phone…"
+            emptyText="No active students"
+          />
+        </div>
+        <div modalFooter class="sd__modal-actions">
+          <sb-button variant="ghost" (clicked)="closeUnlock()">Cancel</sb-button>
+          <sb-button variant="primary" [disabled]="!unlockStudent.value" [loading]="unlockBusy()" (clicked)="confirmUnlock()">
+            Unlock session
+          </sb-button>
+        </div>
+      </sb-modal>
+
+      <!-- Refund + revoke an enrollment (#10) -->
+      <sb-confirm-dialog
+        [open]="refundOpen()"
+        title="Refund enrollment?"
+        [message]="refundMessage()"
+        confirmLabel="Refund & revoke"
+        confirmVariant="danger"
+        [busy]="actionBusy()"
+        (confirm)="confirmRefund()"
+        (cancel)="refundOpen.set(false)"
+      />
     }
   `,
   styles: [`
@@ -431,6 +516,12 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
     .sd__act-body { flex: 1; min-width: 0; }
     .sd__act-text { font-size: var(--sb-body-md-size); color: var(--sb-text); }
     .sd__act-meta { font-size: var(--sb-body-sm-size); color: var(--sb-text-subtle); margin-top: 2px; }
+
+    .sd__student { display: flex; align-items: center; gap: var(--sb-space-3); }
+    .sd__progress { width: 130px; }
+    .sd__muted { margin: 0 0 var(--sb-space-4); color: var(--sb-text-muted); font-size: var(--sb-body-md-size); line-height: 1.5; }
+    .sd__unlock-picker { min-height: 0; }
+    .sd__modal-actions { display: flex; gap: var(--sb-space-2); justify-content: flex-end; }
   `],
 })
 export class SessionDetailComponent {
@@ -471,11 +562,43 @@ export class SessionDetailComponent {
   readonly #pendingDeleteQuestion = signal<QuestionDto | null>(null);
   readonly actionBusy = signal(false);
 
+  // Enrolled tab (#8)
+  readonly enrollments = signal<EnrollmentListDto[]>([]);
+  readonly enrollmentsTotal = signal(0);
+  readonly enrollmentsPage = signal(1);
+  readonly enrollmentsLoading = signal(false);
+  readonly #enrollmentsLoaded = signal(false);
+  readonly enrollmentsPageSize = 10;
+  readonly enrollmentsPageCount = computed(() =>
+    Math.max(1, Math.ceil(this.enrollmentsTotal() / this.enrollmentsPageSize)),
+  );
+
+  // Unlock-for-student modal (#9)
+  readonly unlockOpen = signal(false);
+  readonly unlockBusy = signal(false);
+  readonly unlockStudent = new FormControl('', { nonNullable: true });
+  readonly #activeStudents = signal<StudentSearchRow[]>([]);
+  readonly studentOptions = computed<SelectOption[]>(() =>
+    this.#activeStudents().map((s) => ({ value: s.id, label: s.name, description: s.phone })),
+  );
+
+  // Refund + revoke (#10)
+  readonly refundOpen = signal(false);
+  readonly #pendingRefund = signal<EnrollmentListDto | null>(null);
+  readonly refundMessage = computed(() => {
+    const e = this.#pendingRefund();
+    const title = this.session()?.title ?? 'this session';
+    if (!e) return '';
+    return `Revoke ${e.studentName}'s access to “${title}” and refund the code value? This action is audited.`;
+  });
+
   readonly canEdit = computed(() => this.#auth.hasPermission('SessionsEdit'));
   readonly canDelete = computed(() => this.#auth.hasPermission('SessionsDelete'));
   readonly canQuestionsCreate = computed(() => this.#auth.hasPermission('QuestionsCreate'));
   readonly canQuestionsEdit = computed(() => this.#auth.hasPermission('QuestionsEdit'));
   readonly canQuestionsDelete = computed(() => this.#auth.hasPermission('QuestionsDelete'));
+  readonly canUnlock = computed(() => this.#auth.hasPermission('EnrollmentsUnlock'));
+  readonly canRefund = computed(() => this.#auth.hasPermission('EnrollmentsRefund'));
 
   readonly tabs = computed<SbTab[]>(() => {
     const s = this.session();
@@ -504,8 +627,16 @@ export class SessionDetailComponent {
     { key: 'actions', header: '', align: 'right', width: '1%' },
   ];
 
+  readonly enrollmentColumns: readonly SbTableColumn[] = [
+    { key: 'student', header: 'Student' },
+    { key: 'progress', header: 'Progress' },
+    { key: 'quiz', header: 'Quiz best', align: 'right' },
+    { key: 'actions', header: '', align: 'right', width: '1%' },
+  ];
+
   readonly videoKey = (v: SessionVideoDto): string => v.id;
   readonly questionKey = (q: QuestionDto): string => q.id;
+  readonly enrollmentKey = (e: EnrollmentListDto): string => e.enrollmentId;
 
   readonly quizSummary = computed(() => {
     const q = this.session()?.quizSetting;
@@ -537,6 +668,10 @@ export class SessionDetailComponent {
     this.activityTotal.set(0);
     this.activityPage.set(1);
     this.#activityLoaded.set(false);
+    this.enrollments.set([]);
+    this.enrollmentsTotal.set(0);
+    this.enrollmentsPage.set(1);
+    this.#enrollmentsLoaded.set(false);
     try {
       this.session.set(await this.#service.getById(id));
     } catch {
@@ -549,6 +684,7 @@ export class SessionDetailComponent {
     this.activeTab.set(tab);
     if (tab === 'bank' && this.questions().length === 0) void this.#loadQuestions(1);
     if (tab === 'activity' && !this.#activityLoaded()) void this.#loadActivity(1);
+    if (tab === 'enrolled' && !this.#enrollmentsLoaded()) void this.#loadEnrollments(1);
   }
 
   async #loadQuestions(page: number): Promise<void> {
@@ -605,8 +741,99 @@ export class SessionDetailComponent {
     void this.#router.navigate(['/sessions', this.id(), 'questions', q.id, 'edit']);
   }
 
-  unlock(): void {
-    this.#toast.info('Manual unlock for a student arrives in Phase 4 (enrollment & codes).');
+  // ── Enrolled tab (#8) ────────────────────────────────────────────────────────────
+  async #loadEnrollments(page: number): Promise<void> {
+    this.enrollmentsLoading.set(true);
+    try {
+      const res = await this.#service.listEnrollments(this.id(), page, this.enrollmentsPageSize);
+      this.enrollments.set(res.items);
+      this.enrollmentsTotal.set(res.total);
+      this.enrollmentsPage.set(page);
+      this.#enrollmentsLoaded.set(true);
+    } catch {
+      this.#toast.error('Could not load enrolled students.');
+    } finally {
+      this.enrollmentsLoading.set(false);
+    }
+  }
+
+  onEnrollmentsPage(page: number): void {
+    void this.#loadEnrollments(page);
+  }
+
+  progressPercent(e: EnrollmentListDto): number {
+    return e.videosTotal > 0 ? Math.round((e.videosWatched / e.videosTotal) * 100) : 0;
+  }
+
+  studentAccent(id: string): string {
+    return subjectAccent(id);
+  }
+
+  // ── Unlock for a student (#9) ──────────────────────────────────────────────────────
+  async openUnlock(): Promise<void> {
+    this.unlockStudent.setValue('');
+    this.unlockOpen.set(true);
+    try {
+      this.#activeStudents.set(await this.#service.searchActiveStudents());
+    } catch {
+      this.#toast.error('Could not load active students.');
+    }
+  }
+
+  closeUnlock(): void {
+    this.unlockOpen.set(false);
+  }
+
+  async confirmUnlock(): Promise<void> {
+    const studentId = this.unlockStudent.value;
+    if (!studentId) return;
+    this.unlockBusy.set(true);
+    try {
+      await this.#service.unlock(this.id(), studentId);
+      this.unlockOpen.set(false);
+      this.#toast.success('Session unlocked for student');
+      this.session.update((s) => (s ? { ...s, enrolledCount: s.enrolledCount + 1 } : s));
+      await this.#loadEnrollments(1);
+    } catch (err) {
+      this.#toast.error(this.#problem(err, 'Could not unlock the session. The student may already be enrolled.'));
+    } finally {
+      this.unlockBusy.set(false);
+    }
+  }
+
+  // ── Refund + revoke (#10) ───────────────────────────────────────────────────────────
+  askRefund(e: EnrollmentListDto): void {
+    this.#pendingRefund.set(e);
+    this.refundOpen.set(true);
+  }
+
+  async confirmRefund(): Promise<void> {
+    const e = this.#pendingRefund();
+    if (!e) return;
+    this.actionBusy.set(true);
+    try {
+      await this.#service.refund(e.enrollmentId);
+      this.refundOpen.set(false);
+      this.#toast.info('Enrollment refunded');
+      this.session.update((s) => (s ? { ...s, enrolledCount: Math.max(0, s.enrolledCount - 1) } : s));
+      await this.#loadEnrollments(this.enrollmentsPage());
+    } catch (err) {
+      this.#toast.error(this.#problem(err, 'Could not refund the enrollment.'));
+    } finally {
+      this.actionBusy.set(false);
+    }
+  }
+
+  /** Extracts an RFC 7807 `detail` from an HTTP error, else a fallback. */
+  #problem(err: unknown, fallback: string): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const body = (err as { error?: unknown }).error;
+      if (body && typeof body === 'object' && 'detail' in body) {
+        const detail = (body as { detail?: unknown }).detail;
+        if (typeof detail === 'string') return detail;
+      }
+    }
+    return fallback;
   }
 
   // ── Materials download (on-demand signed URL) ──────────────────────────────────

@@ -24,6 +24,7 @@
       "@sb/admin-portal/feature-staff": ["libs/admin-portal/feature-staff/src/index.ts"],
       "@sb/admin-portal/feature-students": ["libs/admin-portal/feature-students/src/index.ts"],
       "@sb/admin-portal/feature-sessions": ["libs/admin-portal/feature-sessions/src/index.ts"],
+      "@sb/admin-portal/feature-codes": ["libs/admin-portal/feature-codes/src/index.ts"],
       "@sb/admin-portal/feature-taxonomy": ["libs/admin-portal/feature-taxonomy/src/index.ts"],
       "@sb/admin-portal/feature-settings": ["libs/admin-portal/feature-settings/src/index.ts"]
     }

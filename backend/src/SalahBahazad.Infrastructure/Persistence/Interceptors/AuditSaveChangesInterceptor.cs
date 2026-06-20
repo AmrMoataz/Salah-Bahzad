@@ -45,7 +45,13 @@ public sealed class AuditSaveChangesInterceptor(
         var now = clock.GetUtcNow();
         var isAuthenticated = currentUser.IsAuthenticated;
         var actorId = isAuthenticated ? currentUser.UserId : (Guid?)null;
-        var actorRole = isAuthenticated ? currentUser.Role.ToString() : null;
+        var actorType = currentUser.ActorType; // "Staff" | "Student" | "System"
+        var actorRole = actorType switch
+        {
+            "Staff" => currentUser.Role.ToString(),
+            "Student" => "Student",
+            _ => null,
+        };
         var deviceId = currentUser.DeviceId;
         var ipAddress = auditContext.IpAddress;
         var portal = auditContext.Portal;
@@ -90,6 +96,17 @@ public sealed class AuditSaveChangesInterceptor(
 
         foreach (var entry in auditable)
         {
+            // Entities audited solely via their aggregate's semantic events (bulk-minted codes, per-video
+            // access counters, payment + attendance shells) must not emit a generic field-diff row unless
+            // they carry a semantic event this save — keeps one entry per lifecycle event (FR-PLAT-AUD-002).
+            if (entry.Entity is IAuditViaEventOnly)
+            {
+                var carriesSemanticEvent = entry.Entity is EntityBase eventfulEntity
+                    && eventfulEntity.DomainEvents.OfType<IAuditableDomainEvent>().Any();
+                if (!carriesSemanticEvent)
+                    continue;
+            }
+
             var action = entry.State switch
             {
                 EntityState.Added => "Created",
@@ -136,7 +153,7 @@ public sealed class AuditSaveChangesInterceptor(
                 entityId: entityId,
                 actorId: actorId,
                 actorRole: actorRole,
-                actorType: actorId.HasValue ? "Staff" : "System",
+                actorType: actorType,
                 summary: summary,
                 beforeJson: beforeJson,
                 afterJson: afterJson,

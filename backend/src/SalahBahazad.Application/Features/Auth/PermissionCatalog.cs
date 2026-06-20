@@ -34,7 +34,9 @@ public static class PermissionCatalog
         Permission.SessionsRead, Permission.SessionsCreate, Permission.SessionsEdit,
 		Permission.QuestionsRead, Permission.QuestionsCreate, Permission.QuestionsEdit, Permission.QuestionsDelete,
 		Permission.CodesRead,
-        Permission.EnrollmentsRead, Permission.EnrollmentsUnlock,
+        // Assistants may refund: the README role matrix + prototype grant it, and it is not in the
+        // FR-PLAT-ROLE-003 Teacher-only list (contract §5). Flip this one line if it should be Teacher-only.
+        Permission.EnrollmentsRead, Permission.EnrollmentsUnlock, Permission.EnrollmentsRefund,
         Permission.QuestionsRead,
         Permission.TaxonomyRead,
         Permission.StaffRead,

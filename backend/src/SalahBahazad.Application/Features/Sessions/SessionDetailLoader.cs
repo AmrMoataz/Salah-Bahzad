@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Sessions.DTOs;
+using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Application.Features.Sessions;
 
@@ -59,6 +60,10 @@ internal static class SessionDetailLoader
         var quizEligibleQuestionCount = await db.Questions
             .CountAsync(q => q.SessionId == session.Id && q.IsValidForQuiz, cancellationToken);
 
+        // Real active-enrollment count (Phase 4 fills the Phase 3 placeholder).
+        var enrolledCount = await db.Enrollments
+            .CountAsync(e => e.SessionId == session.Id && e.Status == EnrollmentStatus.Active, cancellationToken);
+
         string? thumbnailUrl = null;
         if (!string.IsNullOrWhiteSpace(session.ThumbnailObjectKey))
         {
@@ -75,7 +80,8 @@ internal static class SessionDetailLoader
             prerequisiteTitle,
             thumbnailUrl,
             questionCount,
-            quizEligibleQuestionCount);
+            quizEligibleQuestionCount,
+            enrolledCount);
     }
 
     /// <summary>Counts the session's quiz-eligible questions — the cap for quiz <c>questionCount</c>

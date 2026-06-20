@@ -7,6 +7,7 @@ internal sealed class ListStudentsValidator : AbstractValidator<ListStudentsQuer
     public ListStudentsValidator()
     {
         RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-        RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+        // Reused as the unlock-modal student picker (contract §1); the contract sets no pageSize ceiling.
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 1000);
     }
 }

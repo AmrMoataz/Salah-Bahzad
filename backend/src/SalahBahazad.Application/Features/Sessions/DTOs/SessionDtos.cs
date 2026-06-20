@@ -97,7 +97,8 @@ public static class SessionMappings
         string? subjectName,
         string? specializationName,
         int questionCount,
-        int videoCount) => new(
+        int videoCount,
+        int enrolledCount) => new(
         s.Id,
         s.Title,
         gradeName,
@@ -106,7 +107,7 @@ public static class SessionMappings
         s.Status,
         questionCount,
         videoCount,
-        EnrolledCount: 0);
+        enrolledCount);
 
     public static SessionVideoDto ToDto(this SessionVideoEntity v) => new(
         v.Id, v.Title, v.Order, v.LengthMinutes, v.AccessCount, v.ProcessingStatus, v.CreatedAtUtc);
@@ -129,7 +130,8 @@ public static class SessionMappings
         string? prerequisiteTitle,
         string? thumbnailUrl,
         int questionCount,
-        int quizEligibleQuestionCount) => new(
+        int quizEligibleQuestionCount,
+        int enrolledCount) => new(
         s.Id,
         s.Title,
         s.Description,
@@ -150,7 +152,7 @@ public static class SessionMappings
         s.Materials.OrderBy(m => m.CreatedAtUtc).Select(m => m.ToDto()).ToList(),
         questionCount,
         quizEligibleQuestionCount,
-        EnrolledCount: 0,
+        enrolledCount,
         s.CreatedAtUtc,
         s.UpdatedAtUtc);
 

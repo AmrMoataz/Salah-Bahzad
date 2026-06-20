@@ -40,6 +40,9 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
 
     public const string TestBucket = "sb-test-private";
 
+    /// <summary>Records enrollment side-effect invocations so tests can prove the enrollment event fired.</summary>
+    public SpyEnrollmentSideEffects EnrollmentSideEffects { get; } = new();
+
     public async Task InitializeAsync()
     {
         await Task.WhenAll(_postgres.StartAsync(), _minio.StartAsync());
@@ -79,6 +82,10 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         {
             services.RemoveAll<IFirebaseAuthService>();
             services.AddSingleton<IFirebaseAuthService, FakeFirebaseAuthService>();
+
+            // Spy on the (otherwise no-op) enrollment side-effect seam to assert the event handler ran.
+            services.RemoveAll<IEnrollmentSideEffects>();
+            services.AddSingleton<IEnrollmentSideEffects>(EnrollmentSideEffects);
         });
     }
 
@@ -113,6 +120,48 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", CreateToken(role, tenantId, staffId ?? Guid.NewGuid()));
         return client;
+    }
+
+    /// <summary>Mints a Student-role platform JWT (role claim "Student") for the redeem path (#12).</summary>
+    public string CreateStudentToken(Guid tenantId, Guid studentId)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, studentId.ToString()),
+            new("tenant_id", tenantId.ToString()),
+            new(ClaimTypes.Role, "Student"),
+            new("token_type", "access"),
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecret));
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddMinutes(30),
+            Issuer = JwtIssuer,
+            Audience = JwtAudience,
+            SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256),
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+        return handler.WriteToken(handler.CreateToken(descriptor));
+    }
+
+    public HttpClient CreateClientForStudent(Guid tenantId, Guid studentId)
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", CreateStudentToken(tenantId, studentId));
+        return client;
+    }
+
+    /// <summary>Runs a read against a fresh DbContext scope (no HTTP context → use IgnoreQueryFilters in tenant
+    /// queries). For asserting persisted state the API does not surface (code status, counters, payments).</summary>
+    public async Task<T> QueryDbAsync<T>(Func<AppDbContext, Task<T>> query)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        return await query(db);
     }
 
     // ── Seeding helpers ──────────────────────────────────────────────────────
@@ -265,6 +314,34 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
 
         db.Sessions.Add(session);
         await db.SaveChangesAsync(); // no HTTP context → tenant resolves to Empty → no audit rows
+        return session;
+    }
+
+    /// <summary>Seeds a (by default Published) session with videos and a known price — for enrollment tests
+    /// that need per-video access counters provisioned and a price to value-match a code against.</summary>
+    public async Task<Session> SeedSessionWithContentAsync(
+        Guid tenantId,
+        Guid gradeId,
+        Guid specializationId,
+        decimal price = 100m,
+        int validityDays = 90,
+        SessionStatus status = SessionStatus.Published,
+        int videoCount = 2,
+        int accessPerVideo = 3)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var session = Session.Create(
+            tenantId, $"Session {Guid.NewGuid():N}", "Seeded session", price, validityDays, gradeId, specializationId);
+
+        for (var i = 0; i < videoCount; i++)
+            session.AddVideo($"Lesson {i + 1}", 10, accessPerVideo, $"sessions/{tenantId}/videos/{Guid.NewGuid():N}.mp4");
+
+        if (status == SessionStatus.Published)
+            session.Publish();
+
+        db.Sessions.Add(session);
+        await db.SaveChangesAsync();
         return session;
     }
 

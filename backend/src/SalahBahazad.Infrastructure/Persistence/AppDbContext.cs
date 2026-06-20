@@ -43,6 +43,12 @@ public sealed class AppDbContext(
     // Question bank (tenant-owned) — FR-PLAT-QB-*, FR-ADM-QB-*
     public DbSet<Question> Questions => Set<Question>();
 
+    // Codes & enrollment (tenant-owned) — FR-PLAT-COD-*, FR-PLAT-ENR-*, FR-PLAT-PAY-*, FR-PLAT-ATT-*
+    public DbSet<CodeBatch> CodeBatches => Set<CodeBatch>();
+    public DbSet<Code> Codes => Set<Code>();
+    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+    public DbSet<Attendance> Attendances => Set<Attendance>();
+
     // Location reference data (global, seeded) — FR-PLAT-TAX-003
     public DbSet<City> Cities => Set<City>();
     public DbSet<Region> Regions => Set<Region>();

@@ -26,12 +26,21 @@ import {
 import {
   StudentAuditEntry,
   StudentDetail,
+  StudentEnrollmentDto,
   UpdateStudentContactRequest,
 } from '../data-access/student.models';
 import { StudentService } from '../data-access/student.service';
 import { ReasonDialogComponent } from '../reason-dialog/reason-dialog.component';
 import { StudentContactFormComponent } from '../student-contact-form/student-contact-form.component';
-import { avatarSubject, dateTime, statusDot, statusPill, studentInitials } from '../student.presentation';
+import {
+  amount,
+  avatarSubject,
+  dateTime,
+  methodPill,
+  statusDot,
+  statusPill,
+  studentInitials,
+} from '../student.presentation';
 
 type DetailTab = 'logins' | 'enroll' | 'activity';
 
@@ -196,7 +205,23 @@ interface IdImageState {
             <sb-tabs [tabs]="tabs" [active]="activeTab()" (tabChange)="onTabChange($event)" />
             <div class="det__hist">
               @if (activeTab() === 'enroll') {
-                <p class="det__muted det__hist-empty">Enrolments &amp; transactions appear here once Phase 4 lands.</p>
+                @if (enrollments().length === 0 && !enrollmentsLoading()) {
+                  <p class="det__muted det__hist-empty">No enrolments or transactions recorded yet.</p>
+                } @else {
+                  <sb-table [columns]="enrollmentColumns" [rows]="enrollments()" [rowKey]="enrollmentKey">
+                    <ng-template sbTableCell="session" let-r><span class="det__strong">{{ r.sessionTitle }}</span></ng-template>
+                    <ng-template sbTableCell="method" let-r>
+                      <sb-status-pill [variant]="methodPill(r.method)">{{ r.method }}</sb-status-pill>
+                    </ng-template>
+                    <ng-template sbTableCell="amount" let-r>{{ amount(r.amount) }}</ng-template>
+                    <ng-template sbTableCell="when" let-r>{{ at(r.enrolledAtUtc) }}</ng-template>
+                  </sb-table>
+                  @if (enrollmentsHasMore()) {
+                    <div class="det__more">
+                      <sb-button variant="ghost" size="sm" [loading]="enrollmentsLoading()" (clicked)="loadMoreEnrollments()">Load more</sb-button>
+                    </div>
+                  }
+                }
               } @else if (currentEntries().length === 0 && !currentLoading()) {
                 <p class="det__muted det__hist-empty">No {{ activeTab() === 'activity' ? 'activity' : 'sign-ins' }} recorded yet.</p>
               } @else {
@@ -374,6 +399,11 @@ export class StudentDetailComponent {
   readonly activityTotal = signal(0);
   readonly activityPage = signal(0);
   readonly activityLoading = signal(false);
+  readonly enrollments = signal<StudentEnrollmentDto[]>([]);
+  readonly enrollmentsTotal = signal(0);
+  readonly enrollmentsPage = signal(0);
+  readonly enrollmentsLoading = signal(false);
+  readonly enrollmentsHasMore = computed(() => this.enrollments().length < this.enrollmentsTotal());
 
   readonly tabs: readonly SbTab[] = [
     { id: 'logins', label: 'Login history' },
@@ -417,6 +447,14 @@ export class StudentDetailComponent {
 
   readonly auditKey = (row: StudentAuditEntry): string => row.id;
 
+  readonly enrollmentColumns: readonly SbTableColumn[] = [
+    { key: 'session', header: 'Session' },
+    { key: 'method', header: 'Method' },
+    { key: 'amount', header: 'Amount', align: 'right' },
+    { key: 'when', header: 'When' },
+  ];
+  readonly enrollmentKey = (row: StudentEnrollmentDto): string => row.enrollmentId;
+
   constructor() {
     effect(() => {
       const id = this.id();
@@ -447,6 +485,9 @@ export class StudentDetailComponent {
     this.activity.set([]);
     this.activityTotal.set(0);
     this.activityPage.set(0);
+    this.enrollments.set([]);
+    this.enrollmentsTotal.set(0);
+    this.enrollmentsPage.set(0);
   }
 
   onTabChange(id: string): void {
@@ -454,11 +495,31 @@ export class StudentDetailComponent {
     this.activeTab.set(tab);
     if (tab === 'logins' && this.loginsPage() === 0) void this.#loadLogins(true);
     if (tab === 'activity' && this.activityPage() === 0) void this.#loadActivity(true);
+    if (tab === 'enroll' && this.enrollmentsPage() === 0) void this.#loadEnrollments(true);
   }
 
   loadMore(): void {
     if (this.activeTab() === 'activity') void this.#loadActivity(false);
     else void this.#loadLogins(false);
+  }
+
+  loadMoreEnrollments(): void {
+    void this.#loadEnrollments(false);
+  }
+
+  async #loadEnrollments(reset: boolean): Promise<void> {
+    const page = reset ? 1 : this.enrollmentsPage() + 1;
+    this.enrollmentsLoading.set(true);
+    try {
+      const res = await this.#service.listEnrollments(this.id(), page, 20);
+      this.enrollments.update((cur) => (reset ? res.items : [...cur, ...res.items]));
+      this.enrollmentsTotal.set(res.total);
+      this.enrollmentsPage.set(page);
+    } catch {
+      /* leave what we have */
+    } finally {
+      this.enrollmentsLoading.set(false);
+    }
   }
 
   async #loadLogins(reset: boolean): Promise<void> {
@@ -610,6 +671,8 @@ export class StudentDetailComponent {
   dotFor = statusDot;
   subjectFor = avatarSubject;
   at = dateTime;
+  methodPill = methodPill;
+  amount = amount;
 
   action(value: string): string {
     const spaced = value.replace(/[._]/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').trim();

@@ -1,5 +1,23 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router, Routes } from '@angular/router';
 import { authGuard, guestGuard } from '@sb/admin-portal/feature-auth';
+import { AuthStore } from '@sb/shared/data-access';
+
+/** Allows the route only when the signed-in staff holds `permission`, else bounces to the dashboard. */
+const permissionGuard =
+  (permission: string): CanActivateFn =>
+  () => {
+    const auth = inject(AuthStore);
+    const router = inject(Router);
+    return auth.hasPermission(permission) ? true : router.createUrlTree(['/dashboard']);
+  };
+
+/** Teacher-only route gate (the server still enforces the granular permission regardless). */
+const teacherGuard: CanActivateFn = () => {
+  const auth = inject(AuthStore);
+  const router = inject(Router);
+  return auth.role() === 'Teacher' ? true : router.createUrlTree(['/dashboard']);
+};
 
 export const appRoutes: Routes = [
   {
@@ -73,6 +91,18 @@ export const appRoutes: Routes = [
         path: 'sessions/:id',
         loadComponent: () =>
           import('@sb/admin-portal/feature-sessions').then((m) => m.SessionDetailComponent),
+      },
+      {
+        path: 'codes',
+        canActivate: [permissionGuard('CodesRead')],
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-codes').then((m) => m.CodeListComponent),
+      },
+      {
+        path: 'codes/generate',
+        canActivate: [permissionGuard('CodesRead'), teacherGuard],
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-codes').then((m) => m.CodesGenerateComponent),
       },
       {
         path: 'staff',

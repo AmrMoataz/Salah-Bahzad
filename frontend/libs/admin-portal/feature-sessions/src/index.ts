@@ -25,4 +25,9 @@ export type {
   SaveVariationRequest,
   OptionInput,
   SessionListQuery,
+  EnrollmentStatus,
+  EnrollmentMethod,
+  EnrollmentListDto,
+  EnrollmentDto,
+  StudentSearchRow,
 } from './lib/data-access/session.models';
