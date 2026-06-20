@@ -42,50 +42,78 @@ screen. Follow it for layout, class names, token values, icons, copy. Tokens liv
 --standalone --style=scss` (match the existing libs' generator flags — check `feature-codes/project.json` and
 copy its `name`/tags/`test-setup.ts` setup). Expose the route component from `src/index.ts`.
 
+> **Build the prototype's screens, not generic ones.** `scrActivity` (line 1291) and `scrDashboard` (line 549)
+> are the spec. Open them and match the cards, columns, filters, chart, and copy.
+
 ### B2 — Audit data-access (`feature-audit/src/lib/data-access/`)
-- `audit.models.ts` — `AuditListItem`, `AuditDetail`, `AuditFacets`, `AuditListQuery`, `PagedResult<T>`,
-  `DashboardSummary`-not-here. Field names exactly per contract §2 (e.g. `occurredAtUtc`, `actorType`,
-  `actorName`, `beforeJson`). `actorType` is the union `'Staff'|'Student'|'System'`.
-- `audit.service.ts` — mirror `code.service.ts`. Methods: `list(query): Promise<PagedResult<AuditListItem>>`
-  (signal-backed `#entries/#total/#isLoading/#error`), `get(id): Promise<AuditDetail>`, optional
-  `facets(): Promise<AuditFacets>`. Build `HttpParams` from the query (omit empty filters).
+- `audit.models.ts` — `AuditFeedItem` exactly per contract §1 (`id, occurredAtUtc, actorType, actorRole,
+  actorName, action, category, summary, targetType, targetId, targetLabel, portal, ipAddress`); `AuditCategory`
+  union; `AuditListQuery` (`actorId?, actorType?, category?, period?/from?/to?, studentId?, sessionId?,
+  entityType?, entityId?, page, pageSize`); `PagedResult<T>`. **No `AuditDetail`/`beforeJson`** — there is no
+  detail endpoint in 5A.
+- `audit.service.ts` — mirror `code.service.ts`. One method `list(query): Promise<PagedResult<AuditFeedItem>>`
+  (signal-backed `#items/#total/#isLoading/#error`). Build `HttpParams` (omit empty filters).
 
-### B3 — Audit-log screen (`feature-audit/src/lib/audit-log/audit-log.component.ts`)
-- **Filter bar:** actor type (select), action (select/typeahead from facets or client constants), entity type,
-  date range (from/to), free-text search, plus optional `studentId`/`sessionId` deep-link params. Debounce
-  search; reset to page 1 on filter change.
-- **Feed/table:** columns who (actorName + actorType chip) / action / entity (type + short id) / when
-  (relative + absolute tooltip) / where (portal + ip). Pagination via the shared component. Empty-state when no
-  rows.
-- **Drill-in:** a `shared/ui` drawer (or modal) showing the full `AuditDetail` — who/what/when/where +
-  pretty-printed `beforeJson`/`afterJson` diff + the `prevHash → hash` chain. Opening a row calls `service.get(id)`.
-  (A sensitive entry the caller can't see returns 404 → show a friendly "not available" state.)
-- `audit.presentation.ts` — action→label map, entityType→label/icon, actorType→`--sb-subject-*` chip color,
-  relative-time formatter. Keep all label/format logic here (mirror `code.presentation.ts`).
+### B3 — Activity-log screen (`feature-audit/src/lib/audit-log/audit-log.component.ts`) — match `scrActivity`
+- `pageHead('Activity log', …)` — subtitle by role: Teacher = "Full audit feed — who did what, when & where";
+  Assistant = "Scoped audit feed for your actions and assigned areas".
+- **Assistant "Scoped view" alert** (`shared/ui` Alert, `variant:'info'`), shown when `AuthStore` role ≠ Teacher:
+  *"Assistants see a subset of the audit log. Sensitive entries (e.g. who-read-what) are visible to Admins only."*
+- **Filter bar** (`filterBar`): **Actor** select (`All actors` + distinct actor names from the current result
+  set — no facet endpoint in 5A; populate from loaded rows like the prototype, send `actorId`), **Action** select
+  (`All actions / Approvals / Codes / Sessions / Devices` → `category` param), **Period** select
+  (`7d/30d/90d`, default `7d`). Reset to page 1 on change.
+- **Table** (`shared/ui` Table) columns exactly per the prototype: **Actor** (bold `actorName`) · **Action**
+  (a `--sb-subject-{accent}` icon circle + the action verb-phrase + bold `targetLabel`) · **When** (relative) ·
+  right **"View"** button → **navigate to the affected entity** using `targetType`+`targetId`
+  (`student-detail` / `session-detail` / `codes` / `staff`), toast "No linked entity" when none. Pagination +
+  empty-state. **No detail drawer.**
+- Read optional `studentId`/`sessionId` route query params (so `student-detail`/`session-detail` Activity tabs
+  can reuse this list later).
 
-### B4 — Dashboard data-access + screen (`feature-dashboard`)
-- `data-access/dashboard.models.ts` (`DashboardSummary`, `CodeCounts`, reuse `AuditListItem` shape) +
-  `data-access/dashboard.service.ts` (mirror `code.service.ts`; `load(from?, to?): Promise<DashboardSummary>`).
-- Rewrite `lib/dashboard/dashboard.component.ts` per `scrDashboard`: **KPI cards** (pending approvals, active
-  students, codes used/active/total, enrollments-in-period, revenue-from-codes) with `--sb-subject-*` accent
-  chips; **recent-activity feed** (maps `recentActivity` to the same row presentation as B3 — consider sharing a
-  small presentation helper or duplicating per Nx boundary rules); **quick actions** (review approvals /
-  generate codes / create session) gated by `AuthStore` role (hide code-generation for Assistant — server still
-  enforces). Cards deep-link into the relevant feature routes.
+### B4 — `feature-audit/src/lib/audit.presentation.ts`
+Owns all label/format logic (mirror `code.presentation.ts`), matched to the prototype seed (lines 1588-1597):
+- `CATEGORY_ICON` + `CATEGORY_ACCENT`: `approval`→`check`/`green`, `code`→`ticket`/`blue`,
+  `enrollment`→`unlock`/`mustard` (refund→`money`/`green`), `session`→`book`/`purple`, `question`→`edit`/`blue`,
+  `device`→`device`/`orange`, `staff`→`shield`/`purple`, `student`→`user`/`blue`, `audit`→`eye`/`neutral`,
+  `other`→`dot`/`neutral`. Rejections render `x`/`red`.
+- `actionPhrase(action)` → verb phrase ("approved", "rejected", "generated codes for", "unlocked a session for",
+  "published", "cleared device for", "edited question bank for", "refunded enrollment for",
+  "created staff account", …); fall back to `summary` for unmapped actions.
+- `relativeTime(iso)`; `targetRoute(targetType, targetId)`.
 
-### B5 — Shell wiring (`libs/admin-portal/feature-shell`)
-Mirror how `feature-codes` is registered. Add an `activity` route → `feature-audit` route component; add an
-"Activity log" sidebar nav item (outline icon from the prototype). Dashboard already routes at the app root —
-just ensure it renders the rebuilt component. Nav visibility by role from `AuthStore` (Assistant still sees
-Activity log; sensitive rows are filtered server-side). Optional deep-links: student/session detail screens can
-link to `/activity?studentId=…` / `?sessionId=…`.
+### B5 — Dashboard (`feature-dashboard`) — match `scrDashboard`
+- `data-access/dashboard.models.ts` (`DashboardSummary` per contract `DashboardDto`, incl.
+  `enrollmentsByDay: { date; count }[]` + `recentActivity: AuditFeedItem[]`) + `dashboard.service.ts`
+  (`load(period|from/to): Promise<DashboardSummary>`).
+- Rewrite `lib/dashboard/dashboard.component.ts`:
+  - `pageHead('Dashboard', 'Operational pulse across your academy', <period select 7d/30d/90d default 30d>)`.
+  - **4 StatCards** (`shared/ui` StatCard) — "Pending approvals" (accent `mustard`, click → `approvals`),
+    "Active students" (`blue`), "Codes used / active" = `${codesUsed} / ${codesActive}` (`green`),
+    "Revenue (by code)" = `EGP ${revenueFromCodes.toLocaleString()}` (`purple`). **No delta badges.**
+  - **Enrollments chart** card ("Enrollments — last N days"): bar chart from `enrollmentsByDay`; **bucket exactly
+    like the prototype** (lines 569-575) — daily for 7d, groups of 5 → 6 bars for 30d, groups of 7 → 13 bars for
+    90d; caption "`{total}` total · daily|weekly"; last bar `--sb-primary`, rest `--sb-primary-200`.
+  - **Quick actions** card — **4** buttons (`scrDashboard` line 579): Review approvals, Generate codes
+    (**Teacher-only** via `AuthStore`), Create session, Open attendance; `--sb-subject-*` chips; navigate.
+    ("Open attendance" targets the 5B screen — wire the route now, screen lands in 5B.)
+  - **Recent activity** card — top **7** `recentActivity` rows rendered with the **same** presentation as B3/B4
+    (icon circle + bold actor + phrase + bold target + relative when); header action "View all" → `activity`.
+    (Reuse the B4 presentation helpers; if the Nx module boundary blocks importing `feature-audit`, lift the tiny
+    presentation map into `shared/ui`/`shared/util` or duplicate it — note the choice.)
 
-### B6 — Tests (Jest, mirror `code.service.spec.ts` + `code-list.component.spec.ts`)
-- `audit.service.spec.ts` — param building (filters omitted when empty; paging), response mapping, error
-  extraction. `dashboard.service.spec.ts` — `load()` GET + mapping.
-- `audit-log.component.spec.ts` — renders rows, applies a filter, opens the drill-in (mock service), empty-state.
-  `dashboard.component.spec.ts` — renders KPI values, hides Assistant-only quick action when role=Assistant
-  (mock `AuthStore`). Use `whenStable()` (not `fakeAsync`) for the promise-based services (Phase-4 gotcha).
+### B6 — Shell wiring (`libs/admin-portal/feature-shell`)
+Mirror how `feature-codes` is registered. Add the `activity` route → `feature-audit`; add the **"Activity log"**
+nav item (icon `activity`) — see the prototype nav (`{ id:'activity', label:'Activity log', icon:'activity' }`,
+line 1419). Dashboard already routes at the app root — ensure it renders the rebuilt component. Nav by role from
+`AuthStore` (Assistant still sees Activity log; scoping is server-side).
+
+### B7 — Tests (Jest, mirror `code.service.spec.ts` + `code-list.component.spec.ts`; use `whenStable()` not `fakeAsync`)
+- `audit.service.spec.ts` — param building (empties omitted; `category`/`period`/paging), response mapping, errors.
+- `audit-log.component.spec.ts` — renders feed rows, applies the category filter, **"View" navigates** to the
+  target route (mock Router), shows the Assistant alert when role≠Teacher, empty-state.
+- `dashboard.service.spec.ts` — `load()` GET + mapping. `dashboard.component.spec.ts` — renders the 4 KPI values,
+  buckets the enrollments chart for 30d, **hides "Generate codes"** quick action when role=Assistant (mock `AuthStore`).
 
 ## Exit criteria
 Both screens render against the contract shapes; `npx nx build admin-portal` (AOT) green; both `nx test` targets
@@ -93,10 +121,12 @@ green; Assistant vs Teacher quick-action gating verified in specs. Hand off to t
 screens against the live backend).
 
 ## Out of scope (defer)
+- **Before/after-JSON detail drawer** — not in the prototype; drill-in is *navigate to the entity*. (Raw
+  before/after exists server-side; surface only if a future design asks.)
 - **Attendance** screens (`FR-ADM-ATT-*`) → 5B (scores are null until the 5B engine). **Assignment/quiz review**
   (`FR-ADM-REV-*`) → 5B.
-- Audit CSV export (not required by `FR-ADM-AUD`).
-- Live/streaming audit updates — the feed is request/refresh only in 5A.
+- Audit CSV export (not required by `FR-ADM-AUD`); StatCard trend deltas (demo-only); live/streaming updates
+  (request/refresh only in 5A).
 
 ---
 
@@ -115,12 +145,18 @@ Read first, in order:
 Mirror the Phase-4 feature-codes lib (code.service.ts, code-list.component.ts, code.presentation.ts + specs) for
 structure and the signal-backed data-access pattern. Edit frontend/** ONLY — do not touch backend/.
 
-Deliver: a NEW lib feature-audit (audit.service + models, audit-log component with filter bar + pagination +
-drill-in drawer showing before/after + hash chain, audit.presentation labels/chips); build out the existing
-feature-dashboard stub (dashboard.service + models, KPI cards + recent-activity feed + role-gated quick actions
-per scrDashboard); wire the `activity` route + "Activity log" nav in feature-shell. Gate nav/quick-actions by
-AuthStore role (security is server-side; UI only reflects it). Jest specs for services + components (use
-whenStable(), not fakeAsync).
+BUILD THE PROTOTYPE'S SCREENS, NOT GENERIC ONES — open scrActivity (line 1291) and scrDashboard (line 549) and
+match them. The activity log is a feed of actor/action/target with a category icon, filtered by actor + action-
+category (Approvals/Codes/Sessions/Devices) + period (7/30/90d); the row "View" NAVIGATES to the affected entity
+(NO before/after drawer). The dashboard has 4 stat cards (Pending approvals / Active students / Codes used·active /
+Revenue by code), a period selector, an enrollments bar chart (bucket weekly for 30/90d), 4 role-gated quick
+actions, and a Recent-activity card of 7 feed rows.
+
+Deliver: a NEW lib feature-audit (audit.service + AuditFeedItem models, audit-log component matching scrActivity
+incl. the Assistant "Scoped view" alert, audit.presentation = category→icon/accent + action→verb-phrase); build
+out the existing feature-dashboard stub to match scrDashboard exactly; wire the `activity` route + "Activity log"
+nav in feature-shell. Gate nav/quick-actions by AuthStore role (security is server-side). Jest specs (use
+whenStable(), not fakeAsync) incl. "View navigates" and "Generate codes hidden for Assistant".
 
 Green gate: `npx nx build admin-portal` (AOT type-checks templates) + `nx test admin-portal-feature-audit` +
 `nx test admin-portal-feature-dashboard`. Report all three results when done.

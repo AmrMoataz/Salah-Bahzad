@@ -34,26 +34,28 @@ so the table has **Staff**, **Student**, and **System** actors and at least one 
 - Redeem a code with a **Student** JWT (#12) → `CodeRedeemed` (Student actor) + the enrollment's side-effect
   rows (System actor where applicable).
 
-## Smoke checklist (script it; assert, don't eyeball)
-1. **List + filters (#1):** `GET /api/audit` (Teacher) returns the seeded rows, newest-first, with resolved
-   `actorName`. Each filter narrows correctly: `actorType=Student` (only the redeem), `action=CodeBatchGenerated`,
-   `entityType=Student`, `from/to` window, `search=` summary substring, paging.
-2. **Sensitive scoping (`FR-ADM-AUD-003`):** the **Assistant** list does **NOT** contain `StudentIdImageViewed`
-   (or `AuditViewed`); the **Teacher** list **does**.
-3. **Drill-in (#2):** `GET /api/audit/{id}` (Teacher) returns `beforeJson/afterJson` + `prevHash/hash`. The
-   **Assistant** gets **404** on the sensitive id (existence not revealed). A Teacher drilling into the sensitive
-   id appends **exactly one** `AuditViewed` row (re-list and assert the +1; verify the hash chain still validates).
+## Smoke checklist (script it; assert, don't eyeball) — design-anchored
+1. **Feed + filters (#1):** `GET /api/audit` (Teacher) returns the seeded rows newest-first with resolved
+   `actorName`, `targetLabel`, and `category`. Filters narrow: `actorId`, `actorType=Student` (the redeem),
+   `category=code`, `period=7d/30d`, and `studentId`/`sessionId` (the entity-tab params); paging.
+2. **Sensitive scoping (`FR-ADM-AUD-003`):** the **Assistant** feed does **NOT** contain `StudentIdImageViewed`;
+   the **Teacher** feed **does**. (In the UI, the Assistant build shows the "Scoped view" alert.)
+3. **Drill-in = navigate (no detail endpoint):** every row carries `targetType`+`targetId` so the UI "View" links
+   to the right entity (student/session/codes/staff). Assert there is **no** `/api/audit/{id}` and **no**
+   `AuditViewed` row is ever written (the prototype has no before/after screen).
 4. **Tenant isolation (`NFR-SEC-010`) — the critical assertion:** the **second-tenant** token sees **zero** of
-   tenant A's audit rows from `GET /api/audit` and **404** on any of A's `GET /api/audit/{id}`. (This is the proof
-   that the explicit `Where(TenantId==…)` is present, since no global filter protects `AuditEntry`.)
-5. **Dashboard (#4):** `GET /api/dashboard` KPIs match the seeded counts — `pendingApprovals`, `activeStudents`,
-   `codes.used/active/total`, `enrollmentsInPeriod` for the default 30-day window (and a custom `from/to`),
-   `revenueFromCodes` = Σ used-code values; `recentActivity` ≤ 8, tenant-scoped, **excludes** sensitive rows.
+   tenant A's audit rows from `GET /api/audit`. (Proof the explicit `Where(TenantId==…)` is present, since no
+   global filter protects `AuditEntry`.)
+5. **Dashboard (#2):** `GET /api/dashboard` matches seeded counts — `pendingApprovals`, `activeStudents`,
+   `codesUsed`, `codesActive`, `revenueFromCodes` (Σ used-code values); `enrollmentsByDay` buckets sum to
+   `enrollmentsTotal` over the default 30-day window **and** a custom `period`; `recentActivity` ≤ 7,
+   tenant-scoped, **excludes** sensitive rows.
 6. **Default-deny:** anonymous → **401** on both groups; a token without `AuditRead`/`DashboardRead` → **403**.
-7. **Frontend render:** load the **Activity log** screen and the **Dashboard** in the running Angular app against
-   this data — rows render, a filter round-trips, the drill-in drawer shows before/after, KPI cards show the right
-   numbers, and the Assistant build hides the Teacher-only quick action. Confirm **zero** shape mismatches with the
-   contract (no client-side field renames/coercions papering over drift).
+7. **Frontend render:** load the **Activity log** and **Dashboard** in the running Angular app — feed rows render
+   with category icons, the **category filter round-trips**, **"View" navigates** to the entity, the 4 KPI cards +
+   the enrollments chart show the right numbers, and the **Assistant** build hides the "Generate codes" quick
+   action and shows the scoped alert. Confirm **zero** shape mismatches with the contract (no client-side field
+   renames/coercions papering over drift).
 
 ## Drift log
 Record any contract mismatch found and the one-line fix that returned a side to the contract (mirror the Phase-4
@@ -79,12 +81,16 @@ Read first:
 3. docs/IMPLEMENTATION-PLAN-phase4-wiring.md (the technique to mirror: Aspire AppHost up, drive via :4200 since
    the API port is reassigned, direct-JWT smoke)
 
+The slice is DESIGN-ANCHORED: the activity log is a feed of actor/action/target with a category icon; drill-in
+NAVIGATES to the entity (there is NO /api/audit/{id} and NO AuditViewed write). The dashboard has 4 KPIs + an
+enrollments-by-day chart + 7 recent-activity rows.
+
 Steps: bring up the AppHost stack; mint Teacher / Assistant / second-tenant JWTs (direct-JWT technique) plus a
-Student JWT to seed a redeem; pre-seed real actions (approve student, view ID image [sensitive], generate+export
-codes, redeem #12). Then run the 7-point smoke: list+filters, Assistant-vs-Teacher sensitive scoping, drill-in
-(+AuditViewed-on-sensitive, hash chain intact), TENANT ISOLATION (second tenant sees zero of tenant A's audit —
-the must-pass check), dashboard KPI reconciliation, default-deny (401/403), and frontend render of the Activity
-log + Dashboard screens.
+Student JWT to seed a redeem; pre-seed real actions (approve student, view ID image [sensitive → StudentIdImageViewed],
+generate+export codes, redeem #12). Then run the 7-point smoke: feed+filters (actor/category/period), Assistant-vs-
+Teacher sensitive scoping, drill-in = navigate (assert targetType/targetId present, no detail endpoint, no AuditViewed),
+TENANT ISOLATION (second tenant sees zero of tenant A's audit — the must-pass check), dashboard KPI + enrollments-
+series reconciliation, default-deny (401/403), and frontend render of the Activity log + Dashboard screens.
 
 If you find drift, fix the offending side back ONTO the contract and log it. When done, append a dated run log
 (assertion count + pass/fail) to docs/IMPLEMENTATION-PLAN-phase5a-wiring.md and report the tenant-isolation and

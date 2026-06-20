@@ -161,11 +161,15 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
   - **5A — Audit-log browser + Dashboard** (read-only reporting over data that *already exists*): `FR-ADM-AUD-001..003`,
     `FR-PLAT-AUD-004/006`, `FR-ADM-DASH-001..003`. No engines, no new infra, no migration, no permission/catalog
     change (the `AuditRead`/`AuditReadSensitive`/`DashboardRead` permissions are already declared + bundled). Lowest
-    risk, fastest to demo, finally surfaces the hash-chained audit trail every prior phase has been writing. Planned
+    risk, fastest to demo, finally surfaces the hash-chained audit trail every prior phase has been writing.
+    **Design-anchored** to the prototype (`scrDashboard` + `scrActivity` in `.claude/.../Admin Portal.dc.html`): the
+    activity log is an actor/action/target feed with a category icon, filtered by actor + action-category + period,
+    where drill-in *navigates to the affected entity* (no before/after-JSON screen); the dashboard is 4 stat cards +
+    a period selector + an enrollments bar chart + 4 role-gated quick actions + a 7-row recent-activity card. Planned
     as a frozen contract + 3 parallel-safe streams exactly like Phase 3/4: `docs/contracts/phase5a-audit-dashboard.md`
-    (4 endpoints) and `IMPLEMENTATION-PLAN-phase5a-{backend,frontend,wiring}.md`. **Key correctness call:** `AuditEntry`
-    is not `ITenantOwned`, so every audit read must filter `TenantId` *explicitly* (`NFR-SEC-010`). **This is the
-    chosen next step.**
+    (2 endpoints — audit feed + dashboard) and `IMPLEMENTATION-PLAN-phase5a-{backend,frontend,wiring}.md`. **Key
+    correctness call:** `AuditEntry` is not `ITenantOwned`, so every audit read must filter `TenantId` *explicitly*
+    (`NFR-SEC-010`). **This is the chosen next step.**
   - **5B — Assessment engines + review + attendance** (the core remaining domain): assignment + quiz aggregates
     (server-side timer auto-submit, single-sitting forfeit, focus-loss telemetry, best-of, the `≥` pass-rule fix
     issue #7), the real `IEnrollmentSideEffects` (replacing the Phase-4 stub), the `FR-PLAT-ENR-007` enrollment gate,
