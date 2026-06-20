@@ -24,7 +24,8 @@ internal sealed class AddQuestionVariationHandler(
         {
             var bytes = Convert.FromBase64String(command.ImageBase64);
             var contentType = command.ImageContentType ?? "application/octet-stream";
-            imageObjectKey = StorageKeys.QuestionImage(question.TenantId, contentType);
+            imageObjectKey = StorageKeys.QuestionImage(
+                question.TenantId, command.SessionId, command.QuestionId, contentType);
             using var stream = new MemoryStream(bytes);
             await fileStorage.UploadPrivateAsync(imageObjectKey, stream, contentType, cancellationToken);
         }

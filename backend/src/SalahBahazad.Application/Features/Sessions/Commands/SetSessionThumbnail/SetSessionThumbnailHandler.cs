@@ -19,7 +19,7 @@ internal sealed class SetSessionThumbnailHandler(
 
         // Upload first so the key is only persisted once the bytes are safely stored (orphan-on-failure
         // is cheap to GC; a dangling key is not) — mirrors the Phase 2 registration upload.
-        var objectKey = StorageKeys.SessionThumbnail(currentUser.TenantId, command.ContentType);
+        var objectKey = StorageKeys.SessionThumbnail(currentUser.TenantId, command.Id, command.ContentType);
         await fileStorage.UploadPrivateAsync(objectKey, command.Content, command.ContentType, cancellationToken);
 
         session.SetThumbnail(objectKey);

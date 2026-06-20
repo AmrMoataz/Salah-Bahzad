@@ -25,7 +25,7 @@ internal sealed class AddSessionVideoHandler(
 
         // Stream the source straight to R2 BEFORE opening a transaction — a multi-GB upload must not hold a
         // database transaction (and its connection) open for the duration (docs/05 §3/§6, FR-PLAT-VID-007).
-        var objectKey = StorageKeys.SessionVideo(currentUser.TenantId, command.ContentType);
+        var objectKey = StorageKeys.SessionVideo(currentUser.TenantId, command.SessionId, command.ContentType);
         await fileStorage.UploadPrivateStreamingAsync(
             objectKey, command.Content, command.ContentType, cancellationToken);
 

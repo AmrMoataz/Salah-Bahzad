@@ -1,5 +1,6 @@
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using SalahBahazad.Application.Common;
 using SalahBahazad.Application.Common.Exceptions;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Students.DTOs;
@@ -54,12 +55,10 @@ internal sealed class RegisterStudentHandler(
         if (alreadyRegistered)
             throw new ConflictException("An account already exists for this sign-in.");
 
-        // Upload first so the key is only persisted when the bytes are safely stored. A failed commit
-        // afterwards leaves an orphaned object (cheap to GC), never a dangling key.
-        var objectKey = BuildObjectKey(tenant.Id, command.IdImageContentType);
-        await fileStorage.UploadPrivateAsync(
-            objectKey, command.IdImageContent, command.IdImageContentType, cancellationToken);
-
+        // Create the student first so its id can be embedded in the object key (the bucket groups uploads
+        // by owner for debuggability). Upload before attaching/persisting the key, so the key is only saved
+        // once the bytes are safely stored. A failed commit afterwards leaves an orphaned object (cheap to
+        // GC), never a dangling key.
         var student = Student.Register(
             tenant.Id,
             claims.Uid,
@@ -73,6 +72,10 @@ internal sealed class RegisterStudentHandler(
             command.SchoolName,
             command.TermsVersion,
             clock.GetUtcNow());
+
+        var objectKey = StorageKeys.StudentIdImage(tenant.Id, student.Id, command.IdImageContentType);
+        await fileStorage.UploadPrivateAsync(
+            objectKey, command.IdImageContent, command.IdImageContentType, cancellationToken);
         student.AttachIdImage(objectKey);
 
         db.Students.Add(student);
@@ -90,17 +93,5 @@ internal sealed class RegisterStudentHandler(
             cancellationToken);
 
         return new StudentRegistrationResultDto(student.Id, student.Status);
-    }
-
-    private static string BuildObjectKey(Guid tenantId, string contentType)
-    {
-        var extension = contentType switch
-        {
-            "image/jpeg" => ".jpg",
-            "image/png" => ".png",
-            "image/webp" => ".webp",
-            _ => ".bin",
-        };
-        return $"students/id-images/{tenantId}/{Guid.CreateVersion7():n}{extension}";
     }
 }

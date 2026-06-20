@@ -19,7 +19,7 @@ internal sealed class AddSessionMaterialHandler(
             .FirstOrDefaultAsync(s => s.Id == command.SessionId, cancellationToken)
             ?? throw new NotFoundException("Session", command.SessionId);
 
-        var objectKey = StorageKeys.SessionMaterial(currentUser.TenantId, command.FileName);
+        var objectKey = StorageKeys.SessionMaterial(currentUser.TenantId, command.SessionId, command.FileName);
         await fileStorage.UploadPrivateAsync(objectKey, command.Content, command.ContentType, cancellationToken);
 
         var material = session.AddMaterial(command.FileName, command.ContentType, objectKey, command.Length);

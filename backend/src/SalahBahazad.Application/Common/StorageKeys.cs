@@ -1,24 +1,34 @@
 namespace SalahBahazad.Application.Common;
 
 /// <summary>
-/// Builds R2 object keys for Phase 3 assets, following the Phase 2 convention
-/// (<c>RegisterStudentHandler.BuildObjectKey</c>): <c>sessions/{tenantId}/{kind}/{guid}.ext</c> and
-/// <c>questions/{tenantId}/images/{guid}.ext</c>. Keys never leave the backend (FR-PLAT-AST-004) and the
-/// extension is derived from the validated content type / file name only.
+/// Builds R2 object keys for uploaded assets. Keys are grouped by the owning entity so the bucket is
+/// self-describing when browsing/debugging — you can see exactly which session, question, or student an
+/// object belongs to:
+/// <list type="bullet">
+/// <item><c>sessions/{tenantId}/{sessionId}/{videos|thumbnails|materials}/{guid}.ext</c></item>
+/// <item><c>sessions/{tenantId}/{sessionId}/questions/{questionId}/{guid}.ext</c></item>
+/// <item><c>students/{tenantId}/{studentId}/id-images/{guid}.ext</c></item>
+/// </list>
+/// Keys never leave the backend (FR-PLAT-AST-004) and the extension is derived from the validated
+/// content type / file name only. Keys are opaque to readers (stored in the DB, handed verbatim to the
+/// presigner), so this layout can evolve without a data migration — existing objects keep their old keys.
 /// </summary>
 internal static class StorageKeys
 {
-    public static string SessionThumbnail(Guid tenantId, string contentType)
-        => $"sessions/{tenantId}/thumbnails/{Guid.CreateVersion7():n}{ImageExtension(contentType)}";
+    public static string SessionThumbnail(Guid tenantId, Guid sessionId, string contentType)
+        => $"sessions/{tenantId}/{sessionId}/thumbnails/{Guid.CreateVersion7():n}{ImageExtension(contentType)}";
 
-    public static string SessionVideo(Guid tenantId, string contentType)
-        => $"sessions/{tenantId}/videos/{Guid.CreateVersion7():n}{VideoExtension(contentType)}";
+    public static string SessionVideo(Guid tenantId, Guid sessionId, string contentType)
+        => $"sessions/{tenantId}/{sessionId}/videos/{Guid.CreateVersion7():n}{VideoExtension(contentType)}";
 
-    public static string SessionMaterial(Guid tenantId, string fileName)
-        => $"sessions/{tenantId}/materials/{Guid.CreateVersion7():n}{FileExtension(fileName)}";
+    public static string SessionMaterial(Guid tenantId, Guid sessionId, string fileName)
+        => $"sessions/{tenantId}/{sessionId}/materials/{Guid.CreateVersion7():n}{FileExtension(fileName)}";
 
-    public static string QuestionImage(Guid tenantId, string contentType)
-        => $"questions/{tenantId}/images/{Guid.CreateVersion7():n}{ImageExtension(contentType)}";
+    public static string QuestionImage(Guid tenantId, Guid sessionId, Guid questionId, string contentType)
+        => $"sessions/{tenantId}/{sessionId}/questions/{questionId}/{Guid.CreateVersion7():n}{ImageExtension(contentType)}";
+
+    public static string StudentIdImage(Guid tenantId, Guid studentId, string contentType)
+        => $"students/{tenantId}/{studentId}/id-images/{Guid.CreateVersion7():n}{ImageExtension(contentType)}";
 
     private static string ImageExtension(string contentType) => contentType switch
     {

@@ -31,7 +31,7 @@ internal sealed class UpdateSessionVideoHandler(
         string? newObjectKey = null;
         if (command.HasNewSource)
         {
-            newObjectKey = StorageKeys.SessionVideo(currentUser.TenantId, command.ContentType!);
+            newObjectKey = StorageKeys.SessionVideo(currentUser.TenantId, command.SessionId, command.ContentType!);
             await fileStorage.UploadPrivateStreamingAsync(
                 newObjectKey, command.Content!, command.ContentType!, cancellationToken);
         }

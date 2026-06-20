@@ -19,7 +19,8 @@ internal sealed class SetVariationImageHandler(
         var variation = question.Variations.FirstOrDefault(v => v.Id == command.VariationId)
             ?? throw new NotFoundException("Variation", command.VariationId);
 
-        var objectKey = StorageKeys.QuestionImage(currentUser.TenantId, command.ContentType);
+        var objectKey = StorageKeys.QuestionImage(
+            currentUser.TenantId, command.SessionId, command.QuestionId, command.ContentType);
         await fileStorage.UploadPrivateAsync(objectKey, command.Content, command.ContentType, cancellationToken);
 
         question.SetVariationImage(command.VariationId, objectKey);

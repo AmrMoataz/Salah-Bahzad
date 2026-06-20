@@ -15,7 +15,8 @@ internal sealed class SetQuestionImageHandler(
         var question = await QuestionLoader.LoadTrackedAsync(db, command.SessionId, command.QuestionId, cancellationToken)
             ?? throw new NotFoundException("Question", command.QuestionId);
 
-        var objectKey = StorageKeys.QuestionImage(currentUser.TenantId, command.ContentType);
+        var objectKey = StorageKeys.QuestionImage(
+            currentUser.TenantId, command.SessionId, command.QuestionId, command.ContentType);
         await fileStorage.UploadPrivateAsync(objectKey, command.Content, command.ContentType, cancellationToken);
 
         question.SetImage(objectKey);
