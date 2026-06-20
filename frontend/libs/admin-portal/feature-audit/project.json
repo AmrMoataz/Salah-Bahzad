@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "admin-portal-feature-audit",
+  "projectType": "library",
+  "sourceRoot": "libs/admin-portal/feature-audit/src",
+  "prefix": "sb",
+  "tags": ["scope:admin-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/admin-portal/feature-audit"],
+      "options": {
+        "jestConfig": "libs/admin-portal/feature-audit/jest.config.ts"
+      }
+    }
+  }
+}

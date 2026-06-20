@@ -115,6 +115,12 @@ export const appRoutes: Routes = [
           import('@sb/admin-portal/feature-taxonomy').then((m) => m.TaxonomyPageComponent),
       },
       {
+        path: 'activity',
+        canActivate: [permissionGuard('AuditRead')],
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-audit').then((m) => m.AuditLogComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('@sb/admin-portal/feature-settings').then((m) => m.SettingsPageComponent),

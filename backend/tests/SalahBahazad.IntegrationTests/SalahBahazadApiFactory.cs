@@ -358,6 +358,43 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         return question;
     }
 
+    /// <summary>
+    /// Seeds an <see cref="AuditEntry"/> directly for a tenant (no HTTP context → the audit interceptor is a
+    /// no-op, so this is the only row written, with exactly the tenant/actor/action/time given). Used by the
+    /// Phase-5A audit-feed tests to control isolation, sensitive scoping, filters and ordering deterministically.
+    /// </summary>
+    public async Task<AuditEntry> SeedAuditAsync(
+        Guid tenantId,
+        string action,
+        string entityType = "Student",
+        Guid? entityId = null,
+        string actorType = "Staff",
+        Guid? actorId = null,
+        string? actorRole = "Teacher",
+        DateTimeOffset? occurredAtUtc = null,
+        string? summary = null,
+        string? portal = "admin",
+        string? ipAddress = null)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var entry = AuditEntry.Create(
+            tenantId: tenantId,
+            action: action,
+            entityType: entityType,
+            occurredAtUtc: occurredAtUtc ?? DateTimeOffset.UtcNow,
+            entityId: entityId,
+            actorId: actorId,
+            actorRole: actorRole,
+            actorType: actorType,
+            summary: summary ?? $"{action} {entityType}",
+            portal: portal,
+            ipAddress: ipAddress);
+        db.AuditEntries.Add(entry);
+        await db.SaveChangesAsync();
+        return entry;
+    }
+
     public async Task<AuditEntry?> LatestStaffAuditAsync(Guid tenantId, string action)
         => await LatestAuditAsync(tenantId, nameof(Staff), action);
 

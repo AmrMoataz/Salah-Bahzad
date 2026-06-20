@@ -169,7 +169,13 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
     as a frozen contract + 3 parallel-safe streams exactly like Phase 3/4: `docs/contracts/phase5a-audit-dashboard.md`
     (2 endpoints — audit feed + dashboard) and `IMPLEMENTATION-PLAN-phase5a-{backend,frontend,wiring}.md`. **Key
     correctness call:** `AuditEntry` is not `ITenantOwned`, so every audit read must filter `TenantId` *explicitly*
-    (`NFR-SEC-010`). **This is the chosen next step.**
+    (`NFR-SEC-010`).
+    **Met (2026-06-20):** built across the three streams and proven end-to-end on the running Aspire stack —
+    **21/21** live smoke checks, **ZERO** contract drift. Tenant isolation (`NFR-SEC-010`) and Assistant-vs-Teacher
+    sensitive scoping verified live (Teacher feed total 229 vs Assistant 218, Δ=11 `StudentIdImageViewed`); dashboard
+    KPIs reconciled to DB ground truth (pending 0 / active 2 / codesUsed 1 / codesActive 58 / revenue EGP 150 /
+    enrollments 5); drill-in navigates to the entity (no `/api/audit/{id}`, no `AuditViewed` written); default-deny
+    (anon→401, Student-role→403) holds. Full log in `IMPLEMENTATION-PLAN-phase5a-wiring.md`. **5B is next.**
   - **5B — Assessment engines + review + attendance** (the core remaining domain): assignment + quiz aggregates
     (server-side timer auto-submit, single-sitting forfeit, focus-loss telemetry, best-of, the `≥` pass-rule fix
     issue #7), the real `IEnrollmentSideEffects` (replacing the Phase-4 stub), the `FR-PLAT-ENR-007` enrollment gate,

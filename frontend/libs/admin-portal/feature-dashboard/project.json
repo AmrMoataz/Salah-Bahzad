@@ -4,5 +4,14 @@
   "projectType": "library",
   "sourceRoot": "libs/admin-portal/feature-dashboard/src",
   "prefix": "sb",
-  "tags": ["scope:admin-portal", "type:feature"]
+  "tags": ["scope:admin-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/admin-portal/feature-dashboard"],
+      "options": {
+        "jestConfig": "libs/admin-portal/feature-dashboard/jest.config.ts"
+      }
+    }
+  }
 }

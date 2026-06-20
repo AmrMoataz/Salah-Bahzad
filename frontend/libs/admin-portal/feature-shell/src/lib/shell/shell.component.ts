@@ -37,7 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Taxonomy', route: '/taxonomy', icon: icon('M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01') },
       { label: 'Staff', route: '/staff', icon: icon('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'), teacherOnly: true },
-      { label: 'Activity Log', route: '/activity', icon: icon('M22 12h-4l-3 9L9 3l-3 9H2') },
+      { label: 'Activity log', route: '/activity', icon: icon('M22 12h-4l-3 9L9 3l-3 9H2'), permission: 'AuditRead' },
       { label: 'Settings', route: '/settings', icon: icon('M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z') },
     ],
   },
@@ -53,7 +53,7 @@ const ROUTE_META: Record<string, readonly [string, string]> = {
   attendance: ['Attendance', 'Cross-student progress'],
   taxonomy: ['Taxonomy', 'Reference data'],
   staff: ['Staff', 'Teacher & assistant accounts'],
-  activity: ['Activity Log', 'Audit investigation'],
+  activity: ['Activity log', 'Audit investigation'],
   settings: ['Settings', 'Profile & preferences'],
 };
 

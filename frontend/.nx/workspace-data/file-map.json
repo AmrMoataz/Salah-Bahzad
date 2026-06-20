@@ -11,6 +11,9 @@
     "@sb/shared/util": [
       "libs/shared/util/src/index.ts"
     ],
+    "@sb/admin-portal/feature-audit": [
+      "libs/admin-portal/feature-audit/src/index.ts"
+    ],
     "@sb/admin-portal/feature-auth": [
       "libs/admin-portal/feature-auth/src/index.ts"
     ],
@@ -28,6 +31,9 @@
     ],
     "@sb/admin-portal/feature-sessions": [
       "libs/admin-portal/feature-sessions/src/index.ts"
+    ],
+    "@sb/admin-portal/feature-codes": [
+      "libs/admin-portal/feature-codes/src/index.ts"
     ],
     "@sb/admin-portal/feature-taxonomy": [
       "libs/admin-portal/feature-taxonomy/src/index.ts"
@@ -52,193 +58,122 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": ".nx/workspace-data/project-graph.json",
-        "hash": "9500852260971783409"
+        "file": "nx.json",
+        "hash": "16934025050528280795"
       },
       {
-        "file": "jest.preset.js",
-        "hash": "9723392830648133472"
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
+        "hash": "2051108929511129806"
       },
       {
-        "file": ".nx/workspace-data/source-maps.json",
-        "hash": "2650751079965801516"
-      },
-      {
-        "file": "eslint.config.js",
-        "hash": "12176749841134729328"
-      },
-      {
-        "file": "README.md",
-        "hash": "3062190976032545220"
-      },
-      {
-        "file": ".nx/workspace-data/file-map.json",
-        "hash": "12937796252739611282"
-      },
-      {
-        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
-        "hash": "9851621276976237491"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/3741908769437427157",
-        "hash": "9571191110571158347"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "13922715127670754167"
-      },
-      {
-        "file": ".nx/cache/run.json",
-        "hash": "11920364758204628776"
-      },
-      {
-        "file": ".npmrc",
-        "hash": "9925967549247833609"
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
+        "hash": "1622837066396344987"
       },
       {
         "file": "package.json",
         "hash": "2097197659383523149"
       },
       {
-        "file": ".nx/cache/terminalOutputs/9013392791071458751",
-        "hash": "7367943322070844114"
-      },
-      {
-        "file": "nx.json",
-        "hash": "16934025050528280795"
+        "file": ".nx/cache/run.json",
+        "hash": "6548435912414614899"
       },
       {
         "file": ".prettierrc",
         "hash": "15623139863315169796"
       },
       {
-        "file": "package-lock.json",
-        "hash": "11055423543555067266"
+        "file": ".nx/cache/terminalOutputs/220703009658064044",
+        "hash": "8800914510047151196"
       },
       {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
-        "hash": "2845815889144544126"
+        "file": "tsconfig.base.json",
+        "hash": "15916048421375580166"
+      },
+      {
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "17107691504294975841"
+      },
+      {
+        "file": ".nx/workspace-data/file-map.json",
+        "hash": "2586448467751953645"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/17545723754966977105",
+        "hash": "14687517933363272115"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/5001884239729897055",
+        "hash": "11437903994041606202"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "9723392830648133472"
+      },
+      {
+        "file": ".nx/workspace-data/nx_files.nxt",
+        "hash": "1915607480864104232"
+      },
+      {
+        "file": "README.md",
+        "hash": "3062190976032545220"
+      },
+      {
+        "file": ".nx/workspace-data/source-maps.json",
+        "hash": "14398713296909616325"
+      },
+      {
+        "file": "eslint.config.js",
+        "hash": "12176749841134729328"
       },
       {
         "file": "CLAUDE.md",
         "hash": "9498052161213632713"
       },
       {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
-        "hash": "3731142325207378263"
+        "file": ".npmrc",
+        "hash": "9925967549247833609"
+      },
+      {
+        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
+        "hash": "5588382851370478957"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "11055423543555067266"
       }
     ],
     "projectFileMap": {
-      "admin-portal-feature-dashboard": [
+      "admin-portal-feature-staff": [
         {
-          "file": "libs/admin-portal/feature-dashboard/project.json",
-          "hash": "6345261376290157393"
+          "file": "libs/admin-portal/feature-staff/jest.config.ts",
+          "hash": "7614759097121627180"
         },
         {
-          "file": "libs/admin-portal/feature-dashboard/src/index.ts",
-          "hash": "4436493741501911641"
+          "file": "libs/admin-portal/feature-staff/project.json",
+          "hash": "1343419376003521750"
         },
         {
-          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard/dashboard.component.ts",
-          "hash": "6799426315618479039",
+          "file": "libs/admin-portal/feature-staff/src/index.ts",
+          "hash": "14406305893754530630"
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.models.ts",
+          "hash": "9482697095286065308",
           "deps": [
-            "npm:@angular/core",
-            "npm:@angular/platform-browser",
             "shared-data-access"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-dashboard/tsconfig.json",
-          "hash": "17092705240196255247"
-        },
-        {
-          "file": "libs/admin-portal/feature-dashboard/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        }
-      ],
-      "admin-portal-feature-auth": [
-        {
-          "file": "libs/admin-portal/feature-auth/project.json",
-          "hash": "7665190410828958960"
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/src/index.ts",
-          "hash": "10142587643316463756"
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/src/lib/guards/auth.guard.ts",
-          "hash": "13846377856892953728",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router",
-            "shared-data-access"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.html",
-          "hash": "6062290711156827287"
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.scss",
-          "hash": "17209377583730727787"
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.ts",
-          "hash": "14942499240670815298",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/forms",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/tsconfig.json",
-          "hash": "17092705240196255247"
-        },
-        {
-          "file": "libs/admin-portal/feature-auth/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        }
-      ],
-      "admin-portal-feature-students": [
-        {
-          "file": "libs/admin-portal/feature-students/jest.config.ts",
-          "hash": "10003819578679081059"
-        },
-        {
-          "file": "libs/admin-portal/feature-students/project.json",
-          "hash": "14228884297545896905"
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/index.ts",
-          "hash": "6279925460386848525"
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/lib/approvals-queue/approvals-queue.component.ts",
-          "hash": "14575664806794129564",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.models.ts",
-          "hash": "10684868526842702896"
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.service.spec.ts",
-          "hash": "4162162437003968206",
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.spec.ts",
+          "hash": "13458787684071073948",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.service.ts",
-          "hash": "6765354261547118158",
+          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.ts",
+          "hash": "13526850401014312300",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core",
@@ -246,175 +181,56 @@
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/src/lib/reason-dialog/reason-dialog.component.ts",
-          "hash": "6706194418801783793",
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.spec.ts",
+          "hash": "5938002975522060128",
           "deps": [
-            "npm:@angular/core",
-            "shared-ui"
+            "npm:@angular/core"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/src/lib/student-contact-form/student-contact-form.component.ts",
-          "hash": "10804329059307592752",
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.ts",
+          "hash": "3823634811491813980",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/forms",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/lib/student-detail/student-detail.component.ts",
-          "hash": "18011643834227762493",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/router",
             "shared-data-access",
             "shared-ui"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/src/lib/student-list/student-list.component.ts",
-          "hash": "16479698805792030361",
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.spec.ts",
+          "hash": "13059444049643197418",
           "deps": [
             "npm:@angular/core",
-            "npm:@angular/forms",
-            "npm:@angular/router",
-            "npm:rxjs",
+            "shared-data-access"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.ts",
+          "hash": "2592171950103894211",
+          "deps": [
+            "npm:@angular/core",
             "shared-data-access",
             "shared-ui"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/src/lib/student.presentation.ts",
-          "hash": "9015762468808088520",
-          "deps": [
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-students/src/test-setup.ts",
+          "file": "libs/admin-portal/feature-staff/src/test-setup.ts",
           "hash": "2674404341416425809",
           "deps": [
             "npm:jest-preset-angular"
           ]
         },
         {
-          "file": "libs/admin-portal/feature-students/tsconfig.json",
+          "file": "libs/admin-portal/feature-staff/tsconfig.json",
           "hash": "3788528804526066759"
         },
         {
-          "file": "libs/admin-portal/feature-students/tsconfig.lib.json",
+          "file": "libs/admin-portal/feature-staff/tsconfig.lib.json",
           "hash": "8993976497808532181"
         },
         {
-          "file": "libs/admin-portal/feature-students/tsconfig.spec.json",
-          "hash": "17263122952907776525"
-        }
-      ],
-      "admin-portal-feature-settings": [
-        {
-          "file": "libs/admin-portal/feature-settings/jest.config.ts",
-          "hash": "9125307080111265917"
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/project.json",
-          "hash": "2915681703387855517"
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/src/index.ts",
-          "hash": "1183881034545508027"
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/src/lib/settings-page/settings-page.component.ts",
-          "hash": "7217503035925184277",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/forms",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/tsconfig.json",
-          "hash": "3788528804526066759"
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        },
-        {
-          "file": "libs/admin-portal/feature-settings/tsconfig.spec.json",
-          "hash": "17263122952907776525"
-        }
-      ],
-      "admin-portal-feature-taxonomy": [
-        {
-          "file": "libs/admin-portal/feature-taxonomy/jest.config.ts",
-          "hash": "17117664808232288488"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/project.json",
-          "hash": "1151873494579524832"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/index.ts",
-          "hash": "2975026211508901461"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/lib/data-access/taxonomy.models.ts",
-          "hash": "17363790166289316180"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/lib/data-access/taxonomy.service.ts",
-          "hash": "10903747467279408525",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/lib/taxonomy-form/taxonomy-form.component.ts",
-          "hash": "8935533091267114348",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/forms",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/lib/taxonomy-page/taxonomy-page.component.ts",
-          "hash": "11575894696367440118",
-          "deps": [
-            "npm:@angular/core",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/tsconfig.json",
-          "hash": "3788528804526066759"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        },
-        {
-          "file": "libs/admin-portal/feature-taxonomy/tsconfig.spec.json",
+          "file": "libs/admin-portal/feature-staff/tsconfig.spec.json",
           "hash": "17263122952907776525"
         }
       ],
@@ -429,15 +245,15 @@
         },
         {
           "file": "libs/admin-portal/feature-sessions/src/index.ts",
-          "hash": "4333230886217192456"
+          "hash": "13177243774487012858"
         },
         {
           "file": "libs/admin-portal/feature-sessions/src/lib/data-access/session.models.ts",
-          "hash": "7270814132643449098"
+          "hash": "2298247226827181918"
         },
         {
           "file": "libs/admin-portal/feature-sessions/src/lib/data-access/session.service.spec.ts",
-          "hash": "16397062627991932125",
+          "hash": "1441373566882363542",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core"
@@ -445,7 +261,7 @@
         },
         {
           "file": "libs/admin-portal/feature-sessions/src/lib/data-access/session.service.ts",
-          "hash": "888818661067172038",
+          "hash": "10293342020203019401",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core",
@@ -483,11 +299,22 @@
           ]
         },
         {
-          "file": "libs/admin-portal/feature-sessions/src/lib/session-detail/session-detail.component.ts",
-          "hash": "10825016319466330184",
+          "file": "libs/admin-portal/feature-sessions/src/lib/session-detail/session-detail.component.spec.ts",
+          "hash": "14096967136299226929",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-sessions/src/lib/session-detail/session-detail.component.ts",
+          "hash": "4166752139429224854",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@angular/forms",
             "shared-data-access",
             "shared-ui"
           ]
@@ -568,55 +395,127 @@
           "hash": "17263122952907776525"
         }
       ],
-      "shared-data-access": [
+      "admin-portal-feature-dashboard": [
         {
-          "file": "libs/shared/data-access/project.json",
-          "hash": "449373934118759123"
+          "file": "libs/admin-portal/feature-dashboard/jest.config.ts",
+          "hash": "4751267838697530737"
         },
         {
-          "file": "libs/shared/data-access/src/index.ts",
-          "hash": "11892441123089392169"
+          "file": "libs/admin-portal/feature-dashboard/project.json",
+          "hash": "13875827896126695579"
         },
         {
-          "file": "libs/shared/data-access/src/lib/approvals/pending-approvals.store.ts",
-          "hash": "16426759418474790697",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core",
-            "npm:rxjs"
-          ]
+          "file": "libs/admin-portal/feature-dashboard/src/index.ts",
+          "hash": "10324320694806448741"
         },
         {
-          "file": "libs/shared/data-access/src/lib/auth/auth.interceptor.ts",
-          "hash": "10426373083005747241",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core",
-            "npm:rxjs"
-          ]
+          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard.presentation.ts",
+          "hash": "2916066028542138672"
         },
         {
-          "file": "libs/shared/data-access/src/lib/auth/auth.models.ts",
-          "hash": "14723757736256010464"
-        },
-        {
-          "file": "libs/shared/data-access/src/lib/auth/auth.store.ts",
-          "hash": "10808519469347055042",
+          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard/dashboard.component.spec.ts",
+          "hash": "12765931431100818505",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
-            "npm:@angular/fire",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/src/lib/dashboard/dashboard.component.ts",
+          "hash": "13971140552312254449",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:@angular/platform-browser",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/src/lib/data-access/dashboard.models.ts",
+          "hash": "17779680138708950660"
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/src/lib/data-access/dashboard.service.spec.ts",
+          "hash": "6736881371677154690",
+          "deps": [
             "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/src/lib/data-access/dashboard.service.ts",
+          "hash": "1314461398587124583",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
             "npm:rxjs"
           ]
         },
         {
-          "file": "libs/shared/data-access/tsconfig.json",
-          "hash": "17092705240196255247"
+          "file": "libs/admin-portal/feature-dashboard/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
         },
         {
-          "file": "libs/shared/data-access/tsconfig.lib.json",
+          "file": "libs/admin-portal/feature-dashboard/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/tsconfig.lib.json",
           "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-dashboard/tsconfig.spec.json",
+          "hash": "17263122952907776525"
+        }
+      ],
+      "admin-portal-feature-settings": [
+        {
+          "file": "libs/admin-portal/feature-settings/jest.config.ts",
+          "hash": "9125307080111265917"
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/project.json",
+          "hash": "2915681703387855517"
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/src/index.ts",
+          "hash": "1183881034545508027"
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/src/lib/settings-page/settings-page.component.ts",
+          "hash": "7217503035925184277",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-settings/tsconfig.spec.json",
+          "hash": "17263122952907776525"
         }
       ],
       "admin-portal": [
@@ -662,10 +561,12 @@
         },
         {
           "file": "apps/admin-portal/src/app/app.routes.ts",
-          "hash": "6604838575136906037",
+          "hash": "2697443344545363828",
           "deps": [
+            "npm:@angular/core",
             "npm:@angular/router",
             "admin-portal-feature-auth",
+            "shared-data-access",
             [
               "admin-portal-feature-auth",
               "dynamic"
@@ -687,11 +588,19 @@
               "dynamic"
             ],
             [
+              "admin-portal-feature-codes",
+              "dynamic"
+            ],
+            [
               "admin-portal-feature-staff",
               "dynamic"
             ],
             [
               "admin-portal-feature-taxonomy",
+              "dynamic"
+            ],
+            [
+              "admin-portal-feature-audit",
               "dynamic"
             ],
             [
@@ -765,6 +674,279 @@
         {
           "file": "apps/admin-portal/tsconfig.spec.json",
           "hash": "9890126725829548007"
+        }
+      ],
+      "shared-data-access": [
+        {
+          "file": "libs/shared/data-access/project.json",
+          "hash": "449373934118759123"
+        },
+        {
+          "file": "libs/shared/data-access/src/index.ts",
+          "hash": "11892441123089392169"
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/approvals/pending-approvals.store.ts",
+          "hash": "16426759418474790697",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.interceptor.ts",
+          "hash": "10426373083005747241",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.models.ts",
+          "hash": "14723757736256010464"
+        },
+        {
+          "file": "libs/shared/data-access/src/lib/auth/auth.store.ts",
+          "hash": "10808519469347055042",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@angular/fire",
+            "npm:@angular/common",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/data-access/tsconfig.json",
+          "hash": "17092705240196255247"
+        },
+        {
+          "file": "libs/shared/data-access/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        }
+      ],
+      "admin-portal-feature-codes": [
+        {
+          "file": "libs/admin-portal/feature-codes/jest.config.ts",
+          "hash": "1524593329554658960"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/project.json",
+          "hash": "11168018823394327302"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/index.ts",
+          "hash": "4863753234247431968"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/code-list/code-list.component.spec.ts",
+          "hash": "10245747026995484435",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/code-list/code-list.component.ts",
+          "hash": "17502523705570038802",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/code.presentation.ts",
+          "hash": "1093461476363261762",
+          "deps": [
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/codes-generate/codes-generate.component.spec.ts",
+          "hash": "11137420787240626985",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/codes-generate/codes-generate.component.ts",
+          "hash": "12281682537515120150",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/data-access/code.models.ts",
+          "hash": "1697743618801437608"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/data-access/code.service.spec.ts",
+          "hash": "16870681793488264506",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/lib/data-access/code.service.ts",
+          "hash": "17925637481985694237",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-codes/tsconfig.spec.json",
+          "hash": "17263122952907776525"
+        }
+      ],
+      "admin-portal-feature-students": [
+        {
+          "file": "libs/admin-portal/feature-students/jest.config.ts",
+          "hash": "10003819578679081059"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/project.json",
+          "hash": "14228884297545896905"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/index.ts",
+          "hash": "17189598915405084389"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/approvals-queue/approvals-queue.component.ts",
+          "hash": "14575664806794129564",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.models.ts",
+          "hash": "15211148035801488178"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.service.spec.ts",
+          "hash": "2887516977544974078",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/data-access/student.service.ts",
+          "hash": "4950342865204808105",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/reason-dialog/reason-dialog.component.ts",
+          "hash": "6706194418801783793",
+          "deps": [
+            "npm:@angular/core",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/student-contact-form/student-contact-form.component.ts",
+          "hash": "10804329059307592752",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/student-detail/student-detail.component.spec.ts",
+          "hash": "13559439239047101871",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/student-detail/student-detail.component.ts",
+          "hash": "12960643678847209041",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/student-list/student-list.component.ts",
+          "hash": "16479698805792030361",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/lib/student.presentation.ts",
+          "hash": "8314441298228478179",
+          "deps": [
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-students/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-students/tsconfig.spec.json",
+          "hash": "17263122952907776525"
         }
       ],
       "shared-ui": [
@@ -1012,6 +1194,195 @@
           "hash": "17263122952907776525"
         }
       ],
+      "admin-portal-feature-taxonomy": [
+        {
+          "file": "libs/admin-portal/feature-taxonomy/jest.config.ts",
+          "hash": "17117664808232288488"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/project.json",
+          "hash": "1151873494579524832"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/index.ts",
+          "hash": "2975026211508901461"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/lib/data-access/taxonomy.models.ts",
+          "hash": "17363790166289316180"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/lib/data-access/taxonomy.service.ts",
+          "hash": "10903747467279408525",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/lib/taxonomy-form/taxonomy-form.component.ts",
+          "hash": "8935533091267114348",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/lib/taxonomy-page/taxonomy-page.component.ts",
+          "hash": "11575894696367440118",
+          "deps": [
+            "npm:@angular/core",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-taxonomy/tsconfig.spec.json",
+          "hash": "17263122952907776525"
+        }
+      ],
+      "admin-portal-feature-auth": [
+        {
+          "file": "libs/admin-portal/feature-auth/project.json",
+          "hash": "7665190410828958960"
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/src/index.ts",
+          "hash": "10142587643316463756"
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/src/lib/guards/auth.guard.ts",
+          "hash": "13846377856892953728",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.html",
+          "hash": "6062290711156827287"
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.scss",
+          "hash": "17209377583730727787"
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/src/lib/login/login.component.ts",
+          "hash": "14942499240670815298",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/tsconfig.json",
+          "hash": "17092705240196255247"
+        },
+        {
+          "file": "libs/admin-portal/feature-auth/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        }
+      ],
+      "admin-portal-feature-audit": [
+        {
+          "file": "libs/admin-portal/feature-audit/jest.config.ts",
+          "hash": "14185423487285936608"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/project.json",
+          "hash": "638775459669123428"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/index.ts",
+          "hash": "220878602291072918"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/audit-log/audit-log.component.spec.ts",
+          "hash": "14799992272986923134",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/audit-log/audit-log.component.ts",
+          "hash": "2367964248451896596",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:@angular/platform-browser",
+            "shared-data-access",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/audit.presentation.ts",
+          "hash": "12749226764693855931"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/data-access/audit.models.ts",
+          "hash": "17488666634153641654"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/data-access/audit.service.spec.ts",
+          "hash": "5983526927059090082",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/lib/data-access/audit.service.ts",
+          "hash": "4709487077563881965",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/src/test-setup.ts",
+          "hash": "2674404341416425809",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/tsconfig.json",
+          "hash": "3788528804526066759"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/tsconfig.lib.json",
+          "hash": "8993976497808532181"
+        },
+        {
+          "file": "libs/admin-portal/feature-audit/tsconfig.spec.json",
+          "hash": "17263122952907776525"
+        }
+      ],
       "admin-portal-feature-shell": [
         {
           "file": "libs/admin-portal/feature-shell/project.json",
@@ -1027,7 +1398,7 @@
         },
         {
           "file": "libs/admin-portal/feature-shell/src/lib/shell/shell.component.ts",
-          "hash": "7905502383084703869",
+          "hash": "7782169870865975860",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
@@ -1061,97 +1432,6 @@
         {
           "file": "libs/admin-portal/feature-shell/tsconfig.lib.json",
           "hash": "8993976497808532181"
-        }
-      ],
-      "admin-portal-feature-staff": [
-        {
-          "file": "libs/admin-portal/feature-staff/jest.config.ts",
-          "hash": "7614759097121627180"
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/project.json",
-          "hash": "1343419376003521750"
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/index.ts",
-          "hash": "14406305893754530630"
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.models.ts",
-          "hash": "9482697095286065308",
-          "deps": [
-            "shared-data-access"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.spec.ts",
-          "hash": "13458787684071073948",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/data-access/staff.service.ts",
-          "hash": "13526850401014312300",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.spec.ts",
-          "hash": "5938002975522060128",
-          "deps": [
-            "npm:@angular/core"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/staff-form/staff-form.component.ts",
-          "hash": "3823634811491813980",
-          "deps": [
-            "npm:@angular/core",
-            "npm:@angular/forms",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.spec.ts",
-          "hash": "13059444049643197418",
-          "deps": [
-            "npm:@angular/core",
-            "shared-data-access"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/lib/staff-list/staff-list.component.ts",
-          "hash": "2592171950103894211",
-          "deps": [
-            "npm:@angular/core",
-            "shared-data-access",
-            "shared-ui"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/tsconfig.json",
-          "hash": "3788528804526066759"
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/tsconfig.lib.json",
-          "hash": "8993976497808532181"
-        },
-        {
-          "file": "libs/admin-portal/feature-staff/tsconfig.spec.json",
-          "hash": "17263122952907776525"
         }
       ]
     }
