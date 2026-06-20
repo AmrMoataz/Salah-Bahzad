@@ -22,6 +22,50 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.AssessmentEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DurationMs")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("QuestionOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserAssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserAssignmentId");
+
+                    b.HasIndex("TenantId", "UserAssignmentId", "OccurredAtUtc");
+
+                    b.ToTable("assessment_events", (string)null);
+                });
+
             modelBuilder.Entity("SalahBahazad.Domain.Entities.Attendance", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4549,6 +4593,84 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                     b.ToTable("tenants", (string)null);
                 });
 
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.UserAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CorrectCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EnrollmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MaxMarks")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuestionCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ScoreMarks")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("StartedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TimeSpentSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("SessionId", "Status");
+
+                    b.HasIndex("TenantId", "EnrollmentId")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "StudentId", "SessionId");
+
+                    b.ToTable("user_assignments", (string)null);
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.AssessmentEvent", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.UserAssignment", null)
+                        .WithMany()
+                        .HasForeignKey("UserAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SalahBahazad.Domain.Entities.Attendance", b =>
                 {
                     b.HasOne("SalahBahazad.Domain.Entities.Session", null)
@@ -4818,6 +4940,107 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SalahBahazad.Domain.Entities.UserAssignment", b =>
+                {
+                    b.HasOne("SalahBahazad.Domain.Entities.Enrollment", null)
+                        .WithMany()
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SalahBahazad.Domain.Entities.Session", null)
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SalahBahazad.Domain.Entities.Student", null)
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("SalahBahazad.Domain.Entities.AssignmentQuestion", "Questions", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTimeOffset?>("AnsweredAtUtc")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<string>("BodyLatex")
+                                .HasMaxLength(4000)
+                                .HasColumnType("character varying(4000)");
+
+                            b1.Property<string>("HintUrl")
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)");
+
+                            b1.Property<string>("ImageObjectKey")
+                                .HasMaxLength(512)
+                                .HasColumnType("character varying(512)");
+
+                            b1.Property<int>("Mark")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Order")
+                                .HasColumnType("integer")
+                                .HasColumnName("DisplayOrder");
+
+                            b1.Property<Guid>("QuestionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid?>("SelectedOptionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("UserAssignmentId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("UserAssignmentId");
+
+                            b1.ToTable("assignment_questions", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserAssignmentId");
+
+                            b1.OwnsMany("SalahBahazad.Domain.Entities.AssignmentOption", "Options", b2 =>
+                                {
+                                    b2.Property<Guid>("Id")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<Guid>("AssignmentQuestionId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<bool>("IsCorrect")
+                                        .HasColumnType("boolean");
+
+                                    b2.Property<int>("Order")
+                                        .HasColumnType("integer")
+                                        .HasColumnName("DisplayOrder");
+
+                                    b2.Property<string>("Text")
+                                        .IsRequired()
+                                        .HasMaxLength(2000)
+                                        .HasColumnType("character varying(2000)");
+
+                                    b2.HasKey("Id");
+
+                                    b2.HasIndex("AssignmentQuestionId");
+
+                                    b2.ToTable("assignment_question_options", (string)null);
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AssignmentQuestionId");
+                                });
+
+                            b1.Navigation("Options");
+                        });
+
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("SalahBahazad.Domain.Entities.CodeBatch", b =>

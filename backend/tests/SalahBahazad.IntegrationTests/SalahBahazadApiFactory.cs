@@ -16,6 +16,7 @@ using SalahBahazad.Infrastructure.Persistence;
 using SalahBahazad.Infrastructure.Services;
 using Testcontainers.Minio;
 using Testcontainers.PostgreSql;
+using RealEnrollmentSideEffects = SalahBahazad.Infrastructure.Services.EnrollmentSideEffects;
 
 namespace SalahBahazad.IntegrationTests;
 
@@ -83,9 +84,14 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
             services.RemoveAll<IFirebaseAuthService>();
             services.AddSingleton<IFirebaseAuthService, FakeFirebaseAuthService>();
 
-            // Spy on the (otherwise no-op) enrollment side-effect seam to assert the event handler ran.
+            // Run the REAL assignment-generation side-effect (Phase 5B-1) but record each invocation so the
+            // existing "the enrollment event fired" assertions keep working. Scoped so the real service gets the
+            // request-scoped DbContext + tenant/audit context (System-attributed AssignmentGenerated row).
             services.RemoveAll<IEnrollmentSideEffects>();
-            services.AddSingleton<IEnrollmentSideEffects>(EnrollmentSideEffects);
+            services.AddScoped<RealEnrollmentSideEffects>();
+            services.AddScoped<IEnrollmentSideEffects>(sp =>
+                new RecordingEnrollmentSideEffects(
+                    sp.GetRequiredService<RealEnrollmentSideEffects>(), EnrollmentSideEffects));
         });
     }
 
@@ -356,6 +362,35 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         db.Questions.Add(question);
         await db.SaveChangesAsync();
         return question;
+    }
+
+    /// <summary>
+    /// Seeds a published session (with videos) plus <paramref name="questionCount"/> MCQ questions — each with
+    /// option "A" correct and "B" wrong, mark 1 — for the assignment engine + gate tests (Phase 5B-1).
+    /// </summary>
+    public async Task<Session> SeedSessionWithQuestionsAsync(
+        Guid tenantId,
+        Guid gradeId,
+        Guid specializationId,
+        int questionCount = 2,
+        decimal price = 100m,
+        int validityDays = 90)
+    {
+        var session = await SeedSessionWithContentAsync(
+            tenantId, gradeId, specializationId, price, validityDays);
+        for (var i = 0; i < questionCount; i++)
+            await SeedQuestionAsync(tenantId, session.Id);
+        return session;
+    }
+
+    /// <summary>Sets a session's prerequisite directly (no HTTP context → no audit), for the ENR-007 gate tests.</summary>
+    public async Task SetSessionPrerequisiteAsync(Guid sessionId, Guid prerequisiteSessionId)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var session = await db.Sessions.IgnoreQueryFilters().FirstAsync(s => s.Id == sessionId);
+        session.SetPrerequisite(prerequisiteSessionId);
+        await db.SaveChangesAsync();
     }
 
     /// <summary>

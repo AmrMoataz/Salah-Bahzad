@@ -121,6 +121,18 @@ export const appRoutes: Routes = [
           import('@sb/admin-portal/feature-audit').then((m) => m.AuditLogComponent),
       },
       {
+        path: 'attendance',
+        canActivate: [permissionGuard('AttendanceRead')],
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-attendance').then((m) => m.AttendanceComponent),
+      },
+      {
+        path: 'review/:enrollmentId',
+        canActivate: [permissionGuard('AttendanceRead')],
+        loadComponent: () =>
+          import('@sb/admin-portal/feature-attendance').then((m) => m.AssignmentReviewComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('@sb/admin-portal/feature-settings').then((m) => m.SettingsPageComponent),

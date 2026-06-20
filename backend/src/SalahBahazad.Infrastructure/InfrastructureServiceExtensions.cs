@@ -42,12 +42,14 @@ public static class InfrastructureServiceExtensions
         // Video transcode seam — stubbed in Phase 3 (marks Ready); Hangfire + HLS is Phase 5.
         services.AddScoped<IVideoProcessingQueue, StubVideoProcessingQueue>();
 
-        // Enrollment side-effect seam — stubbed in Phase 4 (logs intent); assignment/quiz snapshot
-        // generation is Phase 5 (FR-PLAT-ENR-005, FR-PLAT-ASG-001, FR-PLAT-QZ-001).
-        services.AddScoped<IEnrollmentSideEffects, StubEnrollmentSideEffects>();
+        // Enrollment side-effect seam — Phase 5B-1 makes this real: snapshots the question bank into a
+        // per-student assignment on enrol/extend (idempotent). Prerequisite-quiz snapshot is still 5B-2
+        // (FR-PLAT-ENR-005, FR-PLAT-ASG-001, FR-PLAT-QZ-001).
+        services.AddScoped<IEnrollmentSideEffects, EnrollmentSideEffects>();
 
-        // Synchronous CSV code export (FR-PLAT-COD-002); stateless.
+        // Synchronous CSV exports (FR-PLAT-COD-002, FR-ADM-ATT-004); stateless.
         services.AddSingleton<ICodeExporter, CsvCodeExporter>();
+        services.AddSingleton<IAttendanceExporter, CsvAttendanceExporter>();
 
         // EF Core + PostgreSQL
         services.AddDbContext<AppDbContext>((sp, opts) =>

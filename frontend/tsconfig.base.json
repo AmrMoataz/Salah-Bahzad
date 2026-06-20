@@ -18,6 +18,7 @@
       "@sb/shared/ui": ["libs/shared/ui/src/index.ts"],
       "@sb/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@sb/shared/util": ["libs/shared/util/src/index.ts"],
+      "@sb/admin-portal/feature-attendance": ["libs/admin-portal/feature-attendance/src/index.ts"],
       "@sb/admin-portal/feature-audit": ["libs/admin-portal/feature-audit/src/index.ts"],
       "@sb/admin-portal/feature-auth": ["libs/admin-portal/feature-auth/src/index.ts"],
       "@sb/admin-portal/feature-shell": ["libs/admin-portal/feature-shell/src/index.ts"],

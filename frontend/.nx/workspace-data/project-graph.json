@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "admin-portal-feature-attendance": {
+      "name": "admin-portal-feature-attendance",
+      "type": "lib",
+      "data": {
+        "root": "libs/admin-portal/feature-attendance",
+        "name": "admin-portal-feature-attendance",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/admin-portal/feature-attendance/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:admin-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/admin-portal/feature-attendance"
+            ],
+            "options": {
+              "jestConfig": "libs/admin-portal/feature-attendance/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-dashboard": {
       "name": "admin-portal-feature-dashboard",
       "type": "lib",
@@ -15840,6 +15876,53 @@
     }
   },
   "dependencies": {
+    "admin-portal-feature-attendance": [
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "shared-data-access",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:@angular/platform-browser",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "admin-portal-feature-attendance",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-dashboard": [
       {
         "source": "admin-portal-feature-dashboard",
@@ -38597,5 +38680,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1781961160725
+  "computedAt": 1781967051612
 }

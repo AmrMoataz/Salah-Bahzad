@@ -245,6 +245,80 @@
       "nx/core/project-json"
     ]
   },
+  "libs/admin-portal/feature-attendance": {
+    "root": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:admin-portal": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:feature": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/admin-portal/feature-attendance/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
   "libs/admin-portal/feature-audit": {
     "root": [
       "libs/admin-portal/feature-audit/project.json",

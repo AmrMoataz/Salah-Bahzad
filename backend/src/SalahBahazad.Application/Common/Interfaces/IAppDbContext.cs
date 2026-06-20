@@ -33,6 +33,10 @@ public interface IAppDbContext
     DbSet<Enrollment> Enrollments { get; }
     DbSet<Attendance> Attendances { get; }
 
+    // Assignments engine (tenant-owned) — FR-PLAT-ASG-*. AssignmentQuestion is navigation-only (owned).
+    DbSet<UserAssignment> UserAssignments { get; }
+    DbSet<AssessmentEvent> AssessmentEvents { get; }
+
     // Location reference data (global, seeded, read-only) — FR-PLAT-TAX-003
     DbSet<City> Cities { get; }
     DbSet<Region> Regions { get; }

@@ -176,11 +176,23 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
     KPIs reconciled to DB ground truth (pending 0 / active 2 / codesUsed 1 / codesActive 58 / revenue EGP 150 /
     enrollments 5); drill-in navigates to the entity (no `/api/audit/{id}`, no `AuditViewed` written); default-deny
     (anon→401, Student-role→403) holds. Full log in `IMPLEMENTATION-PLAN-phase5a-wiring.md`. **5B is next.**
-  - **5B — Assessment engines + review + attendance** (the core remaining domain): assignment + quiz aggregates
-    (server-side timer auto-submit, single-sitting forfeit, focus-loss telemetry, best-of, the `≥` pass-rule fix
-    issue #7), the real `IEnrollmentSideEffects` (replacing the Phase-4 stub), the `FR-PLAT-ENR-007` enrollment gate,
-    SignalR hubs (JWT auth + Redis backplane, issue #6), attendance scoring; then `FR-ADM-REV-*` review screens +
-    `FR-ADM-ATT-*` matrices/export. Largest stream; needs Redis wired in Aspire.
+  - **5B — Assessment engines + review + attendance** (the core remaining domain). Split because the open-book
+    assignment engine is calm while the proctored quiz engine needs SignalR + a Redis backplane:
+    - **5B-1 — Assignments + attendance + assignment/behaviour review** — **Met (2026-06-20).** The real
+      `IEnrollmentSideEffects` (replaces the Phase-4 stub) generating the `UserAssignment` snapshot, the open-book
+      solve/answer/behaviour engine (API-only, driven by a student JWT in wiring), auto-grade → `Attendance`
+      (System actor), the `FR-PLAT-ENR-007` prerequisite gate, and the admin **Attendance** matrices (`scrAttendance`)
+      + **Assignment/Behaviour review** (`scrReview`). No SignalR/Redis, no catalog change; one gated migration.
+      Proven end-to-end on the running stack — **21/21** logical checks, **ZERO** product drift (one frontend gap —
+      the `feature-attendance` screens were unrouted + missing a TS alias — found and fixed during wiring). The gate
+      **blocks (409) then passes (201)** on the real prerequisite chain; behaviour lands in `assessment_events` (not
+      the audit log); tenant isolation (404 cross-tenant), IDOR (403), audited CSV export, and default-deny all hold.
+      Contract + 3 streams: `docs/contracts/phase5b1-assignments-attendance.md` (8 endpoints) +
+      `IMPLEMENTATION-PLAN-phase5b1-{backend,frontend,wiring}.md`.
+    - **5B-2 — Quizzes (proctored)** *(next)*: the quiz engine — SignalR hubs (JWT auth + **Redis backplane**,
+      issue #6), server-side timer auto-submit, single-sitting forfeit-on-disconnect, focus-loss telemetry, best-of,
+      the `≥` pass-rule fix (issue #7), randomised attempts, the video-unlock gate — plus the **Quiz attempts** review
+      tab (`FR-ADM-REV-002`) and the attendance Quiz-best/Attempts columns. Needs Redis wired into the AppHost.
   - **5C — Secure video gate** (`FR-PLAT-VID-001..007`): server access gate + per-video counter decrement + audited
     playback + short-lived signed HLS URL + one-time handoff code. Backend-only in this engagement; needs R2/MinIO +
     HLS infra wired in Aspire. No admin player screen (student-portal/native-app surface).

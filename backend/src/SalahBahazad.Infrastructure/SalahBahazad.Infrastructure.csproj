@@ -5,6 +5,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Integration tests compose the real EnrollmentSideEffects in a recording decorator (Phase 5B-1). -->
+    <InternalsVisibleTo Include="SalahBahazad.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Seeded Egypt cities/regions reference dataset, loaded at model-build for EF HasData. -->
     <EmbeddedResource Include="Persistence\SeedData\egypt-locations.json" />
   </ItemGroup>

@@ -131,6 +131,11 @@ public sealed class AuditSaveChangesInterceptor(
 
             var summary = $"{action} {entityType}";
 
+            // The acting principal for this row — overridable per-row for System-attributed events below.
+            var rowActorId = actorId;
+            var rowActorType = actorType;
+            var rowActorRole = actorRole;
+
             // Semantic enrichment: prefer a buffered IAuditableDomainEvent's action/summary so this
             // single chained row reads meaningfully (e.g. "StudentRejected: duplicate account"). The
             // field-diff above still records the underlying change; events are still buffered here
@@ -142,6 +147,15 @@ public sealed class AuditSaveChangesInterceptor(
                 {
                     action = semantic.AuditAction;
                     summary = semantic.AuditSummary;
+
+                    // Platform-performed actions (assignment auto-generation/auto-grading) are attributed to
+                    // System even though they run inside a user's request (FR-PLAT-AUD-005).
+                    if (semantic is ISystemActorAuditEvent)
+                    {
+                        rowActorId = null;
+                        rowActorType = "System";
+                        rowActorRole = null;
+                    }
                 }
             }
 
@@ -151,9 +165,9 @@ public sealed class AuditSaveChangesInterceptor(
                 entityType: entityType,
                 occurredAtUtc: now,
                 entityId: entityId,
-                actorId: actorId,
-                actorRole: actorRole,
-                actorType: actorType,
+                actorId: rowActorId,
+                actorRole: rowActorRole,
+                actorType: rowActorType,
                 summary: summary,
                 beforeJson: beforeJson,
                 afterJson: afterJson,

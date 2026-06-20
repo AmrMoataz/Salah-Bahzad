@@ -49,6 +49,10 @@ public sealed class AppDbContext(
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
 
+    // Assignments engine (tenant-owned) — FR-PLAT-ASG-*. AssignmentQuestion is navigation-only (owned).
+    public DbSet<UserAssignment> UserAssignments => Set<UserAssignment>();
+    public DbSet<AssessmentEvent> AssessmentEvents => Set<AssessmentEvent>();
+
     // Location reference data (global, seeded) — FR-PLAT-TAX-003
     public DbSet<City> Cities => Set<City>();
     public DbSet<Region> Regions => Set<Region>();
@@ -91,13 +95,16 @@ public sealed class AppDbContext(
     public async Task<TResult> ExecuteInTransactionAsync<TResult>(
         Func<Task<TResult>> action, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Database.BeginTransactionAsync(cancellationToken);
+        TResult result;
+        await using (var transaction = await Database.BeginTransactionAsync(cancellationToken))
+        {
+            result = await action();
+            await transaction.CommitAsync(cancellationToken);
+        }
 
-        var result = await action();
-
-        await transaction.CommitAsync(cancellationToken);
-
-        // Events fire only after the transaction commits, so handlers observe durable state.
+        // Dispatch only after the transaction is committed AND disposed, so post-commit handlers that write
+        // (assignment generation, attendance scoring) run their own SaveChanges with no transaction still
+        // current — handlers observe durable state (FR-PLAT-ENR-005, FR-PLAT-ASG-006).
         await DispatchDomainEventsAsync(cancellationToken);
 
         return result;

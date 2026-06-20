@@ -35,4 +35,15 @@ public sealed class Attendance : TenantEntityBase, IAuditViaEventOnly
         attendance.SetTenant(tenantId);
         return attendance;
     }
+
+    /// <summary>
+    /// Records the auto-graded assignment score as a 0–100 percent (FR-PLAT-ASG-006, FR-PLAT-ATT-002). Written
+    /// by the grading event handler attributed to the System actor; idempotent re-writes keep the latest score.
+    /// </summary>
+    public void SetAssignmentScore(int percent)
+    {
+        if (percent is < 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(percent), "Assignment score must be between 0 and 100.");
+        AssignmentScore = percent;
+    }
 }

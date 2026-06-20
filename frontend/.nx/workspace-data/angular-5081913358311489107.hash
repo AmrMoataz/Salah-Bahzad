@@ -6228,5 +6228,183 @@
         }
       }
     }
+  },
+  "16479899521546334804": {
+    "apps/admin-portal": {
+      "projectType": "application",
+      "sourceRoot": "apps/admin-portal/src",
+      "targets": {
+        "build": {
+          "command": "ng build",
+          "options": {
+            "cwd": "apps/admin-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"build\" target for \"admin-portal\".",
+            "help": {
+              "command": "npx ng run admin-portal:build --help",
+              "example": {
+                "options": {
+                  "localize": true
+                }
+              }
+            }
+          },
+          "dependsOn": [
+            "^build"
+          ],
+          "outputs": [
+            "{workspaceRoot}/dist\\apps\\admin-portal"
+          ],
+          "cache": true,
+          "inputs": [
+            "production",
+            "^production",
+            {
+              "externalDependencies": [
+                "@angular/cli"
+              ]
+            }
+          ],
+          "configurations": {
+            "production": {
+              "command": "ng run admin-portal:build:production"
+            },
+            "staging": {
+              "command": "ng run admin-portal:build:staging"
+            },
+            "development": {
+              "command": "ng run admin-portal:build:development"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "command": "ng serve",
+          "options": {
+            "cwd": "apps/admin-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"serve\" target for \"admin-portal\".",
+            "help": {
+              "command": "npx ng run admin-portal:serve --help",
+              "example": {
+                "options": {
+                  "port": 4201
+                }
+              }
+            }
+          },
+          "continuous": true,
+          "configurations": {
+            "production": {
+              "command": "ng run admin-portal:serve:production"
+            },
+            "staging": {
+              "command": "ng run admin-portal:serve:staging"
+            },
+            "development": {
+              "command": "ng run admin-portal:serve:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  },
+  "6864560043228875678": {
+    "apps/admin-portal": {
+      "projectType": "application",
+      "sourceRoot": "apps/admin-portal/src",
+      "targets": {
+        "build": {
+          "command": "ng build",
+          "options": {
+            "cwd": "apps/admin-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"build\" target for \"admin-portal\".",
+            "help": {
+              "command": "npx ng run admin-portal:build --help",
+              "example": {
+                "options": {
+                  "localize": true
+                }
+              }
+            }
+          },
+          "dependsOn": [
+            "^build"
+          ],
+          "outputs": [
+            "{workspaceRoot}/dist\\apps\\admin-portal"
+          ],
+          "cache": true,
+          "inputs": [
+            "production",
+            "^production",
+            {
+              "externalDependencies": [
+                "@angular/cli"
+              ]
+            }
+          ],
+          "configurations": {
+            "production": {
+              "command": "ng run admin-portal:build:production"
+            },
+            "staging": {
+              "command": "ng run admin-portal:build:staging"
+            },
+            "development": {
+              "command": "ng run admin-portal:build:development"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "command": "ng serve",
+          "options": {
+            "cwd": "apps/admin-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"serve\" target for \"admin-portal\".",
+            "help": {
+              "command": "npx ng run admin-portal:serve --help",
+              "example": {
+                "options": {
+                  "port": 4201
+                }
+              }
+            }
+          },
+          "continuous": true,
+          "configurations": {
+            "production": {
+              "command": "ng run admin-portal:serve:production"
+            },
+            "staging": {
+              "command": "ng run admin-portal:serve:staging"
+            },
+            "development": {
+              "command": "ng run admin-portal:serve:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
   }
 }
