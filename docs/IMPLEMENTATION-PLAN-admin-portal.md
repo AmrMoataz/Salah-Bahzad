@@ -156,6 +156,24 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
 - **Backend:** assignment auto-grade → attendance (`FR-PLAT-ASG-006`, `FR-PLAT-ATT-002`); quiz engine — **server-side timer auto-submit**, single-sitting forfeit-on-disconnect, focus-loss telemetry (recorded, not auto-forfeit), best-of, **`≥` pass rule** (fixes issue #7), all events audited (`FR-PLAT-QZ-001..010`); SignalR hubs authenticated via JWT + Redis backplane (fixes issue #6, `NFR-SCAL-002`, `NFR-SEC-005`); video access gate → **short-lived signed HLS URL** + view accounting + audit + one-time deep-link handoff code (`FR-PLAT-VID-001..007`); attendance queries per session/per student.
 - **Frontend:** Assignment & quiz **review** screens (`FR-ADM-REV-001..003`); Attendance matrices (per session, per student) + Excel/CSV export (`FR-ADM-ATT-001..004`); **Activity/audit log** browser with filters + drill-in (`FR-ADM-AUD-001..003`); Dashboard KPIs + recent-activity feed (`FR-ADM-DASH-001..003`).
 - **Exit:** staff review any student's work; attendance exports; audit log is searchable; dashboard live.
+  **Planned (2026-06-20):** Phase 5 is the largest/riskiest phase and bundles four loosely-coupled concerns, so it
+  is **split into three sub-phases**, delivered in dependency order:
+  - **5A — Audit-log browser + Dashboard** (read-only reporting over data that *already exists*): `FR-ADM-AUD-001..003`,
+    `FR-PLAT-AUD-004/006`, `FR-ADM-DASH-001..003`. No engines, no new infra, no migration, no permission/catalog
+    change (the `AuditRead`/`AuditReadSensitive`/`DashboardRead` permissions are already declared + bundled). Lowest
+    risk, fastest to demo, finally surfaces the hash-chained audit trail every prior phase has been writing. Planned
+    as a frozen contract + 3 parallel-safe streams exactly like Phase 3/4: `docs/contracts/phase5a-audit-dashboard.md`
+    (4 endpoints) and `IMPLEMENTATION-PLAN-phase5a-{backend,frontend,wiring}.md`. **Key correctness call:** `AuditEntry`
+    is not `ITenantOwned`, so every audit read must filter `TenantId` *explicitly* (`NFR-SEC-010`). **This is the
+    chosen next step.**
+  - **5B — Assessment engines + review + attendance** (the core remaining domain): assignment + quiz aggregates
+    (server-side timer auto-submit, single-sitting forfeit, focus-loss telemetry, best-of, the `≥` pass-rule fix
+    issue #7), the real `IEnrollmentSideEffects` (replacing the Phase-4 stub), the `FR-PLAT-ENR-007` enrollment gate,
+    SignalR hubs (JWT auth + Redis backplane, issue #6), attendance scoring; then `FR-ADM-REV-*` review screens +
+    `FR-ADM-ATT-*` matrices/export. Largest stream; needs Redis wired in Aspire.
+  - **5C — Secure video gate** (`FR-PLAT-VID-001..007`): server access gate + per-video counter decrement + audited
+    playback + short-lived signed HLS URL + one-time handoff code. Backend-only in this engagement; needs R2/MinIO +
+    HLS infra wired in Aspire. No admin player screen (student-portal/native-app surface).
 
 ### Cross-cutting (every phase)
 Business-rule tests as features land — enrollment, grading, quiz scoring/forfeit, code lifecycle, tenant isolation (`NFR-MAINT-001`); OpenAPI kept current; responsive phone/tablet/desktop (`NFR-COMPAT-002`); WCAG 2.1 AA (`NFR-A11Y-001`); naming avoids the old typos (`NFR-MAINT-004`).
