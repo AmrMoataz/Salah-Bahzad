@@ -71,6 +71,59 @@ green in the integration suite (+ best-effort live). Append a dated run log here
 
 ---
 
+## Run log — executed 2026-06-20
+
+**Static drift review — ZERO drift.** Backend (`QuizEndpoints`/`QuizDtos`/`QuizHub`/`QuizReviewDto` + the `UserQuiz`
+domain — `Passed = BestPercent >= MinPassPercent` the #7 fix, best-of `.Max()`, sourced from the **prerequisite**,
+audit actor split, no `isCorrect` to students) and frontend (`getQuizReview` → `GET /api/review/quizzes/{id}` with
+the 404="no gating quiz" empty-state; `QuizReview` model) match the frozen contract field-for-field. **No new
+route/lib** (all inside `feature-attendance`), so the 5B-1 routing gap can't recur — confirmed. Backend `dotnet build
+-c Release` + frontend `nx build admin-portal` both green.
+
+**Stack & migration.** The running AppHost was **5 h stale** (pre-5B-2: quiz routes 404'd, no Redis container) →
+the user restarted it; the restart brought up the **redis** container (`:6379`) and the new API. Applied the gated
+`AddQuizzes` migration with `dotnet ef … --configuration Release` (tables `user_quizzes`/`quiz_attempts`/
+`quiz_attempt_questions`/`quiz_attempt_question_options`; `assessment_events` generalised — `QuizAttemptId` nullable).
+Drove REST via **`:4200/api`**; direct HS256 JWTs (Teacher, second-tenant, two students).
+
+**Data setup.** A quiz generates only if the prereq has a `QuizSetting` + quiz-eligible questions. The dev chain is
+Phase 3 smoke (B) → prereq Session 1 (A, 1 quiz-eligible question). Session 1 had **no** quiz settings → set them via
+`PUT /api/sessions/{S1}/quiz-settings` (`time 5/count 5/attempts 2/minPass 100`; the selector clamps the count to the
+1 eligible question). Then **refund→unlock** Phase 3 smoke for Student Test (gate passes — its Session 1 assignment
+is `Completed`) → the side-effect generated the `UserQuiz`.
+
+**Result: full smoke PASS · ZERO product drift.** (First pass: 14/17; the 3 "failures" were a **test-script** bug —
+the bank question has a **variation** that flips the correct option's order, so "answer order 0" hit the wrong option;
+re-ran answering the correct option **by text** {`A24`,`25`}, after resetting the quiz, → 8/8.)
+1. **Generation:** quiz sourced from the prerequisite, `minPass 100`, 2 attempts, not passed; `GatedSessionId` = B.
+2. **Attempt flow:** start → randomised 1-question draw (base form *or* the variation — proves `FR-PLAT-QZ-003`),
+   **no `isCorrect`** → answer → submit. Attempt 1 (wrong) → **0%**; attempt 2 (correct) → **100%**.
+3. **BEST-OF + `≥`-PASS (fixes #7):** `bestPercent` = max(0, 100) = **100**; `passed` = (100 **≥** 100) = **true** —
+   exactly-min-pass passes (the old `>` would have failed). Exhausting attempts (2/2) → start → **409**.
+4. **Focus-loss (`FR-PLAT-QZ-006`):** `POST …/focus` mid-attempt → **204**, attempt **not** forfeited; DB:
+   `assessment_events` `FocusLost` tied to the `QuizAttemptId`, **0** focus rows in the audit log.
+5. **Admin:** `GET /api/review/quizzes/{enrollmentId}` → best 100 / passed / 2-of-2, attempt 2 `isBest`, flags
+   `1:0%/Clean 2:100%/Clean`; **attendance quiz columns now real** (`bestQuizPercent=100`, `quizAttemptCount=2`).
+6. **Audit actor split (`FR-PLAT-QZ-010`):** `QuizAttemptStarted`/`Submitted` = **Student**, `QuizGenerated` =
+   **System**, focus-loss **not** audited. (`Forfeited`/`TimedOut` = **System** is **not** exercised live — clean
+   submits only — and is covered by the backend integration suite.)
+7. **Videos-unlocked state:** `UserQuiz.Passed = true` (BestPercent 100) — the flag the 5C video gate will read.
+8. **Security:** tenant isolation (second-tenant → **404** on the quiz review); **IDOR** (a different student starting
+   an attempt → **403**); default-deny (anon→401; **staff**→403 on `/api/me/quizzes/*`; **student**→403 on
+   `/api/review/quizzes/*`). Frontend served 200 at `:4200`.
+
+**Drift log: ZERO** — no fix needed on either side; the frozen contract was not amended. **Hub / forfeit / timer:**
+the `QuizHub` is statically `[Authorize]` + JWT-via-`access_token`-scoped-to-`/hubs/quiz`; **forfeit-on-disconnect +
+timer auto-submit are proven by the green backend integration suite** (SignalR `HubConnection` test client; the timer
+test invokes the job directly). A *live* negotiate via `:4200` returns 404 because the **admin dev-proxy forwards only
+`/api`, not `/hubs`** — which is correct (the admin portal never uses the quiz hub; the future **student portal**
+connects to `/hubs/quiz` directly against the API). **Follow-ups (not 5B-2 drift):** bump the transitive
+**`MessagePack 2.5.187`** (advisory `NU1903`) the SignalR packages pulled in; and a quiz configured with
+`QuestionCount` > eligible silently draws fewer (the Phase-3 publish gate is the guardrail — `PUT quiz-settings`
+bypasses it).
+
+---
+
 ## Kickoff prompt (paste into a fresh Claude session at the repo root, after both streams are green)
 
 ```

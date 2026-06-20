@@ -17,15 +17,26 @@ namespace SalahBahazad.Infrastructure.Services;
 /// time is correct because <see cref="IHttpContextAccessor"/> is a singleton backed by an AsyncLocal,
 /// so it always reflects the current request even through the captured instance.
 /// </remarks>
-internal sealed class CurrentTenantResolver(IHttpContextAccessor httpContextAccessor) : ICurrentTenantResolver
+internal sealed class CurrentTenantResolver(
+    IHttpContextAccessor httpContextAccessor, ISystemOperationContext systemOperation) : ICurrentTenantResolver
 {
-    // Fall back to Guid.Empty for unauthenticated paths (e.g. the auth exchange endpoint, which has
-    // no tenant claim yet); a tenant-owned query under Guid.Empty simply matches nothing.
-    public Guid TenantId =>
-        Guid.TryParse(httpContextAccessor.HttpContext?.User.FindFirstValue("tenant_id"), out var id)
-            ? id
-            : Guid.Empty;
+    // A System operation (Hangfire job / hub callback) supplies the tenant explicitly — there is no request
+    // to read the claim from (FR-PLAT-QZ-004/005). Otherwise fall back to the JWT claim, then Guid.Empty for
+    // unauthenticated paths (e.g. the auth exchange endpoint); a tenant-owned query under Empty matches nothing.
+    public Guid TenantId
+    {
+        get
+        {
+            if (systemOperation.Current is { } operation)
+                return operation.TenantId;
+
+            return Guid.TryParse(httpContextAccessor.HttpContext?.User.FindFirstValue("tenant_id"), out var id)
+                ? id
+                : Guid.Empty;
+        }
+    }
 
     public bool IsResolved =>
-        Guid.TryParse(httpContextAccessor.HttpContext?.User.FindFirstValue("tenant_id"), out _);
+        systemOperation.Current is not null
+        || Guid.TryParse(httpContextAccessor.HttpContext?.User.FindFirstValue("tenant_id"), out _);
 }

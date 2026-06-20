@@ -21,9 +21,10 @@ export interface PagedResult<T> {
 
 /**
  * One enrolled student's row in the "By session" cohort matrix (contract §B `SessionAttendanceRowDto`,
- * `scrAttendance` line 1265). `videosWatched` is fed by the 5C video gate → **0** in 5B-1;
+ * `scrAttendance` line 1265). `videosWatched` is fed by the 5C video gate → **0** until then;
  * `assignmentPercent` is null until the student completes the assignment; `bestQuizPercent`/
- * `quizAttemptCount` stay null/0 until 5B-2.
+ * `quizAttemptCount` are populated by the 5B-2 quiz engine (null/0 only when the session has no
+ * gating quiz or no attempts yet).
  */
 export interface SessionAttendanceRow {
   enrollmentId: string;
@@ -39,7 +40,7 @@ export interface SessionAttendanceRow {
 
 /**
  * One session's row in the "By student" per-session breakdown (contract §B `StudentAttendanceRowDto`,
- * `scrAttendance` line 1277). Same pending-column caveats as the cohort matrix.
+ * `scrAttendance` line 1277). Same column caveats as the cohort matrix.
  */
 export interface StudentAttendanceRow {
   enrollmentId: string;
@@ -100,8 +101,17 @@ export interface AssignmentReview {
   questions: ReviewQuestion[];
 }
 
-/** Behaviour-event kind (contract §A/§C). Drives the timeline icon/accent (see `attendance.presentation.ts`). */
-export type BehaviourEventType = 'Entered' | 'Left' | 'Answered' | 'Navigated';
+/**
+ * Behaviour-event kind (contract §A/§C; §B adds the quiz attempt's `FocusLost`/`FocusReturned` rows,
+ * sourced from `assessment_events`). Drives the timeline icon/accent (see `attendance.presentation.ts`).
+ */
+export type BehaviourEventType =
+  | 'Entered'
+  | 'Left'
+  | 'Answered'
+  | 'Navigated'
+  | 'FocusLost'
+  | 'FocusReturned';
 
 /**
  * One in-assessment behaviour event (contract §C `BehaviourEventDto`, `scrReview` lines 1131-1134).
@@ -112,6 +122,47 @@ export interface BehaviourEvent {
   label: string;
   questionOrder: number | null;
   occurredAtUtc: string;
+}
+
+// ── §B Quiz-attempts review (Phase 5B-2) ───────────────────────────────────────────────────────────
+
+/**
+ * A quiz attempt's outcome flag (contract §B, `scrReview` line 1129) — derived server-side from the
+ * attempt `status`. Drives the Flags pill (`Clean`→success, `Timeout`→danger, `Forfeit`→warning;
+ * see `quizFlagPill` in `attendance.presentation.ts`).
+ */
+export type QuizFlag = 'Clean' | 'Timeout' | 'Forfeit';
+
+/** A quiz attempt's lifecycle status (contract §C `QuizAttempt.Status`). */
+export type QuizAttemptStatus = 'InProgress' | 'Submitted' | 'Forfeited' | 'TimedOut';
+
+/**
+ * One row in the `scrReview` "Quiz attempts" table (contract §B `QuizReviewDto.attempts[]`,
+ * lines 1128-1130): Attempt / Score / Time spent / Flags / When, with the best attempt marked.
+ */
+export interface QuizAttemptRow {
+  number: number;
+  scorePercent: number;
+  /** `submitted − started` (or `deadline − started` on timeout); rendered `mm:ss`. */
+  timeSpentSeconds: number;
+  flag: QuizFlag;
+  status: QuizAttemptStatus;
+  startedAtUtc: string;
+  isBest: boolean;
+}
+
+/**
+ * The full quiz-review payload (contract §B `QuizReviewDto`) for one enrollment's gating quiz — drives
+ * the header line ("Best {bestPercent}% · {passed} (min {minPassPercent}%) · {used}/{allowed}") and the
+ * attempts table. A **404** means the gated session has no prerequisite quiz → the empty state.
+ */
+export interface QuizReview {
+  bestPercent: number;
+  passed: boolean;
+  minPassPercent: number;
+  attemptsUsed: number;
+  attemptsAllowed: number;
+  attempts: QuizAttemptRow[];
 }
 
 // ── Combo reference lists (read directly to stay within the Nx feature boundary) ──────────────────

@@ -28,6 +28,13 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
+    <!-- Redis L2 for HybridCache + SignalR connection↔attempt map (FR-PLAT-QZ-004, NFR-SCAL-002). -->
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <!-- Authoritative quiz auto-submit timer (FR-PLAT-QZ-005). -->
+    <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire.PostgreSql" />
   </ItemGroup>
 
 </Project>

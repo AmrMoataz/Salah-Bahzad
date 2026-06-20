@@ -14,6 +14,13 @@ var postgres = builder.AddPostgres("postgres", password: postgresPassword, port:
 // ConnectionStrings__DefaultConnection into the API automatically (service discovery).
 var db = postgres.AddDatabase("DefaultConnection");
 
+// ── Redis ────────────────────────────────────────────────────────────────────
+// Backs the SignalR backplane for the QuizHub (NFR-SCAL-002), the connection↔attempt map that makes
+// forfeit-on-disconnect survive horizontal scale (FR-PLAT-QZ-004), and the HybridCache L2. Fixed dev port
+// (mirroring the Postgres/MinIO precedent) so wiring can reach it; injected as ConnectionStrings__redis.
+var redis = builder.AddRedis("redis", port: 6379)
+    .WithDataVolume();
+
 // ── Object storage (MinIO, S3-compatible) ────────────────────────────────────
 // MinIO emulates Cloudflare R2 locally so the IFileStorage → R2FileStorage path runs offline with the
 // exact same code (only the endpoint/creds differ). Throwaway local credentials, matching the Postgres
@@ -39,6 +46,8 @@ var minio = builder.AddContainer("minio", "minio/minio", "latest")
 var api = builder.AddProject<Projects.SalahBahazad_Api>("api")
     .WithReference(db)
     .WaitFor(db)
+    .WithReference(redis)
+    .WaitFor(redis)
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", builder.Environment.EnvironmentName)
     .WithEnvironment("R2__Endpoint", minio.GetEndpoint("api"))
     .WithEnvironment("R2__AccessKeyId", minioRootUser)

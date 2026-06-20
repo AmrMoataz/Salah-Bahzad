@@ -46,4 +46,15 @@ public sealed class Attendance : TenantEntityBase, IAuditViaEventOnly
             throw new ArgumentOutOfRangeException(nameof(percent), "Assignment score must be between 0 and 100.");
         AssignmentScore = percent;
     }
+
+    /// <summary>
+    /// Records the best-of quiz percent as a 0–100 value (FR-PLAT-QZ-007, FR-PLAT-ATT-002). Written by the
+    /// quiz grading event handler attributed to the System actor; idempotent re-writes keep the latest best.
+    /// </summary>
+    public void SetBestQuizPercent(int percent)
+    {
+        if (percent is < 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(percent), "Quiz score must be between 0 and 100.");
+        BestQuizPercent = percent;
+    }
 }

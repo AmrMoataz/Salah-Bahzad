@@ -25,6 +25,7 @@ internal static class AttendanceProjector
             return [];
 
         var studentIds = enrollments.Select(e => e.StudentId).Distinct().ToList();
+        var enrollmentIds = enrollments.Select(e => e.Id).Distinct().ToList();
 
         var studentNames = await db.Students
             .IgnoreQueryFilters()
@@ -37,9 +38,13 @@ internal static class AttendanceProjector
                 .ToListAsync(cancellationToken))
             .ToDictionary(a => a.StudentId);
 
+        // Quiz best-of + attempt count, joined per enrollment (5B-2; null/0 when no quiz gates the session).
+        var quizByEnrollment = await QuizByEnrollmentAsync(db, enrollmentIds, cancellationToken);
+
         return [.. enrollments.Select(e =>
         {
             attendanceByStudent.TryGetValue(e.StudentId, out var att);
+            quizByEnrollment.TryGetValue(e.Id, out var quiz);
             return new SessionAttendanceRowDto(
                 EnrollmentId: e.Id,
                 StudentId: e.StudentId,
@@ -47,8 +52,8 @@ internal static class AttendanceProjector
                 VideosWatched: att?.VideosWatched ?? 0,
                 VideosTotal: videosTotal,
                 AssignmentPercent: att?.AssignmentScore,
-                BestQuizPercent: null,   // 5B-2
-                QuizAttemptCount: 0);    // 5B-2
+                BestQuizPercent: quiz?.BestPercent,
+                QuizAttemptCount: quiz?.AttemptsUsed ?? 0);
         })];
     }
 
@@ -62,6 +67,7 @@ internal static class AttendanceProjector
             return [];
 
         var sessionIds = enrollments.Select(e => e.SessionId).Distinct().ToList();
+        var enrollmentIds = enrollments.Select(e => e.Id).Distinct().ToList();
 
         var sessionTitles = await db.Sessions
             .IgnoreQueryFilters()
@@ -82,9 +88,13 @@ internal static class AttendanceProjector
                 .ToListAsync(cancellationToken))
             .ToDictionary(a => a.SessionId);
 
+        // Quiz best-of + attempt count, joined per enrollment (5B-2; null/0 when no quiz gates the session).
+        var quizByEnrollment = await QuizByEnrollmentAsync(db, enrollmentIds, cancellationToken);
+
         return [.. enrollments.Select(e =>
         {
             attendanceBySession.TryGetValue(e.SessionId, out var att);
+            quizByEnrollment.TryGetValue(e.Id, out var quiz);
             return new StudentAttendanceRowDto(
                 EnrollmentId: e.Id,
                 SessionId: e.SessionId,
@@ -92,8 +102,21 @@ internal static class AttendanceProjector
                 VideosWatched: att?.VideosWatched ?? 0,
                 VideosTotal: videoTotals.GetValueOrDefault(e.SessionId),
                 AssignmentPercent: att?.AssignmentScore,
-                BestQuizPercent: null,   // 5B-2
-                QuizAttemptCount: 0);    // 5B-2
+                BestQuizPercent: quiz?.BestPercent,
+                QuizAttemptCount: quiz?.AttemptsUsed ?? 0);
         })];
     }
+
+    /// <summary>The best-of percent + attempts-used for each enrollment's quiz (FR-PLAT-ATT-002), keyed by
+    /// enrollment id. Empty for enrollments with no gating quiz.</summary>
+    private static async Task<Dictionary<Guid, QuizMetrics>> QuizByEnrollmentAsync(
+        IAppDbContext db, IReadOnlyList<Guid> enrollmentIds, CancellationToken cancellationToken)
+        => (await db.UserQuizzes
+                .AsNoTracking()
+                .Where(q => enrollmentIds.Contains(q.EnrollmentId))
+                .Select(q => new { q.EnrollmentId, q.BestPercent, q.AttemptsUsed })
+                .ToListAsync(cancellationToken))
+            .ToDictionary(q => q.EnrollmentId, q => new QuizMetrics(q.BestPercent, q.AttemptsUsed));
+
+    private sealed record QuizMetrics(int? BestPercent, int AttemptsUsed);
 }

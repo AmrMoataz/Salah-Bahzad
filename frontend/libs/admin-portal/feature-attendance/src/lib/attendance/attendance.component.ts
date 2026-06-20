@@ -36,9 +36,9 @@ type AttendanceTab = 'session' | 'student';
  * (a student combo → their per-session breakdown). Each row drills into the assignment review
  * (`/review/{enrollmentId}`), and the active view's selection exports to CSV (audited server-side).
  *
- * In 5B-1 the **Videos** column renders `0/total` (fed by the 5C video gate) and **Quiz best/Attempts**
- * render `—`/`0` (5B-2) — a caption flags that they populate once those slices ship. The whole screen
- * is gated on `AttendanceRead`; the server still enforces it (default-deny), so the UI only reflects role.
+ * The **Videos** column still renders `0/total` (fed by the 5C video gate) — a caption flags that it
+ * populates once that slice ships; **Quiz best/Attempts** are now live (5B-2). The whole screen is
+ * gated on `AttendanceRead`; the server still enforces it (default-deny), so the UI only reflects role.
  */
 @Component({
   selector: 'sb-attendance',
@@ -150,7 +150,7 @@ type AttendanceTab = 'session' | 'student';
       }
 
       <p class="att__note">
-        Videos and quiz columns populate when video &amp; quiz tracking ship (5C / 5B-2).
+        Videos watched populates when video tracking ships (5C).
       </p>
     }
   `,

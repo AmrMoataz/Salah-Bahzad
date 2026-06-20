@@ -6,10 +6,14 @@ using SalahBahazad.Domain.Enums;
 namespace SalahBahazad.Infrastructure.Services;
 
 /// <summary>Resolves the authenticated staff member from the platform JWT (FR-PLAT-AUTH-002).</summary>
-internal sealed class CurrentUserResolver(IHttpContextAccessor httpContextAccessor) : ICurrentUserResolver
+internal sealed class CurrentUserResolver(
+    IHttpContextAccessor httpContextAccessor, ISystemOperationContext systemOperation) : ICurrentUserResolver
 {
+    // A System operation (Hangfire job / hub callback) has no request principal — it is never an authenticated
+    // user, so the audit row is attributed to System (FR-PLAT-AUD-005).
     public bool IsAuthenticated =>
-        httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+        systemOperation.Current is null
+        && httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 
     public Guid UserId =>
         Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);

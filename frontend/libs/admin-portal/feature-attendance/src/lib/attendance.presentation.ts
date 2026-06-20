@@ -6,7 +6,8 @@
  * `scrReview` lines 1126-1134 and `scrAttendance` line 1267). All functions are pure (no Angular deps)
  * so they unit-test trivially.
  */
-import { BehaviourEventType, ReviewOption } from './data-access/attendance.models';
+import type { PillVariant } from '@sb/shared/ui';
+import { BehaviourEventType, QuizFlag, ReviewOption } from './data-access/attendance.models';
 
 /** Subject-accent palette (the `--sb-subject-*` chips), plus a `neutral` fallback (no subject token). */
 export type BehaviourAccent = 'blue' | 'green' | 'red' | 'mustard' | 'neutral';
@@ -36,12 +37,16 @@ export function behaviourIconSvg(name: BehaviourIconName, size = 14): string {
 /**
  * `behaviour type → { icon, accent }` (contract §C / §F presentation map), matched to `scrReview`
  * lines 1131-1134: `Entered`→logout/green, `Answered`→check/blue, `Left`→x/red, `Navigated`→navigate/mustard.
+ * 5B-2 adds the quiz attempt's focus events: `FocusLost`→x/red ("Focus lost (tab switch)") and
+ * `FocusReturned`→logout/mustard ("Returned to assessment"), mirroring prototype lines 1132-1133.
  */
 const BEHAVIOUR_VISUAL: Record<BehaviourEventType, { icon: BehaviourIconName; accent: BehaviourAccent }> = {
   Entered: { icon: 'logout', accent: 'green' },
   Answered: { icon: 'check', accent: 'blue' },
   Left: { icon: 'x', accent: 'red' },
   Navigated: { icon: 'navigate', accent: 'mustard' },
+  FocusLost: { icon: 'x', accent: 'red' },
+  FocusReturned: { icon: 'logout', accent: 'mustard' },
 };
 
 /** The icon + accent for a behaviour row (falls back to a neutral dot for any unknown type). */
@@ -93,6 +98,48 @@ export function clockTime(iso: string | null): string {
     second: '2-digit',
     hour12: false,
   });
+}
+
+/**
+ * Relative "when" label for the Quiz-attempts table's **When** column ("8 minutes ago",
+ * "Yesterday, 18:20", "2 days ago", then an absolute date) — mirrors `audit.presentation.ts`'s
+ * `relativeTime` (duplicated to stay within the Nx feature boundary). `now` is injectable for tests.
+ */
+export function relativeTime(iso: string | null, now: Date = new Date()): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+
+  const diffMs = now.getTime() - d.getTime();
+  const sec = Math.round(diffMs / 1000);
+  if (sec < 45) return 'Just now';
+  const min = Math.round(sec / 60);
+  if (min < 60) return `${min} minute${min === 1 ? '' : 's'} ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr} hour${hr === 1 ? '' : 's'} ago`;
+
+  const startOf = (x: Date): number => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const dayDiff = Math.round((startOf(now) - startOf(d)) / 86_400_000);
+  const hhmm = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+  if (dayDiff <= 1) return `Yesterday, ${hhmm}`;
+  if (dayDiff < 7) return `${dayDiff} days ago`;
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+/**
+ * Quiz attempt flag → Flags pill (contract §B, `scrReview` line 1129): a clean submit is a `success`
+ * pill, an auto-submit at the deadline is `danger` ("Timeout"), and a single-sitting forfeit is
+ * `warning` ("Forfeit") — the prototype's `active`/`rejected`/`pending` pill variants respectively.
+ */
+export function quizFlagPill(flag: QuizFlag): { label: QuizFlag; variant: PillVariant } {
+  switch (flag) {
+    case 'Timeout':
+      return { label: 'Timeout', variant: 'danger' };
+    case 'Forfeit':
+      return { label: 'Forfeit', variant: 'warning' };
+    default:
+      return { label: 'Clean', variant: 'success' };
+  }
 }
 
 /** Two-letter initials for the avatar (mirrors the students/staff helpers). */

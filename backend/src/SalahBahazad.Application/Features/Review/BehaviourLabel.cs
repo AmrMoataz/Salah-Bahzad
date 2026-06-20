@@ -14,6 +14,8 @@ internal static class BehaviourLabel
         AssessmentEventType.Left => "Left",
         AssessmentEventType.Answered => questionOrder is int a ? $"Answered Q{a}" : "Answered",
         AssessmentEventType.Navigated => questionOrder is int n ? $"Navigated to Q{n}" : "Navigated",
+        AssessmentEventType.FocusLost => "Focus lost",
+        AssessmentEventType.FocusReturned => "Focus returned",
         _ => type.ToString(),
     };
 }

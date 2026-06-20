@@ -16,6 +16,7 @@ using SalahBahazad.Infrastructure.Persistence;
 using SalahBahazad.Infrastructure.Services;
 using Testcontainers.Minio;
 using Testcontainers.PostgreSql;
+using Testcontainers.Redis;
 using RealEnrollmentSideEffects = SalahBahazad.Infrastructure.Services.EnrollmentSideEffects;
 
 namespace SalahBahazad.IntegrationTests;
@@ -39,6 +40,9 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
     // MinIO emulates Cloudflare R2 so the IFileStorage → R2FileStorage path is exercised offline.
     private readonly MinioContainer _minio = new MinioBuilder().Build();
 
+    // Redis backs the SignalR backplane, the QuizHub connection map, and the HybridCache L2 (Phase 5B-2).
+    private readonly RedisContainer _redis = new RedisBuilder().Build();
+
     public const string TestBucket = "sb-test-private";
 
     /// <summary>Records enrollment side-effect invocations so tests can prove the enrollment event fired.</summary>
@@ -46,7 +50,7 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
 
     public async Task InitializeAsync()
     {
-        await Task.WhenAll(_postgres.StartAsync(), _minio.StartAsync());
+        await Task.WhenAll(_postgres.StartAsync(), _minio.StartAsync(), _redis.StartAsync());
 
         // Touching Services builds the host (running ConfigureWebHost, which needs the started
         // containers' connection details), then we apply the real migrations and create the bucket.
@@ -62,11 +66,13 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         await base.DisposeAsync();
         await _postgres.DisposeAsync();
         await _minio.DisposeAsync();
+        await _redis.DisposeAsync();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:DefaultConnection", _postgres.GetConnectionString());
+        builder.UseSetting("ConnectionStrings:redis", _redis.GetConnectionString());
         builder.UseSetting("Firebase:Disable", "true");
         builder.UseSetting("Jwt:Secret", JwtSecret);
         builder.UseSetting("Jwt:Issuer", JwtIssuer);
@@ -390,6 +396,17 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var session = await db.Sessions.IgnoreQueryFilters().FirstAsync(s => s.Id == sessionId);
         session.SetPrerequisite(prerequisiteSessionId);
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>Sets a session's gating-quiz settings directly (no HTTP context → no audit), for the 5B-2 tests.</summary>
+    public async Task SetQuizSettingsAsync(
+        Guid sessionId, int timeLimitMinutes, int questionCount, int attemptCount, int minPassPercent)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var session = await db.Sessions.IgnoreQueryFilters().FirstAsync(s => s.Id == sessionId);
+        session.UpdateQuizSettings(timeLimitMinutes, questionCount, attemptCount, minPassPercent);
         await db.SaveChangesAsync();
     }
 

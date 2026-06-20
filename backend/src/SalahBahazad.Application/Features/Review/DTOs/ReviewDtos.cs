@@ -39,3 +39,27 @@ public sealed record BehaviourEventDto(
     string Label,
     int? QuestionOrder,
     DateTimeOffset OccurredAtUtc);
+
+/// <summary>One attempt row of the staff quiz review (contract §B #6). <c>flag</c>/<c>isBest</c> drive the UI
+/// pill and the "best" marker; <c>timeSpentSeconds</c> is submitted−started (or the full window on timeout).</summary>
+public sealed record QuizReviewAttemptDto(
+    int Number,
+    int? ScorePercent,
+    int TimeSpentSeconds,
+    string Flag,
+    QuizAttemptStatus Status,
+    DateTimeOffset StartedAtUtc,
+    bool IsBest);
+
+/// <summary>
+/// The "Quiz attempts" review of a student's gating quiz (contract §B #6, FR-ADM-REV-002 — scrReview): best-of,
+/// pass state, the min-pass bar, attempts used/allowed, and every attempt (the best marked). Shows scores the
+/// student shape never does.
+/// </summary>
+public sealed record QuizReviewDto(
+    int? BestPercent,
+    bool Passed,
+    int MinPassPercent,
+    int AttemptsUsed,
+    int AttemptsAllowed,
+    IReadOnlyList<QuizReviewAttemptDto> Attempts);

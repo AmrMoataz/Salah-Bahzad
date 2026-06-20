@@ -37,6 +37,9 @@ public interface IAppDbContext
     DbSet<UserAssignment> UserAssignments { get; }
     DbSet<AssessmentEvent> AssessmentEvents { get; }
 
+    // Quiz engine (tenant-owned) — FR-PLAT-QZ-*. QuizAttempt + its questions/options are navigation-only (owned).
+    DbSet<UserQuiz> UserQuizzes { get; }
+
     // Location reference data (global, seeded, read-only) — FR-PLAT-TAX-003
     DbSet<City> Cities { get; }
     DbSet<Region> Regions { get; }

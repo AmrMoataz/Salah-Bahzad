@@ -103,6 +103,23 @@ describe('AttendanceComponent', () => {
     expect(t).toContain('—');
   });
 
+  it('renders real quiz columns (Quiz best % + Attempts) once the 5B-2 engine populates them', async () => {
+    const service = makeServiceMock({
+      sRows: [sessionRow({ bestQuizPercent: 78, quizAttemptCount: 2 })],
+    });
+    const { fixture } = setup({ service });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const t = text(fixture);
+    expect(t).toContain('78%'); // Quiz best now a real percent, not the em-dash
+    expect(t).toContain('2'); // Attempts count
+    // The pending caption now flags only Videos (5C), not quizzes.
+    expect(t).toContain('Videos watched populates when video tracking ships (5C)');
+    expect(t).not.toContain('5B-2');
+  });
+
   it('switches to "By student" and loads that student\'s per-session breakdown', async () => {
     const { fixture, service } = setup();
     fixture.detectChanges();

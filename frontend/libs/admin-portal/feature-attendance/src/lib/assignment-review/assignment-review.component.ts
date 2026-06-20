@@ -14,7 +14,10 @@ import {
   CardComponent,
   EmptyStateComponent,
   LatexPreviewComponent,
+  SbTableColumn,
   StatusPillComponent,
+  TableCellDirective,
+  TableComponent,
   TabsComponent,
   ToastService,
 } from '@sb/shared/ui';
@@ -32,6 +35,8 @@ import {
   optionLetter,
   optionState,
   optionStyle,
+  quizFlagPill,
+  relativeTime,
 } from '../attendance.presentation';
 
 type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
@@ -41,8 +46,9 @@ type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
  * for one enrollment: a back-link, a student header with **Score** (`correctCount/questionCount`) and
  * **Time spent** (`mm:ss`), then three tabs — **Assignment** (a card per question: the correct option
  * is green+check, the student's wrong pick is red+×, with a `+mark`/`0` pill), **Quiz attempts**
- * (a disabled placeholder — its data + endpoint are 5B-2), and **Behaviour log** (the in-assessment
- * icon timeline). Unlike the student `§A` shape, this view exposes `isCorrect`.
+ * (the gating quiz's attempts table — 5B-2 §B, lazy-loaded on tab activation), and **Behaviour log**
+ * (the in-assessment icon timeline, now including the quiz's focus-loss rows). Unlike the student `§A`
+ * shape, this view exposes `isCorrect`.
  */
 @Component({
   selector: 'sb-assignment-review',
@@ -53,6 +59,8 @@ type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
     EmptyStateComponent,
     LatexPreviewComponent,
     StatusPillComponent,
+    TableComponent,
+    TableCellDirective,
     TabsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -140,12 +148,42 @@ type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
           }
 
           @case ('quiz') {
-            <sb-card [padding]="false" title="Quiz attempts">
-              <sb-empty-state
-                headline="No quiz attempts yet"
-                description="Available once the quiz engine ships (5B-2)."
-              />
-            </sb-card>
+            @if (quizReview(); as qz) {
+              <div class="rv-qz__summary">
+                Best <strong>{{ qz.bestPercent }}%</strong> ·
+                <span [class.rv-qz__pass]="qz.passed" [class.rv-qz__fail]="!qz.passed">
+                  {{ qz.passed ? 'Passed' : 'Not passed' }}
+                </span>
+                (min {{ qz.minPassPercent }}%) ·
+                {{ qz.attemptsUsed }}/{{ qz.attemptsAllowed }} attempts
+              </div>
+              <sb-card [padding]="false" title="Quiz attempts">
+                <sb-table [columns]="quizColumns" [rows]="qz.attempts" [rowKey]="byAttempt">
+                  <ng-template sbTableCell="attempt" let-row>
+                    Attempt {{ row.number }}
+                    @if (row.isBest) {
+                      <span class="rv-qz__best">(best)</span>
+                    }
+                  </ng-template>
+                  <ng-template sbTableCell="score" let-row><strong>{{ row.scorePercent }}%</strong></ng-template>
+                  <ng-template sbTableCell="time" let-row>{{ time(row.timeSpentSeconds) }}</ng-template>
+                  <ng-template sbTableCell="flag" let-row>
+                    @let pill = flagPill(row.flag);
+                    <sb-status-pill [variant]="pill.variant">{{ pill.label }}</sb-status-pill>
+                  </ng-template>
+                  <ng-template sbTableCell="when" let-row>{{ when(row.startedAtUtc) }}</ng-template>
+                </sb-table>
+              </sb-card>
+            } @else if (quizMissing()) {
+              <sb-card [padding]="false" title="Quiz attempts">
+                <sb-empty-state
+                  headline="No gating quiz for this session"
+                  description="This session isn’t gated by a prerequisite quiz, so there are no attempts to review."
+                />
+              </sb-card>
+            } @else {
+              <div class="rv__loading">{{ quizLoading() ? 'Loading…' : 'Could not load quiz attempts.' }}</div>
+            }
           }
 
           @case ('behaviour') {
@@ -201,6 +239,13 @@ type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
 
     .rv__tabs { margin-bottom: var(--sb-space-4); }
 
+    /* Quiz attempts */
+    .rv-qz__summary { margin-bottom: var(--sb-space-3); color: var(--sb-text-muted); font-size: var(--sb-body-md-size); }
+    .rv-qz__summary strong { color: var(--sb-text); }
+    .rv-qz__pass { color: var(--sb-success-fg); font-weight: 700; }
+    .rv-qz__fail { color: var(--sb-danger-fg); font-weight: 700; }
+    .rv-qz__best { margin-left: 4px; color: var(--sb-primary); font-weight: 700; }
+
     /* Question cards */
     .rv__qs { display: flex; flex-direction: column; gap: var(--sb-space-3); }
     .rv-q__head { display: flex; justify-content: space-between; gap: var(--sb-space-3); margin-bottom: var(--sb-space-3); }
@@ -249,6 +294,9 @@ export class AssignmentReviewComponent implements OnInit {
   readonly review = this.#service.review;
   readonly behaviour = this.#service.behaviour;
   readonly isLoading = this.#service.isLoading;
+  readonly quizReview = this.#service.quizReview;
+  readonly quizMissing = this.#service.quizMissing;
+  readonly quizLoading = this.#service.quizLoading;
 
   readonly canRead = computed(() => this.#auth.hasPermission('AttendanceRead'));
 
@@ -259,7 +307,18 @@ export class AssignmentReviewComponent implements OnInit {
     { id: 'behaviour', label: 'Behaviour log' },
   ];
 
+  /** `scrReview` "Quiz attempts" columns (lines 1128-1130): Attempt / Score / Time spent / Flags / When. */
+  readonly quizColumns: readonly SbTableColumn[] = [
+    { key: 'attempt', header: 'Attempt' },
+    { key: 'score', header: 'Score', align: 'right' },
+    { key: 'time', header: 'Time spent', align: 'right' },
+    { key: 'flag', header: 'Flags' },
+    { key: 'when', header: 'When', align: 'right' },
+  ];
+
   #enrollmentId = '';
+  /** The quiz tab is lazy-loaded once on first activation (idempotent; reset to retry after an error). */
+  #quizLoadStarted = false;
 
   readonly backIcon: SafeHtml = this.#sanitizer.bypassSecurityTrustHtml(
     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
@@ -286,6 +345,19 @@ export class AssignmentReviewComponent implements OnInit {
 
   onTab(id: string): void {
     this.activeTab.set(id as ReviewTab);
+    if (id === 'quiz') void this.#loadQuiz();
+  }
+
+  /** Lazy-load the quiz attempts the first time the tab is opened (a 404 is a silent empty state). */
+  async #loadQuiz(): Promise<void> {
+    if (this.#quizLoadStarted || !this.#enrollmentId) return;
+    this.#quizLoadStarted = true;
+    try {
+      await this.#service.getQuizReview(this.#enrollmentId);
+    } catch {
+      this.#quizLoadStarted = false; // allow a retry on the next activation
+      this.#toast.error(this.#service.error() ?? 'Could not load quiz attempts.');
+    }
   }
 
   back(): void {
@@ -296,8 +368,13 @@ export class AssignmentReviewComponent implements OnInit {
   initials = initialsOf;
   time = mmss;
   clock = clockTime;
+  when = relativeTime;
+  flagPill = quizFlagPill;
   letter = optionLetter;
   optState = optionState;
+
+  /** Quiz-attempts table keys on the attempt number (one row per attempt). */
+  readonly byAttempt = (row: { number: number }): number => row.number;
 
   subjectFor(): string {
     return avatarSubject(this.#enrollmentId);

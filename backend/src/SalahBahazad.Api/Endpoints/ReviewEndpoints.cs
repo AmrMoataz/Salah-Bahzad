@@ -4,6 +4,8 @@ using SalahBahazad.Api.Authorization;
 using SalahBahazad.Application.Features.Review.DTOs;
 using SalahBahazad.Application.Features.Review.Queries.GetAssignmentBehaviour;
 using SalahBahazad.Application.Features.Review.Queries.GetAssignmentReview;
+using SalahBahazad.Application.Features.Review.Queries.GetQuizBehaviour;
+using SalahBahazad.Application.Features.Review.Queries.GetQuizReview;
 using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Api.Endpoints;
@@ -34,6 +36,20 @@ internal sealed class ReviewEndpoints : IEndpointGroup
             .WithSummary("The in-assessment behaviour timeline")
             .Produces<IReadOnlyList<BehaviourEventDto>>()
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+
+        group.MapGet("/quizzes/{enrollmentId:guid}", GetQuizReviewAsync)
+            .RequirePermission(Permission.AttendanceRead)
+            .WithName("GetQuizReview")
+            .WithSummary("The Quiz-attempts review: best-of, pass, attempts (the best marked) — FR-ADM-REV-002")
+            .Produces<QuizReviewDto>()
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+
+        group.MapGet("/quizzes/{enrollmentId:guid}/behaviour", GetQuizBehaviourAsync)
+            .RequirePermission(Permission.AttendanceRead)
+            .WithName("GetQuizBehaviour")
+            .WithSummary("The quiz attempts' focus-loss/return behaviour timeline")
+            .Produces<IReadOnlyList<BehaviourEventDto>>()
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetReviewAsync(
@@ -43,4 +59,12 @@ internal sealed class ReviewEndpoints : IEndpointGroup
     private static async Task<IResult> GetBehaviourAsync(
         Guid enrollmentId, ISender sender, CancellationToken cancellationToken)
         => Results.Ok(await sender.Send(new GetAssignmentBehaviourQuery(enrollmentId), cancellationToken));
+
+    private static async Task<IResult> GetQuizReviewAsync(
+        Guid enrollmentId, ISender sender, CancellationToken cancellationToken)
+        => Results.Ok(await sender.Send(new GetQuizReviewQuery(enrollmentId), cancellationToken));
+
+    private static async Task<IResult> GetQuizBehaviourAsync(
+        Guid enrollmentId, ISender sender, CancellationToken cancellationToken)
+        => Results.Ok(await sender.Send(new GetQuizBehaviourQuery(enrollmentId), cancellationToken));
 }

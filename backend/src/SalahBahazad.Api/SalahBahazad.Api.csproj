@@ -25,6 +25,9 @@
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
     <PackageReference Include="Serilog.Enrichers.Thread" />
+    <!-- SignalR Redis backplane + connection map for the QuizHub (FR-PLAT-QZ-004, NFR-SCAL-002). -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" />
+    <PackageReference Include="StackExchange.Redis" />
     <!-- OpenTelemetry packages come transitively from SalahBahazad.ServiceDefaults -->
   </ItemGroup>
 

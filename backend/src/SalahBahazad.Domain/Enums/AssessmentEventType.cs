@@ -18,4 +18,11 @@ public enum AssessmentEventType
 
     /// <summary>The student navigated between questions.</summary>
     Navigated = 3,
+
+    /// <summary>The student lost focus during a quiz attempt (tab switch / app background) — monitoring only,
+    /// never auto-forfeits (FR-PLAT-QZ-006).</summary>
+    FocusLost = 4,
+
+    /// <summary>The student returned focus to a quiz attempt after a <see cref="FocusLost"/>.</summary>
+    FocusReturned = 5,
 }

@@ -61,52 +61,92 @@
   "fileMap": {
     "nonProjectFiles": [
       {
+        "file": "jest.preset.js",
+        "hash": "9723392830648133472"
+      },
+      {
         "file": "README.md",
         "hash": "3062190976032545220"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "15623139863315169796"
-      },
-      {
-        "file": ".nx/cache/run.json",
-        "hash": "15725084823096101335"
-      },
-      {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
-        "hash": "2051108929511129806"
-      },
-      {
-        "file": "CLAUDE.md",
-        "hash": "9498052161213632713"
-      },
-      {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
-        "hash": "1027713634711675919"
-      },
-      {
-        "file": ".nx/workspace-data/file-map.json",
-        "hash": "5020899796141193556"
       },
       {
         "file": ".nx/workspace-data/nx_files.nxt",
         "hash": "1915607480864104232"
       },
       {
-        "file": ".npmrc",
-        "hash": "9925967549247833609"
+        "file": ".nx/cache/terminalOutputs/5131657773919333078",
+        "hash": "4864417673390231958"
       },
       {
         "file": ".nx/cache/terminalOutputs/5001884239729897055",
         "hash": "11437903994041606202"
       },
       {
+        "file": "package.json",
+        "hash": "2097197659383523149"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "149961805202457127"
+      },
+      {
         "file": ".nx/workspace-data/source-maps.json",
         "hash": "16048977167854087676"
       },
       {
+        "file": ".nx/cache/terminalOutputs/779978597855182484",
+        "hash": "791473849511843789"
+      },
+      {
+        "file": "CLAUDE.md",
+        "hash": "9498052161213632713"
+      },
+      {
+        "file": ".npmrc",
+        "hash": "9925967549247833609"
+      },
+      {
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "9453659214030027366"
+      },
+      {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
+        "hash": "2051108929511129806"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/220703009658064044",
+        "hash": "8800914510047151196"
+      },
+      {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
+        "hash": "4871636763759990439"
+      },
+      {
         "file": "eslint.config.js",
         "hash": "12176749841134729328"
+      },
+      {
+        "file": ".nx/workspace-data/file-map.json",
+        "hash": "4024235567307420819"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "15623139863315169796"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/12148695987588380018",
+        "hash": "1476605748057615820"
+      },
+      {
+        "file": ".nx/cache/run.json",
+        "hash": "10305883715733233794"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "11055423543555067266"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/17545723754966977105",
+        "hash": "14687517933363272115"
       },
       {
         "file": ".nx/workspace-data/angular-5081913358311489107.hash",
@@ -115,38 +155,6 @@
       {
         "file": "nx.json",
         "hash": "16934025050528280795"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "149961805202457127"
-      },
-      {
-        "file": "jest.preset.js",
-        "hash": "9723392830648133472"
-      },
-      {
-        "file": ".nx/workspace-data/project-graph.json",
-        "hash": "9778613113284926020"
-      },
-      {
-        "file": "package.json",
-        "hash": "2097197659383523149"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "11055423543555067266"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/220703009658064044",
-        "hash": "8800914510047151196"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/779978597855182484",
-        "hash": "791473849511843789"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/17545723754966977105",
-        "hash": "14687517933363272115"
       }
     ],
     "projectFileMap": {
@@ -161,11 +169,11 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/index.ts",
-          "hash": "12132842297038324219"
+          "hash": "8148181799702871328"
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/assignment-review/assignment-review.component.spec.ts",
-          "hash": "12676029017135469897",
+          "hash": "377437199775604956",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
@@ -175,7 +183,7 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/assignment-review/assignment-review.component.ts",
-          "hash": "7367852986322704911",
+          "hash": "11950498308644735689",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
@@ -185,12 +193,19 @@
           ]
         },
         {
+          "file": "libs/admin-portal/feature-attendance/src/lib/attendance.presentation.spec.ts",
+          "hash": "11539807503511944581"
+        },
+        {
           "file": "libs/admin-portal/feature-attendance/src/lib/attendance.presentation.ts",
-          "hash": "15255201167171720435"
+          "hash": "15633515907041349249",
+          "deps": [
+            "shared-ui"
+          ]
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/attendance/attendance.component.spec.ts",
-          "hash": "12685569972345191289",
+          "hash": "14054662494772471948",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/router",
@@ -200,7 +215,7 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/attendance/attendance.component.ts",
-          "hash": "9741649990467030751",
+          "hash": "14626451466712072474",
           "deps": [
             "npm:@angular/core",
             "npm:@angular/forms",
@@ -212,7 +227,7 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/data-access/attendance.models.ts",
-          "hash": "6873117603177730306"
+          "hash": "18444592214563218570"
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/data-access/attendance.service.spec.ts",
@@ -233,7 +248,7 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/data-access/review.service.spec.ts",
-          "hash": "14272284078960761952",
+          "hash": "13246600189264128093",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core"
@@ -241,7 +256,7 @@
         },
         {
           "file": "libs/admin-portal/feature-attendance/src/lib/data-access/review.service.ts",
-          "hash": "7620147109424035166",
+          "hash": "10747422113447977463",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core",

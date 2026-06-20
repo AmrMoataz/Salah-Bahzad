@@ -201,6 +201,16 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
       1128, `scrAttendance` quiz columns line 1269, `scrQuizSettings` line 1091). Frozen contract + 3 streams:
       `docs/contracts/phase5b2-quizzes.md` (6 REST endpoints + the `QuizHub`) +
       `IMPLEMENTATION-PLAN-phase5b2-{backend,frontend,wiring}.md`.
+      **Met (2026-06-20):** built across the three streams (the backend wired SignalR + a **Redis backplane** +
+      Hangfire) and proven end-to-end on the running Aspire stack — **ZERO product drift**. The quiz generates from
+      the **prerequisite's** bank+settings; the live smoke proved **best-of** (max(0%,100%)=100), the **`≥`-pass
+      boundary** (best 100 == minPass 100 → passed, the #7 fix), attempts-exhausted→409, focus-loss→`assessment_events`
+      (not auto-forfeit, not audited), the audit actor split (`QuizAttemptStarted/Submitted`=**Student**,
+      `QuizGenerated`/forfeit/timeout=**System**), `UserQuiz.Passed`=videos-unlocked state, the admin quiz-review tab
+      + now-real attendance quiz columns, tenant isolation (404), IDOR (403), and default-deny. Forfeit-on-disconnect
+      + timer auto-submit are covered by the backend integration suite (SignalR test client); the admin dev-proxy
+      intentionally doesn't forward `/hubs` (the hub is the future student portal's surface). Full log in
+      `IMPLEMENTATION-PLAN-phase5b2-wiring.md`. **5C (secure video gate) is next.**
   - **5C — Secure video gate** (`FR-PLAT-VID-001..007`): server access gate + per-video counter decrement + audited
     playback + short-lived signed HLS URL + one-time handoff code. Backend-only in this engagement; needs R2/MinIO +
     HLS infra wired in Aspire. No admin player screen (student-portal/native-app surface).

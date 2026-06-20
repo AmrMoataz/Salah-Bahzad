@@ -53,6 +53,9 @@ public sealed class AppDbContext(
     public DbSet<UserAssignment> UserAssignments => Set<UserAssignment>();
     public DbSet<AssessmentEvent> AssessmentEvents => Set<AssessmentEvent>();
 
+    // Quiz engine (tenant-owned) — FR-PLAT-QZ-*. QuizAttempt + its questions/options are navigation-only (owned).
+    public DbSet<UserQuiz> UserQuizzes => Set<UserQuiz>();
+
     // Location reference data (global, seeded) — FR-PLAT-TAX-003
     public DbSet<City> Cities => Set<City>();
     public DbSet<Region> Regions => Set<Region>();

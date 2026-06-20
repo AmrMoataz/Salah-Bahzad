@@ -2,6 +2,8 @@ using Amazon.Runtime;
 using Amazon.S3;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +12,7 @@ using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Infrastructure.Persistence;
 using SalahBahazad.Infrastructure.Persistence.Interceptors;
 using SalahBahazad.Infrastructure.Services;
+using StackExchange.Redis;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
@@ -28,10 +31,19 @@ public static class InfrastructureServiceExtensions
         // HTTP context accessors (needed by tenant/user resolvers)
         services.AddHttpContextAccessor();
 
+        // Ambient System-operation context — lets Hangfire jobs / hub callbacks (no HttpContext) resolve the
+        // tenant and attribute writes to System (FR-PLAT-QZ-004/005, FR-PLAT-AUD-005). Read by the resolvers.
+        services.AddSingleton<ISystemOperationContext, SystemOperationContext>();
+
         // Scoped resolvers
         services.AddScoped<ICurrentTenantResolver, CurrentTenantResolver>();
         services.AddScoped<ICurrentUserResolver, CurrentUserResolver>();
         services.AddScoped<IAuditContextAccessor, AuditContextAccessor>();
+
+        // Quiz engine system seams — the authoritative timer (Hangfire) and the System-attributed terminal ops.
+        services.AddSingleton<IQuizTimerScheduler, HangfireQuizTimerScheduler>();
+        services.AddScoped<IQuizLifecycleService, QuizLifecycleService>();
+        services.AddScoped<Jobs.QuizAutoSubmitJob>();
 
         // Audit interceptor (scoped — needs resolver)
         services.AddScoped<AuditSaveChangesInterceptor>();
@@ -121,12 +133,53 @@ public static class InfrastructureServiceExtensions
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                 };
+
+                // SignalR can't set an Authorization header on the WebSocket/SSE handshake, so the QuizHub passes
+                // the platform JWT in the access_token query. Read it ONLY for the hub path and let it flow through
+                // the SAME full JWT validation above — not the legacy insecure query-string-credentials scheme
+                // (NFR-SEC-005; issue #6 done right).
+                opts.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/quiz"))
+                            context.Token = accessToken;
+                        return Task.CompletedTask;
+                    },
+                };
             });
 
         services.AddAuthorization();
 
-        // HybridCache (in-process L1 only for now; wire Redis L2 when the caching phase arrives)
+        // ── Redis (backplane + L2 + connection map) ─────────────────────────────
+        // Aspire injects ConnectionStrings__redis. When present: a shared multiplexer (SignalR backplane +
+        // the QuizHub's connection↔attempt map, NFR-SCAL-002/FR-PLAT-QZ-004) and the HybridCache L2 distributed
+        // cache. Absent (e.g. a unit-only host): HybridCache stays L1-only and the timer falls back to its
+        // idempotent job with no cancellation map.
+        var redisConnectionString = configuration.GetConnectionString("redis");
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            services.AddSingleton<IConnectionMultiplexer>(
+                _ => ConnectionMultiplexer.Connect(redisConnectionString));
+            services.AddStackExchangeRedisCache(options => options.Configuration = redisConnectionString);
+        }
+
+        // HybridCache (L1 in-process; promotes to the Redis L2 above when an IDistributedCache is registered).
         services.AddHybridCache();
+
+        // ── Hangfire (authoritative quiz auto-submit timer, FR-PLAT-QZ-005) ──────
+        // PostgreSQL-backed so a scheduled auto-submit survives an API restart; the schema is created on first
+        // use (PrepareSchemaIfNecessary). A short polling interval keeps the deadline tight.
+        var hangfireConnectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("DefaultConnection is not configured.");
+        services.AddHangfire(cfg => cfg
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(opts => opts.UseNpgsqlConnection(hangfireConnectionString)));
+        services.AddHangfireServer(opts => opts.SchedulePollingInterval = TimeSpan.FromSeconds(1));
 
         // ── Object storage (R2 / MinIO) ─────────────────────────────────────────
         AddObjectStorage(services, configuration);

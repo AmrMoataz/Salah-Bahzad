@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { AuthStore } from '@sb/shared/data-access';
 import { ToastService } from '@sb/shared/ui';
-import { AssignmentReview, BehaviourEvent } from '../data-access/attendance.models';
+import { AssignmentReview, BehaviourEvent, QuizReview } from '../data-access/attendance.models';
 import { ReviewService } from '../data-access/review.service';
 import { AssignmentReviewComponent } from './assignment-review.component';
 
@@ -53,15 +53,38 @@ const REVIEW: AssignmentReview = {
 const EVENTS: BehaviourEvent[] = [
   { type: 'Entered', label: 'Entered assessment', questionOrder: null, occurredAtUtc: '2026-06-20T09:05:01Z' },
   { type: 'Answered', label: 'Answered Q1', questionOrder: 1, occurredAtUtc: '2026-06-20T09:05:48Z' },
-  { type: 'Left', label: 'Focus lost (tab switch)', questionOrder: null, occurredAtUtc: '2026-06-20T09:06:12Z' },
+  { type: 'FocusLost', label: 'Focus lost (tab switch)', questionOrder: null, occurredAtUtc: '2026-06-20T09:06:12Z' },
+  { type: 'FocusReturned', label: 'Returned to assessment', questionOrder: null, occurredAtUtc: '2026-06-20T09:06:40Z' },
 ];
 
-function makeReviewMock(review: AssignmentReview | null = REVIEW, events: BehaviourEvent[] = EVENTS) {
+// Contract §B QuizReviewDto sample (scrReview lines 1128-1130): two attempts, the 2nd is best + clean.
+const QUIZ: QuizReview = {
+  bestPercent: 78,
+  passed: true,
+  minPassPercent: 60,
+  attemptsUsed: 2,
+  attemptsAllowed: 3,
+  attempts: [
+    { number: 1, scorePercent: 52, timeSpentSeconds: 898, flag: 'Timeout', status: 'TimedOut', startedAtUtc: '2026-06-20T09:05:00Z', isBest: false },
+    { number: 2, scorePercent: 78, timeSpentSeconds: 702, flag: 'Clean', status: 'Submitted', startedAtUtc: '2026-06-20T09:20:00Z', isBest: true },
+  ],
+};
+
+function makeReviewMock(
+  review: AssignmentReview | null = REVIEW,
+  events: BehaviourEvent[] = EVENTS,
+  quiz: QuizReview | null = QUIZ,
+) {
   const reviewSig = signal<AssignmentReview | null>(null);
   const behaviourSig = signal<BehaviourEvent[]>([]);
+  const quizSig = signal<QuizReview | null>(null);
+  const quizMissingSig = signal(false);
   return {
     review: reviewSig,
     behaviour: behaviourSig,
+    quizReview: quizSig,
+    quizMissing: quizMissingSig,
+    quizLoading: signal(false),
     isLoading: signal(false),
     error: signal<string | null>(null),
     getReview: jest.fn().mockImplementation(async () => {
@@ -71,6 +94,15 @@ function makeReviewMock(review: AssignmentReview | null = REVIEW, events: Behavi
     getBehaviour: jest.fn().mockImplementation(async () => {
       behaviourSig.set(events);
       return events;
+    }),
+    getQuizReview: jest.fn().mockImplementation(async () => {
+      // null fixture ⇒ the endpoint 404s (no gating quiz) → flag the empty state.
+      if (quiz === null) {
+        quizMissingSig.set(true);
+        return null;
+      }
+      quizSig.set(quiz);
+      return quiz;
     }),
   };
 }
@@ -139,14 +171,58 @@ describe('AssignmentReviewComponent', () => {
     expect(states).toContain('picked-wrong'); // the student's wrong pick is red + ×
   });
 
-  it('renders the disabled Quiz attempts placeholder (5B-2)', async () => {
-    const { fixture } = setup();
+  it('loads + renders the Quiz attempts table (best marker, flag pills, summary) on the quiz tab', async () => {
+    const { fixture, service } = setup();
     fixture.detectChanges();
     await fixture.whenStable();
 
     fixture.componentInstance.onTab('quiz');
+    await fixture.whenStable();
     fixture.detectChanges();
-    expect(text(fixture)).toContain('Available once the quiz engine ships (5B-2)');
+
+    expect(service.getQuizReview).toHaveBeenCalledWith('en-1');
+    const t = text(fixture);
+    // Header line: best / pass / min / used-allowed.
+    expect(t).toContain('Best');
+    expect(t).toContain('78%');
+    expect(t).toContain('Passed');
+    expect(t).toContain('min 60%');
+    expect(t).toContain('2/3 attempts');
+    // Attempts rows + best marker + flag pills + mm:ss time.
+    expect(t).toContain('Attempt 1');
+    expect(t).toContain('Attempt 2');
+    expect(t).toContain('best'); // isBest marker on attempt 2
+    expect(t).toContain('52%');
+    expect(t).toContain('14:58'); // mmss(898)
+    expect(t).toContain('Timeout'); // attempt 1 flag pill
+    expect(t).toContain('Clean'); // attempt 2 flag pill
+  });
+
+  it('shows the empty-state when the gated session has no quiz (404)', async () => {
+    const { fixture, service } = setup({ service: makeReviewMock(REVIEW, EVENTS, null) });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    fixture.componentInstance.onTab('quiz');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(service.getQuizReview).toHaveBeenCalledWith('en-1');
+    expect(text(fixture)).toContain('No gating quiz for this session');
+  });
+
+  it('lazy-loads the quiz once — re-activating the tab does not refetch', async () => {
+    const { fixture, service } = setup();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    fixture.componentInstance.onTab('quiz');
+    await fixture.whenStable();
+    fixture.componentInstance.onTab('assignment');
+    fixture.componentInstance.onTab('quiz');
+    await fixture.whenStable();
+
+    expect(service.getQuizReview).toHaveBeenCalledTimes(1);
   });
 
   it('renders the behaviour-log timeline', async () => {

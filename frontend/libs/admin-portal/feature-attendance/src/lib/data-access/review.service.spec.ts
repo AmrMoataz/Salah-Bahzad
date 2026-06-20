@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AssignmentReview, BehaviourEvent } from './attendance.models';
+import { AssignmentReview, BehaviourEvent, QuizReview } from './attendance.models';
 import { ReviewService } from './review.service';
 
 const review = (over: Partial<AssignmentReview> = {}): AssignmentReview => ({
@@ -37,6 +37,19 @@ const event = (over: Partial<BehaviourEvent> = {}): BehaviourEvent => ({
   label: 'Answered Q1',
   questionOrder: 1,
   occurredAtUtc: '2026-06-20T09:05:48Z',
+  ...over,
+});
+
+const quizReview = (over: Partial<QuizReview> = {}): QuizReview => ({
+  bestPercent: 78,
+  passed: true,
+  minPassPercent: 60,
+  attemptsUsed: 2,
+  attemptsAllowed: 3,
+  attempts: [
+    { number: 1, scorePercent: 52, timeSpentSeconds: 898, flag: 'Timeout', status: 'TimedOut', startedAtUtc: '2026-06-20T09:05:00Z', isBest: false },
+    { number: 2, scorePercent: 78, timeSpentSeconds: 702, flag: 'Clean', status: 'Submitted', startedAtUtc: '2026-06-20T09:20:00Z', isBest: true },
+  ],
   ...over,
 });
 
@@ -87,5 +100,42 @@ describe('ReviewService', () => {
 
     await expect(promise).rejects.toBeTruthy();
     expect(service.error()).toBe('No assignment for this enrollment.');
+  });
+
+  it('getQuizReview() GETs /api/review/quizzes/{enrollmentId} and stores the payload (5B-2 §B #6)', async () => {
+    const promise = service.getQuizReview('en-1');
+
+    const req = http.expectOne((r) => r.url.endsWith('/api/review/quizzes/en-1'));
+    expect(req.request.method).toBe('GET');
+    req.flush(quizReview());
+
+    const result = await promise;
+    expect(result?.bestPercent).toBe(78);
+    expect(service.quizReview()?.attempts[1].isBest).toBe(true);
+    expect(service.quizMissing()).toBe(false);
+    expect(service.quizLoading()).toBe(false);
+  });
+
+  it('getQuizReview() treats a 404 as "no gating quiz": resolves null, flags quizMissing, no error', async () => {
+    const promise = service.getQuizReview('en-1');
+
+    const req = http.expectOne((r) => r.url.endsWith('/api/review/quizzes/en-1'));
+    req.flush({ detail: 'No quiz for this enrollment.' }, { status: 404, statusText: 'Not Found' });
+
+    await expect(promise).resolves.toBeNull();
+    expect(service.quizMissing()).toBe(true);
+    expect(service.quizReview()).toBeNull();
+    expect(service.error()).toBeNull();
+  });
+
+  it('getQuizReview() rethrows + records the message on a non-404 failure', async () => {
+    const promise = service.getQuizReview('en-1');
+
+    const req = http.expectOne((r) => r.url.endsWith('/api/review/quizzes/en-1'));
+    req.flush({ detail: 'Boom.' }, { status: 500, statusText: 'Server Error' });
+
+    await expect(promise).rejects.toBeTruthy();
+    expect(service.quizMissing()).toBe(false);
+    expect(service.error()).toBe('Boom.');
   });
 });

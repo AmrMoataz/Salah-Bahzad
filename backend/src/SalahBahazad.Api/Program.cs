@@ -50,8 +50,16 @@ try
     builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
         o.MultipartBodyLengthLimit = maxUploadBytes);
 
-    // ── Infrastructure (EF, Firebase, JWT, Redis, Auth) ─────────────────────
+    // ── Infrastructure (EF, Firebase, JWT, Redis, Hangfire, Auth) ───────────
     builder.Services.AddInfrastructure(builder.Configuration);
+
+    // ── SignalR (QuizHub) + Redis backplane (NFR-SCAL-002) ──────────────────
+    // The backplane is added only when Redis is configured (dev/prod/tests); a single instance still works
+    // without it. Hub JWT (access_token on the /hubs/quiz path) is configured in AddInfrastructure.
+    var signalR = builder.Services.AddSignalR();
+    var redisConnectionString = builder.Configuration.GetConnectionString("redis");
+    if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        signalR.AddStackExchangeRedis(redisConnectionString);
 
     // ── CQRS — source-generated Mediator ────────────────────────────────────
     // Handlers are Scoped so they can consume scoped services (e.g. IAppDbContext / EF Core).
@@ -155,6 +163,11 @@ try
 
     // ── Endpoints (auto-discovered IEndpointGroup implementations) ────────────
     app.MapEndpoints();
+
+    // ── SignalR hubs ──────────────────────────────────────────────────────────
+    // JWT-authenticated (access_token query scoped to this path, validated in AddInfrastructure); the hub
+    // forfeits the active attempt on disconnect (FR-PLAT-QZ-004).
+    app.MapHub<SalahBahazad.Api.Hubs.QuizHub>("/hubs/quiz");
 
     // ── Bootstrap seed (Development only) ─────────────────────────────────────
     // Migrations are gated (no auto-apply on prod boot), so seeding assumes the schema
