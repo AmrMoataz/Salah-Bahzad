@@ -130,6 +130,13 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
 - **Backend:** Code batches — Teacher-only generate, **Excel export**, lifecycle disable/enable/delete (soft), register with full usage join (`FR-PLAT-COD-001..006`, `FR-ADM-COD-*`, fixes issue #1); enrollment by code (value==price, one-shot) + **staff unlock** + **refund/revoke** + re-enroll/extend resets counters (`FR-PLAT-ENR-001..008`); payment abstraction + `PaymentTransaction` seam, gateway disabled (`FR-PLAT-PAY-001/002`); enrollment side-effects: generate assignment, provision video counters, generate prerequisite quiz (`FR-PLAT-ENR-005`).
 - **Frontend:** Codes list (filter by status/batch/session) + Generate batch (Excel download); unlock-for-student and refund flows.
 - **Exit:** mint→export→redeem→refund a code, all audited; counters/expiry correct on re-enroll.
+  **Planned (2026-06-20):** design-anchored to the `.claude` prototype (`scrCodes`/`scrCodesGenerate`/`scrSessionDetail`
+  unlock+enrolled/`scrStudentDetail` enrollments) and split into three parallel-safe streams + a frozen contract, exactly
+  like Phase 3 — `docs/contracts/phase4-codes-enrollment.md` (12 endpoints) and
+  `IMPLEMENTATION-PLAN-phase4-{backend,frontend,wiring}.md`. Key scope calls: **codes are session-bound + value-matched**;
+  enrollment side-effects ship as a **stubbed `IEnrollmentSideEffects` seam** (assignment/quiz snapshot engines + the
+  `FR-PLAT-ENR-007` prerequisite gate are Phase 5, mirroring Phase 3’s transcode stub); **redeem (#12) is backend-only**
+  (student-portal path, no admin screen); Assistant bundle gains `EnrollmentsRefund` to match the role matrix + prototype.
 
 ### Phase 5 — Assessment review, attendance, video gate & dashboard
 - **Backend:** assignment auto-grade → attendance (`FR-PLAT-ASG-006`, `FR-PLAT-ATT-002`); quiz engine — **server-side timer auto-submit**, single-sitting forfeit-on-disconnect, focus-loss telemetry (recorded, not auto-forfeit), best-of, **`≥` pass rule** (fixes issue #7), all events audited (`FR-PLAT-QZ-001..010`); SignalR hubs authenticated via JWT + Redis backplane (fixes issue #6, `NFR-SCAL-002`, `NFR-SEC-005`); video access gate → **short-lived signed HLS URL** + view accounting + audit + one-time deep-link handoff code (`FR-PLAT-VID-001..007`); attendance queries per session/per student.
