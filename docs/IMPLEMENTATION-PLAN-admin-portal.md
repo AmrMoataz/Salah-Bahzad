@@ -189,10 +189,18 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
       the audit log); tenant isolation (404 cross-tenant), IDOR (403), audited CSV export, and default-deny all hold.
       Contract + 3 streams: `docs/contracts/phase5b1-assignments-attendance.md` (8 endpoints) +
       `IMPLEMENTATION-PLAN-phase5b1-{backend,frontend,wiring}.md`.
-    - **5B-2 — Quizzes (proctored)** *(next)*: the quiz engine — SignalR hubs (JWT auth + **Redis backplane**,
-      issue #6), server-side timer auto-submit, single-sitting forfeit-on-disconnect, focus-loss telemetry, best-of,
-      the `≥` pass-rule fix (issue #7), randomised attempts, the video-unlock gate — plus the **Quiz attempts** review
-      tab (`FR-ADM-REV-002`) and the attendance Quiz-best/Attempts columns. Needs Redis wired into the AppHost.
+    - **5B-2 — Quizzes (proctored)** *(planned 2026-06-20, docs only — chosen next step)*: the quiz engine — SignalR
+      hubs (JWT auth + **Redis backplane**, issue #6 done right since the new backend has no legacy hub), server-side
+      timer auto-submit (Hangfire), single-sitting forfeit-on-disconnect, focus-loss telemetry (recorded, not
+      auto-forfeit), best-of, the `≥` pass-rule fix (issue #7), randomised attempts, the quiz→**videos-unlocked**
+      state — plus the **Quiz attempts** review tab (`FR-ADM-REV-002`, fills the 5B-1 placeholder) and the now-real
+      attendance Quiz-best/Attempts columns. The quiz is generated from the **prerequisite's** bank+settings
+      (`FR-PLAT-QZ-001/002`); passing unlocks **this** session's videos (the *playback* gate is 5C). Engine is
+      API/hub-only (driven by a student JWT + SignalR test client in wiring); admin surface is small. **Adds Redis to
+      the AppHost; one gated migration; no permission/catalog change.** Design-anchored (`scrReview` Quiz tab line
+      1128, `scrAttendance` quiz columns line 1269, `scrQuizSettings` line 1091). Frozen contract + 3 streams:
+      `docs/contracts/phase5b2-quizzes.md` (6 REST endpoints + the `QuizHub`) +
+      `IMPLEMENTATION-PLAN-phase5b2-{backend,frontend,wiring}.md`.
   - **5C — Secure video gate** (`FR-PLAT-VID-001..007`): server access gate + per-video counter decrement + audited
     playback + short-lived signed HLS URL + one-time handoff code. Backend-only in this engagement; needs R2/MinIO +
     HLS infra wired in Aspire. No admin player screen (student-portal/native-app surface).
