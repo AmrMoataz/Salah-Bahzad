@@ -21,12 +21,17 @@ function authorize(req: HttpRequest<unknown>, token: string | null): HttpRequest
  *
  * The auth endpoints (`/api/auth/*`) are skipped entirely — they carry no bearer, and the store
  * sets its own `withCredentials` on the exchange/refresh; skipping them also keeps the refresh call
- * from recursing into this 401 handler. Functional interceptor (Angular 20 pattern).
+ * from recursing into this 401 handler. The **anonymous registration surface** is skipped for the
+ * same reason: `POST /api/students/register` and the `/api/reference/*` dropdown reads run before a
+ * student exists (no bearer, no cookie, no refresh replay on a 401). Functional interceptor
+ * (Angular 20 pattern).
  */
+const ANONYMOUS_PATHS = ['/api/auth/', '/api/students/register', '/api/reference/'];
+
 export const studentAuthInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(StudentAuthStore);
 
-  if (req.url.includes('/api/auth/')) {
+  if (ANONYMOUS_PATHS.some((path) => req.url.includes(path))) {
     return next(req);
   }
 

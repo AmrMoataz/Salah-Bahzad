@@ -4,6 +4,12 @@ export const environment = {
   // (proxy.conf.js) forwards them to the live API. Same-origin keeps the HttpOnly
   // sb_device cookie a first-party cookie (SameSite=Lax) in dev.
   apiUrl: '',
+  // Single-tenant today: the registration wizard sends this slug as the register form
+  // field and the ?tenantSlug= on GET /api/reference/grades (contract §F). Runtime-overridable
+  // via window.__SB_TENANT__ (like apiUrl). Confirm against the seeded tenant during wiring.
+  tenantSlug: 'salah-bahzad',
+  // The accepted terms version recorded as the TermsAcceptance consent on register (contract §F).
+  termsVersion: 'v1',
   firebase: {
     apiKey: 'AIzaSyCtaaoO-5YSaItKDHC4kf5KPHwPLnV_Cu0',
     authDomain: 'salah-bahzad-development.firebaseapp.com',

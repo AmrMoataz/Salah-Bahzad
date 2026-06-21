@@ -1,6 +1,8 @@
 export const environment = {
   production: true,
   apiUrl: '',
+  tenantSlug: 'salah-bahzad',
+  termsVersion: 'v1',
   firebase: {
     apiKey: 'AIzaSyAFQzY-HLYCjuB26QXbVpJbTvhBWUNiyp0',
     authDomain: 'salah-bahzad.firebaseapp.com',

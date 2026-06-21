@@ -153,10 +153,21 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 - **Exit:** a student signs in via the new student exchange and lands in the shell on phone/tablet/desktop; first sign-in with no bound device prompts consent → an HttpOnly device token binds; a second device is refused with the right message; `Pending`/`Rejected` accounts are blocked with the readable reason; refresh works; guards redirect anonymous users.
 
 ### S1 — Registration & onboarding
+> **Status: ✅ MET (2026-06-21)** — backend (the one new anonymous `GET /api/reference/grades?tenantSlug=`) + frontend
+> (the two-step register wizard) built; **wiring proven live on the Aspire stack, all scripted checks green (grades
+> 200/400/404 + LIVE cross-tenant isolation & soft-delete exclusion, cascade, register `201` Pending + ID image in
+> MinIO + `StudentRegistered` audit, errors 409/404/400/429, and the full register→pending→reject→approve→S0-exchange
+> `200`+device-bind loop), ZERO product drift.** The browser visual walkthrough is the only user step (as S0 #9). See
+> `docs/IMPLEMENTATION-PLAN-student-s1-{backend,frontend,wiring}.md` + `docs/contracts/student-s1-registration.md`.
+> Doc correction logged: terms consent is stored on the student row (`TermsVersion`/`TermsAcceptedAtUtc`), not a
+> `terms_acceptances` table. **Grounding correction (planning):** grades are tenant-owned + staff-permissioned
+> (`/api/taxonomy/grades`), so S1 added **one** anonymous reference read; the "status read" needed **no** new endpoint
+> (S0's exchange `403 { reason }` covers it).
+
 **Goal:** a prospective student completes the wizard and sees the pending state.
 - **Frontend:** `feature-auth` register wizard — Step 1 manual (name/email/phone/password) or Google (prefill name/email, ask phone), Step 2 (school, grade, city→region cascade, two parent phones [≥1 required], ID upload ≤5 MB, terms checkbox), submit → success/pending (prototype § AUTH: REGISTER wizard). Dropdowns from `GET /api/reference/*`; submit `multipart/form-data` → `POST /api/students/register`.
-- **Backend:** **exists**; add only the status-read touch if S0 didn't (`FR-STU-REG-009`).
-- **Contract:** `docs/contracts/student-s1-registration.md` (documents the existing register multipart shape + the status read).
+- **Backend (one small addition — user-confirmed 2026-06-21):** the register POST + city/region reads **exist**; add **`GET /api/reference/grades?tenantSlug=<slug>`** (anonymous, tenant-scoped, `IgnoreQueryFilters` + explicit `TenantId` filter) so the anonymous wizard can populate its grade dropdown — `/api/taxonomy/grades` is staff-only. **No status-read touch** (S0's `POST /api/auth/student/exchange` already returns `403 account_pending`/`account_rejected`+reason, `FR-STU-REG-009`). No migration.
+- **Contract:** `docs/contracts/student-s1-registration.md` (freezes the existing register multipart shape + the new grades read; documents that the status read is S0's exchange `403`).
 - **Reqs:** FR-STU-REG-001..009, FR-PLAT-AUTH-003, NFR-PRIV-001/003.
 - **Exit:** a new account is created `Pending` with ID image in private R2 + terms recorded + a registration `AuditEntry`; the student cannot sign in until approved; rejection reason renders.
 

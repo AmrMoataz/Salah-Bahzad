@@ -1,18 +1,18 @@
 {
   "run": {
-    "command": "nx test student-portal-feature-shell",
-    "startTime": "2026-06-21T11:44:43.928Z",
-    "endTime": "2026-06-21T11:44:48.192Z",
+    "command": "nx test student-portal-feature-auth --skip-nx-cache",
+    "startTime": "2026-06-21T12:47:25.651Z",
+    "endTime": "2026-06-21T12:47:30.142Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "student-portal-feature-shell:test",
+      "taskId": "student-portal-feature-auth:test",
       "target": "test",
-      "projectName": "student-portal-feature-shell",
-      "hash": "686210291234261903",
-      "startTime": "2026-06-21T11:44:43.943Z",
-      "endTime": "2026-06-21T11:44:48.182Z",
+      "projectName": "student-portal-feature-auth",
+      "hash": "13342745651536214052",
+      "startTime": "2026-06-21T12:47:25.666Z",
+      "endTime": "2026-06-21T12:47:30.140Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

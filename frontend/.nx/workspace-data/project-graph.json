@@ -16404,6 +16404,16 @@
       },
       {
         "source": "student-portal-feature-auth",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
         "target": "npm:jest-preset-angular",
         "type": "static"
       }
@@ -39054,5 +39064,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1782042283907
+  "computedAt": 1782046045628
 }

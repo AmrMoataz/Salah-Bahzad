@@ -1,0 +1,12 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-auth [39m[27m[0m [2mlibs/student-portal/feature-auth/src/lib/status/[22m[1mstatus.component.spec.ts[22m
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-auth [39m[27m[0m [2mlibs/student-portal/feature-auth/src/lib/login/[22m[1mlogin.component.spec.ts[22m
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-auth [39m[27m[0m [2mlibs/student-portal/feature-auth/src/lib/register/[22m[1mregister.component.spec.ts[22m
+
+[1mTest Suites: [22m[1m[32m3 passed[39m[22m, 3 total
+[1mTests:       [22m[1m[32m25 passed[39m[22m, 25 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        [1m[33m5.061 s[39m[22m
+[2mRan all test suites[22m[2m.[22m

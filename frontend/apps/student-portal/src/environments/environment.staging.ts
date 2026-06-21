@@ -5,6 +5,8 @@ export const environment = {
   // (see studentAuthInterceptor) so the cookie is sent. The API must allow this origin
   // with AllowCredentials() (backend §4).
   apiUrl: 'https://api.staging.salahbahzad.com',
+  tenantSlug: 'salah-bahzad',
+  termsVersion: 'v1',
   firebase: {
     apiKey: 'AIzaSyC0IXB7W4qBq_dmoZm2Rsn_vvkMe4ZPMqM',
     authDomain: 'salah-bahzad-staging.firebaseapp.com',

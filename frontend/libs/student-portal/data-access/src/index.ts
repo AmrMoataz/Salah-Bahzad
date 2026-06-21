@@ -11,3 +11,20 @@ export type {
   StudentAuthProblem,
   StudentAuthState,
 } from './lib/auth/student-auth.models';
+
+export { RegistrationService, registrationConfig } from './lib/registration/registration.service';
+export {
+  ID_IMAGE_MAX_BYTES,
+  ID_IMAGE_ACCEPTED_TYPES,
+  ID_IMAGE_ACCEPT_ATTR,
+} from './lib/registration/registration.models';
+export type {
+  GradeRef,
+  CityRef,
+  RegionRef,
+  RegistrationMethod,
+  RegisterFormData,
+  GoogleProfile,
+  RegisterResult,
+  RegistrationConfig,
+} from './lib/registration/registration.models';

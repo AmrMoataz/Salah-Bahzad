@@ -150,6 +150,10 @@
 }
 .login__footnote { text-align: center; margin: 22px 0 0; font-size: var(--sb-body-md-size); color: var(--sb-neutral-600); }
 
+/* Auth buttons span the full form width (design: hint-size "100%,48px") */
+:host ::ng-deep sb-button { display: block; }
+:host ::ng-deep sb-button .sb-btn { width: 100%; }
+
 /* Shared input (design-system field) */
 :host ::ng-deep .sb-input {
   width: 100%;

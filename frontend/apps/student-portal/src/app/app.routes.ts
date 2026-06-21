@@ -9,11 +9,11 @@ export const appRoutes: Routes = [
       import('@sb/student-portal/feature-auth').then((m) => m.LoginComponent),
   },
   {
-    // S1 placeholder — the registration wizard ships later.
+    // S1 — the two-step self-registration wizard (guests only).
     path: 'register',
     canActivate: [guestGuard],
     loadComponent: () =>
-      import('@sb/student-portal/feature-auth').then((m) => m.RegisterPlaceholderComponent),
+      import('@sb/student-portal/feature-auth').then((m) => m.RegisterComponent),
   },
   {
     // Blocked-sign-in status screen (pending / rejected / inactive / device_not_recognized).

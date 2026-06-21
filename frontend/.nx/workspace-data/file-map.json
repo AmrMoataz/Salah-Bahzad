@@ -70,88 +70,16 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": ".prettierrc",
-        "hash": "15623139863315169796"
+        "file": ".nx/cache/terminalOutputs/12621105649264300263",
+        "hash": "2648378655666959189"
       },
       {
-        "file": ".nx/workspace-data/lockfile.hash",
-        "hash": "11088372258240359647"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/17866812980155312777",
-        "hash": "4162881904844554947"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/11728076030290737159",
-        "hash": "17396609109140013366"
-      },
-      {
-        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
-        "hash": "6603132757495858215"
-      },
-      {
-        "file": ".nx/cache/run.json",
-        "hash": "7421524940114009860"
-      },
-      {
-        "file": ".npmrc",
-        "hash": "9925967549247833609"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/17648272201978385499",
-        "hash": "17964821952452833822"
-      },
-      {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
-        "hash": "9674378885841417541"
+        "file": "README.md",
+        "hash": "3062190976032545220"
       },
       {
         "file": ".nx/cache/terminalOutputs/1228538385093071911",
         "hash": "17208495497192401137"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/10682576843476596166",
-        "hash": "18436696335652250264"
-      },
-      {
-        "file": ".nx/workspace-data/source-maps.json",
-        "hash": "4792113634724464825"
-      },
-      {
-        "file": ".nx/workspace-data/parsed-lock-file.json",
-        "hash": "17378318895149150408"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/8233523120442313224",
-        "hash": "16046508334467985152"
-      },
-      {
-        "file": "eslint.config.js",
-        "hash": "4541218842999047522"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/2825160396126263512",
-        "hash": "10979904289908269750"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "9911853994792357420"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/14769849802728444242",
-        "hash": "11051835673871155766"
-      },
-      {
-        "file": "package.json",
-        "hash": "5882413538775065489"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/4017569834431136404",
-        "hash": "881148221156998833"
-      },
-      {
-        "file": ".nx/cache/terminalOutputs/2903325117937116553",
-        "hash": "5150728555422640088"
       },
       {
         "file": "CLAUDE.md",
@@ -162,60 +90,156 @@
         "hash": "9545564522193265620"
       },
       {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db",
+        "hash": "6240709564311096908"
+      },
+      {
         "file": ".nx/cache/terminalOutputs/15599121032916755200",
         "hash": "15286032763717174599"
       },
       {
-        "file": "package-lock.json",
-        "hash": "11055423543555067266"
+        "file": "eslint.config.js",
+        "hash": "4541218842999047522"
       },
       {
-        "file": ".nx/workspace-data/project-graph.json",
-        "hash": "9497178228600980381"
+        "file": ".nx/cache/terminalOutputs/17648272201978385499",
+        "hash": "17964821952452833822"
       },
       {
-        "file": ".nx/cache/terminalOutputs/15509500303428488092",
-        "hash": "11906329738553557558"
+        "file": ".prettierrc",
+        "hash": "15623139863315169796"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/2825160396126263512",
+        "hash": "10979904289908269750"
       },
       {
         "file": "jest.preset.js",
         "hash": "9723392830648133472"
       },
       {
-        "file": ".nx/cache/terminalOutputs/11601700923918181928",
-        "hash": "14827266085148351387"
-      },
-      {
-        "file": "README.md",
-        "hash": "3062190976032545220"
-      },
-      {
         "file": ".nx/cache/terminalOutputs/17889312516420635748",
         "hash": "8068884404128944396"
       },
       {
-        "file": ".nx/workspace-data/nx_files.nxt",
-        "hash": "15124221673916223889"
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-shm",
+        "hash": "9674378885841417541"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/686210291234261903",
+        "hash": "12731899389700982756"
       },
       {
         "file": ".nx/workspace-data/file-map.json",
-        "hash": "7652780867535765101"
+        "hash": "6482194996240958675"
       },
       {
         "file": "nx.json",
         "hash": "16934025050528280795"
       },
       {
+        "file": ".nx/cache/terminalOutputs/17881411702062064597",
+        "hash": "10290330039227622059"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/11728076030290737159",
+        "hash": "17396609109140013366"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/11117637702501595470",
+        "hash": "3592307667360885564"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "11055423543555067266"
+      },
+      {
+        "file": ".nx/workspace-data/nx_files.nxt",
+        "hash": "15124221673916223889"
+      },
+      {
+        "file": ".nx/cache/run.json",
+        "hash": "17079126801504004997"
+      },
+      {
+        "file": ".nx/workspace-data/lockfile.hash",
+        "hash": "11088372258240359647"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "9911853994792357420"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/17866812980155312777",
+        "hash": "4162881904844554947"
+      },
+      {
+        "file": ".npmrc",
+        "hash": "9925967549247833609"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/10682576843476596166",
+        "hash": "18436696335652250264"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/5577160413400260780",
+        "hash": "11611470927713388846"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/7259625074475076660",
+        "hash": "15665926199386171342"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/11601700923918181928",
+        "hash": "14827266085148351387"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/8233523120442313224",
+        "hash": "16046508334467985152"
+      },
+      {
+        "file": ".nx/workspace-data/source-maps.json",
+        "hash": "4792113634724464825"
+      },
+      {
+        "file": ".nx/workspace-data/parsed-lock-file.json",
+        "hash": "17378318895149150408"
+      },
+      {
+        "file": ".nx/workspace-data/angular-5081913358311489107.hash",
+        "hash": "1537937148772966800"
+      },
+      {
+        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
+        "hash": "13762917437561969457"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/15509500303428488092",
+        "hash": "11906329738553557558"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/2903325117937116553",
+        "hash": "5150728555422640088"
+      },
+      {
+        "file": ".nx/cache/terminalOutputs/14769849802728444242",
+        "hash": "11051835673871155766"
+      },
+      {
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "5970482931201626505"
+      },
+      {
         "file": ".nx/cache/terminalOutputs/1952521444066551150",
         "hash": "18390929672206201451"
       },
       {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db",
-        "hash": "6240709564311096908"
+        "file": ".nx/cache/terminalOutputs/4017569834431136404",
+        "hash": "881148221156998833"
       },
       {
-        "file": ".nx/workspace-data/77aad91c-8faf-48cb-bedd-f8d32b1fc9bd.db-wal",
-        "hash": "11141737448557589996"
+        "file": "package.json",
+        "hash": "5882413538775065489"
       }
     ],
     "projectFileMap": {
@@ -813,7 +837,7 @@
         },
         {
           "file": "libs/student-portal/data-access/src/index.ts",
-          "hash": "986930105192480811"
+          "hash": "4951801377563908378"
         },
         {
           "file": "libs/student-portal/data-access/src/lib/auth/auth.guard.ts",
@@ -829,7 +853,7 @@
         },
         {
           "file": "libs/student-portal/data-access/src/lib/auth/student-auth.interceptor.ts",
-          "hash": "11492696153326162956",
+          "hash": "4085379242300857866",
           "deps": [
             "npm:@angular/common",
             "npm:@angular/core",
@@ -858,6 +882,29 @@
             "npm:@angular/router",
             "npm:@angular/fire",
             "npm:@angular/common",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/student-portal/data-access/src/lib/registration/registration.models.ts",
+          "hash": "632046136688438184"
+        },
+        {
+          "file": "libs/student-portal/data-access/src/lib/registration/registration.service.spec.ts",
+          "hash": "9772915247555970825",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/fire"
+          ]
+        },
+        {
+          "file": "libs/student-portal/data-access/src/lib/registration/registration.service.ts",
+          "hash": "2667138500781357507",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/fire",
             "npm:rxjs"
           ]
         },
@@ -927,7 +974,7 @@
       "student-portal": [
         {
           "file": "apps/student-portal/angular.json",
-          "hash": "15987542831937008750"
+          "hash": "8090175457562327633"
         },
         {
           "file": "apps/student-portal/jest.config.ts",
@@ -967,7 +1014,7 @@
         },
         {
           "file": "apps/student-portal/src/app/app.routes.ts",
-          "hash": "4688867719837297009",
+          "hash": "14575402854543150802",
           "deps": [
             "npm:@angular/router",
             "student-portal-data-access",
@@ -1040,15 +1087,15 @@
         },
         {
           "file": "apps/student-portal/src/environments/environment.prod.ts",
-          "hash": "12653743480312456980"
+          "hash": "18412096771079515880"
         },
         {
           "file": "apps/student-portal/src/environments/environment.staging.ts",
-          "hash": "14459980326642053525"
+          "hash": "5098183353050660936"
         },
         {
           "file": "apps/student-portal/src/environments/environment.ts",
-          "hash": "18434739957777134872"
+          "hash": "6411615758110467291"
         },
         {
           "file": "apps/student-portal/src/index.html",
@@ -1056,7 +1103,7 @@
         },
         {
           "file": "apps/student-portal/src/main.ts",
-          "hash": "4249442130471178838",
+          "hash": "15019803260028173758",
           "deps": [
             "npm:@angular/platform-browser"
           ]
@@ -1770,7 +1817,7 @@
         },
         {
           "file": "libs/student-portal/feature-auth/src/index.ts",
-          "hash": "13102676627535655221"
+          "hash": "13492535304295197556"
         },
         {
           "file": "libs/student-portal/feature-auth/src/lib/login/login.component.html",
@@ -1778,7 +1825,7 @@
         },
         {
           "file": "libs/student-portal/feature-auth/src/lib/login/login.component.scss",
-          "hash": "15143669879004998053"
+          "hash": "2997116587850117392"
         },
         {
           "file": "libs/student-portal/feature-auth/src/lib/login/login.component.spec.ts",
@@ -1801,11 +1848,35 @@
           ]
         },
         {
-          "file": "libs/student-portal/feature-auth/src/lib/register/register-placeholder.component.ts",
-          "hash": "576375649191569235",
+          "file": "libs/student-portal/feature-auth/src/lib/register/register.component.html",
+          "hash": "10133820491994298786"
+        },
+        {
+          "file": "libs/student-portal/feature-auth/src/lib/register/register.component.scss",
+          "hash": "6748455895873463135"
+        },
+        {
+          "file": "libs/student-portal/feature-auth/src/lib/register/register.component.spec.ts",
+          "hash": "10685827202234871367",
           "deps": [
             "npm:@angular/core",
-            "npm:@angular/router"
+            "npm:@angular/router",
+            "npm:@angular/common",
+            "npm:rxjs",
+            "student-portal-data-access"
+          ]
+        },
+        {
+          "file": "libs/student-portal/feature-auth/src/lib/register/register.component.ts",
+          "hash": "10275365388561717192",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "shared-ui",
+            "student-portal-data-access"
           ]
         },
         {
