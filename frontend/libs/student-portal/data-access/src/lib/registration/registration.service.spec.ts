@@ -14,11 +14,17 @@ jest.mock('@angular/fire/auth', () => ({
   Auth: class Auth {},
   GoogleAuthProvider: class GoogleAuthProvider {},
   createUserWithEmailAndPassword: jest.fn(),
+  signInWithEmailAndPassword: jest.fn(),
   signInWithPopup: jest.fn(),
 }));
 
-import { createUserWithEmailAndPassword, signInWithPopup } from '@angular/fire/auth';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from '@angular/fire/auth';
 const mockEmailCreate = createUserWithEmailAndPassword as jest.Mock;
+const mockEmailSignIn = signInWithEmailAndPassword as jest.Mock;
 const mockGooglePopup = signInWithPopup as jest.Mock;
 
 const GRADES_URL = '/api/reference/grades?tenantSlug=salah-bahzad';
@@ -163,6 +169,19 @@ describe('RegistrationService', () => {
     const req = httpMock.expectOne(REGISTER_URL);
     expect((req.request.body as FormData).get('firebaseIdToken')).toBe('google-token');
     req.flush({ studentId: 'stu-2', status: 'Pending' });
+  });
+
+  it('signInExistingEmailAccount() holds the existing user so register() carries its token (resubmit path)', async () => {
+    mockEmailSignIn.mockResolvedValue({ user: { getIdToken: async () => 'existing-token' } });
+
+    await service.signInExistingEmailAccount('rejected@example.com', 'password1');
+    expect(mockEmailSignIn).toHaveBeenCalledWith(expect.anything(), 'rejected@example.com', 'password1');
+
+    service.register(makeForm()).subscribe();
+    await tick();
+    const req = httpMock.expectOne(REGISTER_URL);
+    expect((req.request.body as FormData).get('firebaseIdToken')).toBe('existing-token');
+    req.flush({ studentId: 'stu-3', status: 'Pending' });
   });
 
   it('register() errors out when no Firebase account was created first', async () => {

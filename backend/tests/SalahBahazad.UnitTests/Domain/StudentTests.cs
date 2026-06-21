@@ -127,6 +127,46 @@ public class StudentTests
     }
 
     [Fact]
+    public void Resubmit_moves_rejected_back_to_pending_and_overwrites_details()
+    {
+        var student = NewPending();
+        student.Reject("Blurry ID photo");
+        var newGrade = Guid.NewGuid();
+
+        student.Resubmit(
+            fullName: "  Mariam Adel Hassan  ",
+            phoneNumber: "  01088888888 ",
+            parentPhonePrimary: "  01000000001 ",
+            parentPhoneSecondary: "  ",
+            gradeId: newGrade,
+            cityId: Guid.NewGuid(),
+            regionId: Guid.NewGuid(),
+            schoolName: "  New School ",
+            termsVersion: "v2",
+            termsAcceptedAtUtc: DateTimeOffset.UtcNow);
+
+        student.Status.Should().Be(StudentStatus.Pending);
+        student.RejectionReason.Should().BeNull();
+        student.FullName.Should().Be("Mariam Adel Hassan");
+        student.ParentPhoneSecondary.Should().BeNull(); // blank → null
+        student.GradeId.Should().Be(newGrade);
+        student.SchoolName.Should().Be("New School");
+        student.TermsVersion.Should().Be("v2");
+    }
+
+    [Fact]
+    public void Resubmit_throws_when_not_rejected()
+    {
+        var student = NewPending(); // pending, never rejected
+
+        var act = () => student.Resubmit(
+            "Name", "0111", "0100", null,
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
     public void Deactivate_and_reactivate_toggle_status_with_events()
     {
         var student = NewPending();

@@ -143,6 +143,55 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         AddDomainEvent(new StudentRejectedEvent(Id, RejectionReason));
     }
 
+    /// <summary>
+    /// A <see cref="StudentStatus.Rejected"/> registration is corrected and re-submitted for review,
+    /// reusing the same row (and the same Firebase identity) so the email is never a dead-end
+    /// (FR-ADM-STU-004 follow-up). Overwrites the editable details with the new submission, clears the
+    /// rejection reason, and returns to <see cref="StudentStatus.Pending"/>. The fresh ID image is
+    /// attached separately via <see cref="AttachIdImage"/> once its upload succeeds. Like
+    /// <see cref="Register"/>, this runs in the anonymous self-service path, so it raises no domain event —
+    /// the audit row is written explicitly by the handler with the resolved tenant.
+    /// </summary>
+    public void Resubmit(
+        string fullName,
+        string phoneNumber,
+        string parentPhonePrimary,
+        string? parentPhoneSecondary,
+        Guid gradeId,
+        Guid cityId,
+        Guid regionId,
+        string schoolName,
+        string termsVersion,
+        DateTimeOffset termsAcceptedAtUtc)
+    {
+        if (Status != StudentStatus.Rejected)
+            throw new InvalidOperationException(
+                $"Only a rejected registration can be re-submitted; current status is {Status}.");
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(fullName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
+        ArgumentException.ThrowIfNullOrWhiteSpace(parentPhonePrimary);
+        ArgumentException.ThrowIfNullOrWhiteSpace(schoolName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(termsVersion);
+        if (gradeId == Guid.Empty) throw new ArgumentException("A student must have a grade.", nameof(gradeId));
+        if (cityId == Guid.Empty) throw new ArgumentException("A student must have a city.", nameof(cityId));
+        if (regionId == Guid.Empty) throw new ArgumentException("A student must have a region.", nameof(regionId));
+
+        FullName = fullName.Trim();
+        PhoneNumber = phoneNumber.Trim();
+        ParentPhonePrimary = parentPhonePrimary.Trim();
+        ParentPhoneSecondary = string.IsNullOrWhiteSpace(parentPhoneSecondary) ? null : parentPhoneSecondary.Trim();
+        GradeId = gradeId;
+        CityId = cityId;
+        RegionId = regionId;
+        SchoolName = schoolName.Trim();
+        TermsVersion = termsVersion.Trim();
+        TermsAcceptedAtUtc = termsAcceptedAtUtc;
+
+        Status = StudentStatus.Pending;
+        RejectionReason = null;
+    }
+
     /// <summary>Deactivates an active account; sign-in is refused while inactive (FR-ADM-STU-006).</summary>
     public void Deactivate()
     {

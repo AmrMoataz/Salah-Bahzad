@@ -22,6 +22,7 @@ function makeService() {
       .mockReturnValue(of([{ id: 'r1', cityId: 'c1', nameEn: 'Maadi', nameAr: 'المعادي' }])),
     register: jest.fn().mockReturnValue(of({ studentId: 'stu-1', status: 'Pending' })),
     createEmailAccount: jest.fn().mockResolvedValue(undefined),
+    signInExistingEmailAccount: jest.fn().mockResolvedValue(undefined),
     signUpWithGoogle: jest
       .fn()
       .mockResolvedValue({ fullName: 'Lina Hassan', email: 'lina@example.com' }),
@@ -280,11 +281,29 @@ describe('RegisterComponent', () => {
     expect(c.topError()).toContain('Too many attempts');
   });
 
-  it('Firebase email-already-in-use → sign-in hint (no register POST)', async () => {
+  it('email-already-in-use → signs in to the existing account and submits (resubmit path)', async () => {
+    const fixture = setup();
+    const c = fixture.componentInstance;
+    // Account creation fails because the email exists (e.g. a rejected student); we sign in instead.
+    service.createEmailAccount.mockRejectedValueOnce(
+      Object.assign(new Error('x'), { code: 'auth/email-already-in-use' }),
+    );
+
+    await submitValidManual(c);
+
+    expect(service.signInExistingEmailAccount).toHaveBeenCalledWith('lina@example.com', 'password1');
+    expect(service.register).toHaveBeenCalled();
+    expect(c.submitted()).toBe(true);
+  });
+
+  it('email-already-in-use but wrong password → sign-in hint, no register POST', async () => {
     const fixture = setup();
     const c = fixture.componentInstance;
     service.createEmailAccount.mockRejectedValueOnce(
       Object.assign(new Error('x'), { code: 'auth/email-already-in-use' }),
+    );
+    service.signInExistingEmailAccount.mockRejectedValueOnce(
+      Object.assign(new Error('x'), { code: 'auth/invalid-credential' }),
     );
 
     await submitValidManual(c);

@@ -76,6 +76,72 @@ public sealed class StudentRegistrationTests(SalahBahazadApiFactory factory)
     }
 
     [Fact]
+    public async Task Rejected_student_can_resubmit_reusing_the_same_account()
+    {
+        var (cityId, regionId) = await factory.GetSeedLocationAsync();
+        var tenant = await factory.SeedTenantEntityAsync();
+        var grade = await factory.SeedGradeAsync(tenant.Id);
+
+        // Pin a token → UID so both registrations resolve to the *same* Firebase identity (the default
+        // fake yields a fresh UID per call). This is what lets the second submit find the rejected row.
+        const string token = "resubmit-firebase-token";
+        factory.PinFirebaseUser(token, $"resubmit-uid-{Guid.NewGuid():N}");
+        var anon = factory.CreateClient();
+
+        // 1) First registration → Pending.
+        var first = await anon.PostAsync("/api/students/register", BuildForm(token, tenant.Slug, grade.Id, cityId, regionId, "Mariam Adel"));
+        first.StatusCode.Should().Be(HttpStatusCode.Created);
+        var firstResult = await first.Content.ReadFromJsonAsync<StudentRegistrationResponse>(TestJson.Options);
+        var studentId = firstResult!.StudentId;
+
+        // 2) Staff reject with a reason.
+        var staff = factory.CreateClientFor(StaffRole.Teacher, tenant.Id);
+        var reject = await staff.PostAsJsonAsync($"/api/students/{studentId}/reject", new { reason = "Blurry ID photo" });
+        reject.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // 3) Re-submit with the same account but corrected details — reuses the row, no 409.
+        var resubmit = await anon.PostAsync("/api/students/register", BuildForm(token, tenant.Slug, grade.Id, cityId, regionId, "Mariam Adel Hassan"));
+        resubmit.StatusCode.Should().Be(HttpStatusCode.Created);
+        var resubmitResult = await resubmit.Content.ReadFromJsonAsync<StudentRegistrationResponse>(TestJson.Options);
+        resubmitResult!.StudentId.Should().Be(studentId, "the rejected row is reused, not a new one");
+        resubmitResult.Status.Should().Be("Pending");
+
+        // Re-submission is audited under its own action.
+        var resubmitAudit = await factory.LatestAuditAsync(tenant.Id, "Student", "StudentResubmitted");
+        resubmitAudit.Should().NotBeNull();
+        resubmitAudit!.ActorType.Should().Be("Student");
+
+        // The student is Pending again, the rejection reason is cleared, and the corrected name took.
+        var detail = await staff.GetFromJsonAsync<StudentDetailResponse>(
+            $"/api/students/{studentId}", TestJson.Options);
+        detail!.Status.Should().Be("Pending");
+        detail.RejectionReason.Should().BeNull();
+        detail.FullName.Should().Be("Mariam Adel Hassan");
+    }
+
+    private static MultipartFormDataContent BuildForm(
+        string firebaseToken, string tenantSlug, Guid gradeId, Guid cityId, Guid regionId, string fullName)
+    {
+        var form = new MultipartFormDataContent
+        {
+            { new StringContent(firebaseToken), "firebaseIdToken" },
+            { new StringContent(tenantSlug), "tenantSlug" },
+            { new StringContent(fullName), "fullName" },
+            { new StringContent("01099999999"), "phoneNumber" },
+            { new StringContent("01000000000"), "parentPhonePrimary" },
+            { new StringContent(gradeId.ToString()), "gradeId" },
+            { new StringContent(cityId.ToString()), "cityId" },
+            { new StringContent(regionId.ToString()), "regionId" },
+            { new StringContent("Nile Language School"), "schoolName" },
+            { new StringContent("terms-v1"), "termsVersion" },
+        };
+        var file = new ByteArrayContent(ImageBytes);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        form.Add(file, "idImage", "id.jpg");
+        return form;
+    }
+
+    [Fact]
     public async Task Register_rejects_a_disallowed_file_type()
     {
         var (cityId, regionId) = await factory.GetSeedLocationAsync();

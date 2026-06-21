@@ -5,6 +5,7 @@ using SalahBahazad.Application.Common.Exceptions;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Students.DTOs;
 using SalahBahazad.Domain.Entities;
+using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Application.Features.Students.Commands.RegisterStudent;
 
@@ -13,6 +14,12 @@ namespace SalahBahazad.Application.Features.Students.Commands.RegisterStudent;
 /// region, uploads the ID image to the private bucket, then creates a Pending student and writes an
 /// explicit registration audit entry. Runs anonymously, so there is no JWT tenant claim — the audit is
 /// written via <see cref="IAuditWriter"/> with the resolved tenant (the interceptor is a no-op here).
+/// <para>
+/// If a <see cref="StudentStatus.Rejected"/> student already exists for this Firebase identity, the same
+/// row is re-used and moved back to Pending (audited as <c>StudentResubmitted</c>) instead of returning a
+/// 409 — so a rejected registration is never a permanent dead-end for that email (FR-ADM-STU-004 follow-up).
+/// A live account (Pending/Active/Inactive) still conflicts.
+/// </para>
 /// </summary>
 internal sealed class RegisterStudentHandler(
     IAppDbContext db,
@@ -49,44 +56,76 @@ internal sealed class RegisterStudentHandler(
         if (!regionExists)
             throw new NotFoundException("Region", command.RegionId);
 
-        var alreadyRegistered = await db.Students
+        // A prior registration for this Firebase identity is only a hard conflict while it is still a live
+        // account (Pending/Active/Inactive). A *Rejected* one is reused — the student corrects their details
+        // and re-submits on the same row + same email, so rejection is never a dead-end (FR-ADM-STU-004
+        // follow-up). Tracked (not AnyAsync) so Resubmit can mutate it. IgnoreQueryFilters: anonymous, no
+        // tenant claim, and a soft-deleted row should still block re-registration.
+        var existing = await db.Students
             .IgnoreQueryFilters()
-            .AnyAsync(s => s.TenantId == tenant.Id && s.FirebaseUid == claims.Uid, cancellationToken);
-        if (alreadyRegistered)
+            .FirstOrDefaultAsync(
+                s => s.TenantId == tenant.Id && s.FirebaseUid == claims.Uid, cancellationToken);
+
+        if (existing is not null && existing.Status != StudentStatus.Rejected)
             throw new ConflictException("An account already exists for this sign-in.");
 
-        // Create the student first so its id can be embedded in the object key (the bucket groups uploads
-        // by owner for debuggability). Upload before attaching/persisting the key, so the key is only saved
-        // once the bytes are safely stored. A failed commit afterwards leaves an orphaned object (cheap to
-        // GC), never a dangling key.
-        var student = Student.Register(
-            tenant.Id,
-            claims.Uid,
-            command.FullName,
-            command.PhoneNumber,
-            command.ParentPhonePrimary,
-            command.ParentPhoneSecondary,
-            command.GradeId,
-            command.CityId,
-            command.RegionId,
-            command.SchoolName,
-            command.TermsVersion,
-            clock.GetUtcNow());
+        var now = clock.GetUtcNow();
+        var isResubmission = existing is not null;
+
+        // Either branch yields a tracked student with a stable Id before the upload: a fresh Register adds
+        // a new row, a resubmission reuses the rejected one. The id seeds the object key (the bucket groups
+        // uploads by owner). Upload before attaching/persisting the key, so the key is only saved once the
+        // bytes are stored. A failed commit afterwards leaves an orphaned object (cheap to GC), never a
+        // dangling key.
+        Student student;
+        if (existing is not null)
+        {
+            student = existing;
+            student.Resubmit(
+                command.FullName,
+                command.PhoneNumber,
+                command.ParentPhonePrimary,
+                command.ParentPhoneSecondary,
+                command.GradeId,
+                command.CityId,
+                command.RegionId,
+                command.SchoolName,
+                command.TermsVersion,
+                now);
+        }
+        else
+        {
+            student = Student.Register(
+                tenant.Id,
+                claims.Uid,
+                command.FullName,
+                command.PhoneNumber,
+                command.ParentPhonePrimary,
+                command.ParentPhoneSecondary,
+                command.GradeId,
+                command.CityId,
+                command.RegionId,
+                command.SchoolName,
+                command.TermsVersion,
+                now);
+            db.Students.Add(student);
+        }
 
         var objectKey = StorageKeys.StudentIdImage(tenant.Id, student.Id, command.IdImageContentType);
         await fileStorage.UploadPrivateAsync(
             objectKey, command.IdImageContent, command.IdImageContentType, cancellationToken);
         student.AttachIdImage(objectKey);
 
-        db.Students.Add(student);
         await db.SaveChangesAsync(cancellationToken);
 
         await auditWriter.WriteAsync(
             new AuditWriteRequest(
-                Action: "StudentRegistered",
+                Action: isResubmission ? "StudentResubmitted" : "StudentRegistered",
                 EntityType: "Student",
                 EntityId: student.Id,
-                Summary: "Student self-registered (pending review).",
+                Summary: isResubmission
+                    ? "Rejected student re-submitted registration (pending review)."
+                    : "Student self-registered (pending review).",
                 TenantId: tenant.Id,
                 ActorType: "Student",
                 Portal: "student"),

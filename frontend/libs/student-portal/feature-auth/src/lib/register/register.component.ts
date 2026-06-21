@@ -313,7 +313,7 @@ export class RegisterComponent {
     const raw = this.form.getRawValue();
     try {
       if (this.method() === 'manual') {
-        await this.#registration.createEmailAccount(raw.email!.trim(), raw.password!);
+        await this.#authenticateManual(raw.email!.trim(), raw.password!);
       }
       await firstValueFrom(
         this.#registration.register({
@@ -333,6 +333,25 @@ export class RegisterComponent {
       this.#handleSubmitError(err);
     } finally {
       this.submitting.set(false);
+    }
+  }
+
+  /**
+   * Mints (or re-connects) the email/password Firebase identity for the submit. A brand-new account is
+   * created; but if the email is already registered — typically a **rejected** student re-submitting —
+   * account creation throws `auth/email-already-in-use`, so we sign in to the existing account instead
+   * to get a fresh token. The server then reuses the rejected row (back to Pending) rather than 409-ing.
+   * A wrong password surfaces as a Firebase credential error (handled in `#handleFirebaseError`).
+   */
+  async #authenticateManual(email: string, password: string): Promise<void> {
+    try {
+      await this.#registration.createEmailAccount(email, password);
+    } catch (err: unknown) {
+      if ((err as { code?: string })?.code === 'auth/email-already-in-use') {
+        await this.#registration.signInExistingEmailAccount(email, password);
+        return;
+      }
+      throw err;
     }
   }
 
@@ -406,6 +425,16 @@ export class RegisterComponent {
       case 'auth/email-already-in-use':
         this.alreadyRegistered.set(true);
         this.topError.set('You already have an account — sign in instead.');
+        this.step.set(1);
+        break;
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        // The email already exists (e.g. a rejected re-submission) but the password didn't match.
+        this.alreadyRegistered.set(true);
+        this.topError.set(
+          'That email already has an account, but the password doesn’t match. Sign in to continue, or reset your password.',
+        );
+        this.form.controls.password.setErrors({ server: 'Incorrect password for this email.' });
         this.step.set(1);
         break;
       case 'auth/weak-password':

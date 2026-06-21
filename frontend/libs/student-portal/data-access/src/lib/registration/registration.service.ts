@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   User,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signInWithPopup,
 } from '@angular/fire/auth';
 import { Observable, from, switchMap } from 'rxjs';
@@ -77,6 +78,17 @@ export class RegistrationService {
    */
   async createEmailAccount(email: string, password: string): Promise<void> {
     const credential = await createUserWithEmailAndPassword(this.#firebaseAuth, email, password);
+    this.#firebaseUser = credential.user;
+  }
+
+  /**
+   * Signs in to an **existing** email/password Firebase account and holds it for `register`. Used when
+   * a rejected student re-submits: their Firebase account already exists, so account *creation* would
+   * throw `auth/email-already-in-use`. Signing in instead yields a fresh ID token, and the server
+   * reuses the rejected row (moving it back to Pending) rather than returning a 409.
+   */
+  async signInExistingEmailAccount(email: string, password: string): Promise<void> {
+    const credential = await signInWithEmailAndPassword(this.#firebaseAuth, email, password);
     this.#firebaseUser = credential.user;
   }
 

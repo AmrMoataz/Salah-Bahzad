@@ -69,14 +69,22 @@
 |---|---|
 | `400` | FluentValidation failure (any `§A.1`/`§D` rule) **or** an invalid/expired Firebase ID token. |
 | `404` | `tenantSlug` unknown, or `gradeId`/`cityId`/`regionId` not found / region not in city. |
-| `409` | A student already exists for this Firebase UID in this tenant (`"An account already exists for this sign-in."`). |
+| `409` | A **live** account (Pending/Active/Inactive) already exists for this Firebase UID in this tenant (`"An account already exists for this sign-in."`). A **Rejected** prior registration does **not** 409 — it is re-submitted (see `§A.4`). |
 | `429` | `auth` rate-limit tripped. |
 
 ### A.4 Server behaviour (for reference — already implemented, do not rebuild)
 
-Verify Firebase → resolve tenant by slug → validate grade (tenant-scoped) / city / region → reject duplicate →
-`Student.Register(...)` (creates **Pending** student + records the terms consent) → upload ID image to private R2 →
-save (transactional) → write a **`StudentRegistered`** audit row (`§E`) → return `201`.
+Verify Firebase → resolve tenant by slug → validate grade (tenant-scoped) / city / region → look up any existing
+student for this Firebase UID:
+- **none** → `Student.Register(...)` (creates **Pending** student + records the terms consent), audit `StudentRegistered`;
+- **Rejected** → `Student.Resubmit(...)` re-uses the same row: overwrites the editable details, clears
+  `RejectionReason`, moves it back to **Pending**, audit **`StudentResubmitted`**. So a rejected registration is
+  never a dead-end for that email — the student keeps the **same Firebase account** and re-submits (FR-ADM-STU-004
+  follow-up);
+- **live** (Pending/Active/Inactive) → `409`.
+
+Then upload the (fresh) ID image to private R2 → save (transactional) → write the audit row (`§E`) → return `201`
+with `status:"Pending"` in both the register and resubmit cases.
 
 ## B. Reference data for the wizard dropdowns (all `AllowAnonymous`)
 
@@ -123,6 +131,10 @@ server's `400` field messages.
   **`ActorType=Student`**, `Portal=student`, summary "Student self-registered (pending review)." Written via
   `IAuditWriter` (the request is anonymous, so the interceptor is a no-op — same pattern as the S0 exchange). **Already
   implemented.**
+- **`StudentResubmitted`** — one row when a **Rejected** student re-submits (the reused-row path in `§A.4`). Same
+  `EntityType`/`EntityId`/`ActorType=Student`/`Portal=student`; summary "Rejected student re-submitted registration
+  (pending review)." Written the same explicit way. The original `StudentRejected` row stays, so the
+  rejected→fixed→pending trail is preserved.
 - The reference reads (`§B`) are **pure reads — not audited** (consistent with cities/regions and the catalogue reads).
 
 ## F. Client-supplied constants (frontend provisioning)

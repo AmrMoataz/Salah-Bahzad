@@ -76,4 +76,25 @@ describe('StatusComponent', () => {
     expect(store.clearStatus).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
+
+  it('offers "Edit & resubmit" only when rejected, routing to /register', () => {
+    const rejected = setup('account_rejected', 'Blurry ID photo.');
+    const buttons = Array.from(
+      rejected.nativeElement.querySelectorAll('.status__btn'),
+    ) as HTMLElement[];
+    const resubmit = buttons.find((b) => /resubmit/i.test(b.textContent ?? ''));
+    expect(resubmit).toBeTruthy();
+
+    resubmit!.click();
+    expect(store.clearStatus).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/register']);
+  });
+
+  it('does not offer "Edit & resubmit" for non-rejected states', () => {
+    const pending = setup('account_pending');
+    const buttons = Array.from(
+      pending.nativeElement.querySelectorAll('.status__btn'),
+    ) as HTMLElement[];
+    expect(buttons.some((b) => /resubmit/i.test(b.textContent ?? ''))).toBe(false);
+  });
 });

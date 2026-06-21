@@ -59,12 +59,19 @@ const META: Record<StudentBlockReason, StatusMeta> = {
                 <span>{{ detail() }}</span>
               </div>
             }
-            <p class="status__body">If you think this is a mistake, contact support.</p>
+            <p class="status__body">
+              You can fix the details above and submit your registration again — your email stays the same.
+            </p>
+            <button type="button" class="status__btn" (click)="editAndResubmit()">
+              Edit &amp; resubmit registration
+            </button>
+            <button type="button" class="status__btn status__btn--ghost" (click)="backToLogin()">
+              Back to sign in
+            </button>
           } @else {
             <p class="status__body">{{ detail() || v.fallbackBody }}</p>
+            <button type="button" class="status__btn" (click)="backToLogin()">Back to sign in</button>
           }
-
-          <button type="button" class="status__btn" (click)="backToLogin()">Back to sign in</button>
         </div>
       </div>
     }
@@ -144,6 +151,14 @@ const META: Record<StudentBlockReason, StatusMeta> = {
     }
     .status__btn:hover { background: var(--sb-primary-hover); }
     .status__btn:focus-visible { outline: none; box-shadow: var(--sb-shadow-focus); }
+    .status__btn + .status__btn { margin-top: 10px; }
+
+    .status__btn--ghost {
+      background: transparent;
+      color: var(--sb-neutral-600);
+      border: 1px solid var(--sb-neutral-200);
+    }
+    .status__btn--ghost:hover { background: var(--sb-neutral-50); }
   `],
 })
 export class StatusComponent {
@@ -167,5 +182,15 @@ export class StatusComponent {
   backToLogin(): void {
     this.#authStore.clearStatus();
     void this.#router.navigate(['/login']);
+  }
+
+  /**
+   * Rejected → re-enter the registration wizard. The student keeps their existing Firebase account
+   * (same email): the wizard re-authenticates and re-posts to `/api/students/register`, which the
+   * server reuses to move the rejected row back to Pending (no new account, no 409).
+   */
+  editAndResubmit(): void {
+    this.#authStore.clearStatus();
+    void this.#router.navigate(['/register']);
   }
 }
