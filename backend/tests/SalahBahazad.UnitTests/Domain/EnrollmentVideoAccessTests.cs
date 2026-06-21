@@ -14,7 +14,7 @@ public class EnrollmentVideoAccessTests
         var session = SessionEntity.Create(Tenant, "Algebra", null, 100m, 90, Guid.NewGuid(), Guid.NewGuid());
         session.AddVideo("v", accessCount, "sessions/t/s/videos/a.mp4");
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, DateTimeOffset.UtcNow);
+            Tenant, Guid.NewGuid(), "Test Student", session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, DateTimeOffset.UtcNow);
         return enrollment.VideoAccesses.Single();
     }
 

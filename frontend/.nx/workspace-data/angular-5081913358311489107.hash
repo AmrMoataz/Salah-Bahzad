@@ -888,5 +888,183 @@
         }
       }
     }
+  },
+  "6734245847487581567": {
+    "apps/student-portal": {
+      "projectType": "application",
+      "sourceRoot": "apps/student-portal/src",
+      "targets": {
+        "build": {
+          "command": "ng build",
+          "options": {
+            "cwd": "apps/student-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"build\" target for \"student-portal\".",
+            "help": {
+              "command": "npx ng run student-portal:build --help",
+              "example": {
+                "options": {
+                  "localize": true
+                }
+              }
+            }
+          },
+          "dependsOn": [
+            "^build"
+          ],
+          "outputs": [
+            "{workspaceRoot}/dist\\apps\\student-portal"
+          ],
+          "cache": true,
+          "inputs": [
+            "production",
+            "^production",
+            {
+              "externalDependencies": [
+                "@angular/cli"
+              ]
+            }
+          ],
+          "configurations": {
+            "production": {
+              "command": "ng run student-portal:build:production"
+            },
+            "staging": {
+              "command": "ng run student-portal:build:staging"
+            },
+            "development": {
+              "command": "ng run student-portal:build:development"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "command": "ng serve",
+          "options": {
+            "cwd": "apps/student-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"serve\" target for \"student-portal\".",
+            "help": {
+              "command": "npx ng run student-portal:serve --help",
+              "example": {
+                "options": {
+                  "port": 4201
+                }
+              }
+            }
+          },
+          "continuous": true,
+          "configurations": {
+            "production": {
+              "command": "ng run student-portal:serve:production"
+            },
+            "staging": {
+              "command": "ng run student-portal:serve:staging"
+            },
+            "development": {
+              "command": "ng run student-portal:serve:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  },
+  "12703060756423145410": {
+    "apps/student-portal": {
+      "projectType": "application",
+      "sourceRoot": "apps/student-portal/src",
+      "targets": {
+        "build": {
+          "command": "ng build",
+          "options": {
+            "cwd": "apps/student-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"build\" target for \"student-portal\".",
+            "help": {
+              "command": "npx ng run student-portal:build --help",
+              "example": {
+                "options": {
+                  "localize": true
+                }
+              }
+            }
+          },
+          "dependsOn": [
+            "^build"
+          ],
+          "outputs": [
+            "{workspaceRoot}/dist\\apps\\student-portal"
+          ],
+          "cache": true,
+          "inputs": [
+            "production",
+            "^production",
+            {
+              "externalDependencies": [
+                "@angular/cli"
+              ]
+            }
+          ],
+          "configurations": {
+            "production": {
+              "command": "ng run student-portal:build:production"
+            },
+            "staging": {
+              "command": "ng run student-portal:build:staging"
+            },
+            "development": {
+              "command": "ng run student-portal:build:development"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "command": "ng serve",
+          "options": {
+            "cwd": "apps/student-portal"
+          },
+          "metadata": {
+            "technologies": [
+              "angular"
+            ],
+            "description": "Run the \"serve\" target for \"student-portal\".",
+            "help": {
+              "command": "npx ng run student-portal:serve --help",
+              "example": {
+                "options": {
+                  "port": 4201
+                }
+              }
+            }
+          },
+          "continuous": true,
+          "configurations": {
+            "production": {
+              "command": "ng run student-portal:serve:production"
+            },
+            "staging": {
+              "command": "ng run student-portal:serve:staging"
+            },
+            "development": {
+              "command": "ng run student-portal:serve:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
   }
 }

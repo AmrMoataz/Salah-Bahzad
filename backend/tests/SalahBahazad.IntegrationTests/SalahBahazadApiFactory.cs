@@ -398,6 +398,24 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         await db.SaveChangesAsync();
     }
 
+    /// <summary>Adds a material to a session (no HTTP context → no audit) and returns it — for the S3 material
+    /// signed-URL read (§C). Only the row + object key are needed; the presigned URL is built from the key.</summary>
+    public async Task<SessionMaterial> SeedMaterialAsync(
+        Guid sessionId,
+        string fileName = "notes.pdf",
+        string contentType = "application/pdf",
+        long sizeBytes = 1024)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var session = await db.Sessions.IgnoreQueryFilters().Include(s => s.Materials)
+            .FirstAsync(s => s.Id == sessionId);
+        var key = $"sessions/{session.TenantId}/materials/{Guid.NewGuid():N}/{fileName}";
+        var material = session.AddMaterial(fileName, contentType, key, sizeBytes);
+        await db.SaveChangesAsync();
+        return material;
+    }
+
     public async Task<Question> SeedQuestionAsync(
         Guid tenantId, Guid sessionId, bool isValidForQuiz = true, string? bodyLatex = null)
     {

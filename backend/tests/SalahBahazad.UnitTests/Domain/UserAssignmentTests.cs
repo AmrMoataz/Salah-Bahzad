@@ -27,7 +27,7 @@ public class UserAssignmentTests
         var tenant = Guid.NewGuid();
         var student = Guid.NewGuid();
         var session = Session.Create(tenant, "S", null, 100m, 90, Guid.NewGuid(), Guid.NewGuid());
-        var enrollment = Enrollment.Create(tenant, student, session, EnrollmentMethod.Code, null, 100m, Now);
+        var enrollment = Enrollment.Create(tenant, student, "Test Student", session, EnrollmentMethod.Code, null, 100m, Now);
         var assignment = UserAssignment.GenerateFor(tenant, enrollment, session, questions, BaseForm, Now);
         return (assignment, tenant, student);
     }

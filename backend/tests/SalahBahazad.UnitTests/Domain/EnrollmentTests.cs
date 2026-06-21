@@ -25,7 +25,7 @@ public class EnrollmentTests
         var student = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
 
-        var enrollment = Enrollment.Create(Tenant, student, session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, now);
+        var enrollment = Enrollment.Create(Tenant, student, "Test Student", session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, now);
 
         enrollment.Status.Should().Be(EnrollmentStatus.Active);
         enrollment.Method.Should().Be(EnrollmentMethod.Code);
@@ -48,7 +48,7 @@ public class EnrollmentTests
     {
         var now = DateTimeOffset.UtcNow;
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), SessionWithVideos(30), EnrollmentMethod.Unlock, null, 0m, now);
+            Tenant, Guid.NewGuid(), "Test Student", SessionWithVideos(30), EnrollmentMethod.Unlock, null, 0m, now);
 
         enrollment.ExpiresAtUtc.Should().Be(now.AddDays(30));
     }
@@ -57,7 +57,7 @@ public class EnrollmentTests
     public void Create_with_zero_validity_has_no_expiry()
     {
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), SessionWithVideos(0), EnrollmentMethod.Unlock, null, 0m, DateTimeOffset.UtcNow);
+            Tenant, Guid.NewGuid(), "Test Student", SessionWithVideos(0), EnrollmentMethod.Unlock, null, 0m, DateTimeOffset.UtcNow);
 
         enrollment.ExpiresAtUtc.Should().BeNull();
     }
@@ -66,7 +66,7 @@ public class EnrollmentTests
     public void Unlock_enrollment_records_a_zero_amount_unlock_payment()
     {
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), SessionWithVideos(30, 1), EnrollmentMethod.Unlock, null, 0m, DateTimeOffset.UtcNow);
+            Tenant, Guid.NewGuid(), "Test Student", SessionWithVideos(30, 1), EnrollmentMethod.Unlock, null, 0m, DateTimeOffset.UtcNow);
 
         var payment = enrollment.Payments.Should().ContainSingle().Subject;
         payment.Method.Should().Be(PaymentMethod.Unlock);
@@ -78,7 +78,7 @@ public class EnrollmentTests
     public void Refund_flips_to_refunded_adds_reversal_and_raises_event()
     {
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), SessionWithVideos(30, 1), EnrollmentMethod.Code, Guid.NewGuid(), 100m,
+            Tenant, Guid.NewGuid(), "Test Student", SessionWithVideos(30, 1), EnrollmentMethod.Code, Guid.NewGuid(), 100m,
             DateTimeOffset.UtcNow);
 
         enrollment.Refund(DateTimeOffset.UtcNow, "SB-ABCDE-12345");
@@ -94,7 +94,7 @@ public class EnrollmentTests
     public void Refund_requires_an_active_enrollment()
     {
         var enrollment = Enrollment.Create(
-            Tenant, Guid.NewGuid(), SessionWithVideos(30, 1), EnrollmentMethod.Code, Guid.NewGuid(), 100m,
+            Tenant, Guid.NewGuid(), "Test Student", SessionWithVideos(30, 1), EnrollmentMethod.Code, Guid.NewGuid(), 100m,
             DateTimeOffset.UtcNow);
         enrollment.Refund(DateTimeOffset.UtcNow, null);
 
@@ -109,7 +109,7 @@ public class EnrollmentTests
         var student = Guid.NewGuid();
         var start = DateTimeOffset.UtcNow;
 
-        var enrollment = Enrollment.Create(Tenant, student, session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, start);
+        var enrollment = Enrollment.Create(Tenant, student, "Test Student", session, EnrollmentMethod.Code, Guid.NewGuid(), 100m, start);
         enrollment.Refund(start, null); // make it non-active so it can be extended/reused
 
         // The video's budget is raised and a new video is added before re-enrolling.

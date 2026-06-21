@@ -29,7 +29,7 @@ public class UserQuizTests
         var spec = Guid.NewGuid();
         var sourceA = Session.Create(tenant, "A", null, 100m, 90, grade, spec);
         var gatedB = Session.Create(tenant, "B", null, 100m, 90, grade, spec);
-        var enrollment = Enrollment.Create(tenant, student, gatedB, EnrollmentMethod.Code, null, 100m, Now);
+        var enrollment = Enrollment.Create(tenant, student, "Test Student", gatedB, EnrollmentMethod.Code, null, 100m, Now);
         return UserQuiz.GenerateFor(tenant, enrollment, gatedB, sourceA, setting, Now);
     }
 

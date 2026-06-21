@@ -20,6 +20,38 @@ export type {
   Enrollment,
 } from './lib/catalogue/catalogue.models';
 
+export { MySessionsService } from './lib/sessions/my-sessions.service';
+export type {
+  MySessionState,
+  MySessionFilter,
+  VideoProcessingStatus,
+  VideoLockState,
+  GateState,
+  AssignmentStatus,
+  MySession,
+  MySessionVideo,
+  MySessionMaterial,
+  MyAssignmentStatus,
+  MyQuizStatus,
+  MySessionDetail,
+  SignedUrl,
+  PlaybackHandoff,
+} from './lib/sessions/my-sessions.models';
+
+export { AssignmentService } from './lib/assignments/assignment.service';
+export type {
+  AssignmentStatus as AssignmentRunStatus,
+  StudentAssignment,
+  StudentAssignmentQuestion,
+  StudentAssignmentOption,
+  AssignmentProgress,
+  AssignmentEventType,
+  AssignmentEventBody,
+  StudentAssignmentReview,
+  StudentReviewQuestion,
+  StudentReviewOption,
+} from './lib/assignments/assignment.models';
+
 export { RegistrationService, registrationConfig } from './lib/registration/registration.service';
 export {
   ID_IMAGE_MAX_BYTES,

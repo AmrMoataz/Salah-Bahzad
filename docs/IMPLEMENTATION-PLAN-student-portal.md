@@ -37,6 +37,7 @@ The admin engagement (Phases 0–5C, latest commit `8742138`) built the platform
 | My enrolled sessions (progress + expiry countdown) | `GET /api/me/sessions` | FR-STU-SES-001 | S3 |
 | One session's detail for the student (video playlist + per-video remaining access + lock state, materials signed reads, assignment/quiz status, prerequisite/quiz-gate status) | `GET /api/me/sessions/{id}` (+ `…/materials/{mid}/url`) | FR-STU-SES-002/003/004 | S3 |
 | Student self-service profile (read/update personal info + parent phones + avatar; bound-device info) | `GET /api/me/profile`, `PUT /api/me/profile` | FR-STU-PRO-001/002/003 | S6 |
+| **Personalized Home — a weekly study plan** (KPI roll-up + a current-frontier "what to do next" step list + recently enrolled), derived from existing state and Redis-cached; **net-new** beyond the original "Home = catalogue" (screen #5) | `GET /api/me/plan` | FR-STU-SES-001, FR-PLAT-ENR-003/-007, FR-PLAT-QZ-008 | Home (post-S6) — `docs/contracts/student-home-weekly-plan.md` + `IMPLEMENTATION-PLAN-student-home-{backend,frontend,wiring}.md` |
 
 > Note: `/api/profile` already exists but is **staff-only** (Settings → own profile). The student profile is a **new, separate** `/api/me/profile` group, scoped to the caller's JWT (no IDOR surface), to match the `/api/me/*` family.
 
@@ -200,6 +201,21 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 - **Exit:** catalogue filters live; redeem moves a session to My Sessions, consumes the code, provisions assignment/quiz/video access; every failure (invalid/used/disabled/price-mismatch/prereq-unmet/already-enrolled) shows a specific message.
 
 ### S3 — My sessions, session detail & secure video
+> **Status: ✅ Met (2026-06-21)** — proven live on the Aspire stack via the `:4300` proxy + a direct Student JWT,
+> **9/9 scripted checks green, zero functional drift** (browser walkthrough #10 is the user's step). My-sessions
+> list/DESC/thumbnail-resolves; progress **derived** from the gate decrement (Play → `videosWatched` 0→1, `progressPercent`
+> 0→100, `Completed`); per-video `lockState` proven across **Playable / QuizLocked / Expired / Exhausted / NotReady** +
+> `gateState` Open/QuizRequired/Expired; the full **gate reason ladder** (`not_ready` 409, `not_enrolled` /
+> `enrollment_expired` / `quiz_required` / `no_views_remaining` 403) with `AccessRemaining` decrement + a
+> `VideoPlaybackStarted`/`Student` audit row; material signed-URL **200 + resolves + not-audited**, **404** when
+> refunded/foreign; the 404 IDOR + tenant boundary; 401/403/200 auth; per-caller scoping. NOT committed; run log in
+> `IMPLEMENTATION-PLAN-student-s3-wiring.md`. *(Backend had 2 compile blockers fixed pre-run; 3 minor §D.2 detail-string
+> copy nits are 5C-gate-owned, rendered verbatim — non-blocking.)* Two new student reads
+> (`GET /api/me/sessions`, `GET /api/me/sessions/{id}`) + one material signed-URL read; the **Phase-5C video gate is
+> reused as-is** (the browser calls only `POST /api/me/videos/{id}/playback` then deep-links the handoff — redeem/key
+> stay the native app's). See `docs/contracts/student-s3-my-sessions-video.md` +
+> `docs/IMPLEMENTATION-PLAN-student-s3-{backend,frontend,wiring}.md`.
+
 **Goal:** the enrolled-content hub, including the Play handoff. (Largest slice.)
 - **Backend:** **new** `GET /api/me/sessions` (enrolled list + progress + expiry countdown) and `GET /api/me/sessions/{id}` (video playlist with per-video remaining access + lock state, materials with student-gated signed-URL reads, assignment/quiz status, prerequisite + quiz-gate status). Video gate/redeem/key **exist**.
 - **Frontend:** `feature-sessions` — **My Sessions** (`spotlight` layout only: summary counts, "jump back in" hero, divided list, expiry chips — prototype § MY SESSIONS: SPOTLIGHT) + **Session detail** (hero band with circular progress, mascot-forward gate banner, video playlist with lock/access badges + Play, materials, assignment/quiz entry cards — § SESSION DETAIL). **Play flow (deep-link only):** `POST /api/me/videos/{id}/playback` → on success open `salah-bahazad://stream?...&handoff=<code>` to hand off to the native/desktop app (which authenticates, calls redeem + key, and plays with OS black-out + watermark); if the app isn't installed, show an **install prompt** (store/download links). **No in-browser HLS player is built** (§8.4); surface the six gate `reason`s as readable failures and show lock/access/expiry on the playlist.
@@ -207,12 +223,41 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 - **Reqs:** FR-STU-SES-001..004, FR-STU-VID-001..005, FR-PLAT-VID-001..007, FR-PLAT-ENR-003.
 - **Exit:** My Sessions shows real progress + expiry; Play fires the gate (decrement + audit) and deep-links to the app, or shows an install prompt when the app is absent; expired/exhausted/locked/quiz-required states show the right reason; assignments stay reachable after expiry. (No in-browser playback — proven via the gate + deep-link, not a browser player.)
 
-### S4 — Assignments (frontend-only)
+### S4 — Assignments (runner + answer-key review)
+> **Status: ✅ MET (2026-06-22)** — backend (the one new review read) + frontend (`feature-assessment` runner +
+> answer-key review) built; **wiring proven live on the Aspire stack, 9/9 scripted checks green, ZERO drift** (the 10th,
+> the browser walkthrough, is the user's visual step, as S0 #9 / S1 #7 / S2 #9 / S3 #10). Verified: engine load with
+> **no `isCorrect`**; **answer-through → auto-grade on the last answer** (`System` actor → `Status Completed` +
+> `attendance.AssignmentScore` + the S3 card flip, re-answer `409`); behaviour events + accrued `TimeSpentSeconds`
+> (`Answered` rejected); the new **`GET /api/me/assignments/{id}/review`** → answer key + score (`percent =
+> round(100·marks/max)`, per-option & per-question `isCorrect`, `selectedOptionId` echoed); **`403 assignment_in_progress`**
+> on an in-progress assignment; **`404`** IDOR/unknown; **401/403/200** auth; the **`isCorrect` split** (runner hides /
+> review exposes) live; review **not audited**; cross-tenant covered by `MyAssignmentReviewApiTests`. Seeded two
+> rich-LaTeX sessions for the browser step. See `docs/IMPLEMENTATION-PLAN-student-s4-{backend,frontend,wiring}.md` +
+> `docs/contracts/student-s4-assignments.md`. **NOT committed.**
+>
+> **Grounding correction (planning):** §S4 originally read *"Backend: none."* That was an oversight — the
+> student `StudentAssignmentDto` **deliberately hides `isCorrect`** and the only correctness-exposing endpoint is the
+> **staff** `GET /api/review/assignments/{enrollmentId}` (`AttendanceRead`-gated), so **`FR-STU-ASG-007`** ("review their
+> answers vs. correct answers") had **no** student path. S4 adds **one** new read —
+> **`GET /api/me/assignments/{assignmentId}/review`** (`RequireStudent`, gated to the caller's own `Completed` assignment,
+> the only student surface that exposes `isCorrect`) — so the slice is the standard **3-stream** split (backend +
+> frontend + wiring), exactly like S1's lone anonymous grades read in an otherwise frontend-led slice. The three solving
+> routes (`/api/me/assignments`, Phase 5B-1) are **reused as-is**.
+
 **Goal:** do and review homework.
-- **Backend:** **none** — `/api/me/assignments` exists.
-- **Frontend:** `feature-assessment` — runner (save-&-exit, accumulated resumable timer, progress, one-question-at-a-time MCQ with LaTeX/image render, per-question video hint, prev/next, auto-submit on last) + review (your vs correct answers + score) (prototype § ASSIGNMENT RUNNER).
-- **Reqs:** FR-STU-ASG-001..007, FR-PLAT-ASG-002/003/004/006/007.
-- **Exit:** answers persist incrementally; time accumulates across visits; completing auto-grades and writes attendance; review renders.
+- **Backend (one small addition — user-confirmed 2026-06-21):** **new** `GET /api/me/assignments/{assignmentId}/review`
+  (`RequireStudent`) → `StudentAssignmentReviewDto` (per-question/-option `isCorrect` + score), gated to the caller's own
+  **`Completed`** assignment (`403 assignment_in_progress` otherwise, `404` IDOR). The three solving routes
+  (`/api/me/assignments` — load/answer/events) **exist** (5B-1) and are reused. **No migration.**
+- **Frontend:** **new** `feature-assessment` lib — runner (save-as-you-go, accumulated resumable timer, progress, one-
+  question-at-a-time MCQ with LaTeX/image render, per-question hint, prev/next, **auto-submit on the last answer** — no
+  inline results screen) + **answer-key review** (your vs correct answers + score) (prototype § ASSIGNMENT RUNNER — the
+  review screen is **new**; the prototype has none). Replaces S3's dead-end Assignment CTA.
+- **Contract:** `docs/contracts/student-s4-assignments.md`.
+- **Reqs:** FR-STU-ASG-001..007, FR-PLAT-ASG-002/003/004/006/007/008.
+- **Exit:** answers persist incrementally; time accumulates across visits; completing auto-grades and writes attendance;
+  the answer-key review renders (your vs correct + score) for the caller's own **completed** assignment.
 
 ### S5 — Quizzes (proctored)
 **Goal:** the single-sitting quiz with the live server timer.
@@ -251,4 +296,4 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 ---
 
 ### Per-phase docs to produce (as each phase starts, mirroring the admin plan)
-`docs/contracts/student-s{1,2,3,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. S4 and S5 reuse the existing engine contracts (`phase5b1-assignments-attendance.md`, `phase5b2-quizzes.md`, `phase5c-video-gate.md`) and need only `-frontend` (+ `-wiring`) streams.
+`docs/contracts/student-s{1,2,3,4,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. **S4** reuses the 5B-1 engine (`phase5b1-assignments-attendance.md`) but adds **one** new student review read, so it has its **own** contract (`student-s4-assignments.md`) + all **three** streams. **S5** reuses the existing engine contracts (`phase5b2-quizzes.md`, `phase5c-video-gate.md`) and needs only `-frontend` (+ `-wiring`) streams.

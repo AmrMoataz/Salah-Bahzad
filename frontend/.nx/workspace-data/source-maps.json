@@ -1419,6 +1419,80 @@
       "nx/target-defaults"
     ]
   },
+  "libs/student-portal/feature-assessment": {
+    "root": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:feature": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/student-portal/feature-assessment/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
   "libs/student-portal/feature-auth": {
     "root": [
       "libs/student-portal/feature-auth/project.json",
@@ -1552,6 +1626,80 @@
     ],
     "targets.test.options.jestConfig": [
       "libs/student-portal/feature-catalogue/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "libs/student-portal/feature-sessions": {
+    "root": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:feature": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/student-portal/feature-sessions/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/student-portal/feature-sessions/project.json",
       "nx/core/project-json"
     ],
     "targets.test.cache": [

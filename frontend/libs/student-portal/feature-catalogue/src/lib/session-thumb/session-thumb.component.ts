@@ -235,10 +235,9 @@ const SUBJECT_ACCENTS = ['blue', 'green', 'purple', 'orange', 'mint', 'pink', 'm
       color: var(--sb-success-fg); background: var(--sb-success-bg); border-color: var(--sb-success-border);
     }
     .thumb__prereq {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
-      align-self: flex-start;
       font-size: var(--sb-label-md-size);
       font-weight: 700;
       color: var(--sb-warning-fg);

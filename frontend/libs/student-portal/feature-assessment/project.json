@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "student-portal-feature-assessment",
+  "projectType": "library",
+  "sourceRoot": "libs/student-portal/feature-assessment/src",
+  "prefix": "sb",
+  "tags": ["scope:student-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/student-portal/feature-assessment"],
+      "options": {
+        "jestConfig": "libs/student-portal/feature-assessment/jest.config.ts"
+      }
+    }
+  }
+}

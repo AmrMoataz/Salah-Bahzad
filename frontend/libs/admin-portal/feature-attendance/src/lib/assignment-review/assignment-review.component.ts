@@ -87,8 +87,12 @@ type ReviewTab = 'assignment' | 'quiz' | 'behaviour';
           </div>
           <div class="rv__stats">
             <div class="rv__stat">
-              <div class="rv__stat-value rv__stat-value--score">{{ r.correctCount }}/{{ r.questionCount }}</div>
+              <div class="rv__stat-value rv__stat-value--score">{{ r.scoreMarks }}/{{ r.maxMarks }}</div>
               <div class="rv__stat-label">Score</div>
+            </div>
+            <div class="rv__stat">
+              <div class="rv__stat-value">{{ r.correctCount }}/{{ r.questionCount }}</div>
+              <div class="rv__stat-label">Questions</div>
             </div>
             <div class="rv__stat">
               <div class="rv__stat-value">{{ time(r.timeSpentSeconds) }}</div>

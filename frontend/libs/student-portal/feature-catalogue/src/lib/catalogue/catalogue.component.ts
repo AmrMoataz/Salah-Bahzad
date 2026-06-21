@@ -157,7 +157,8 @@ interface SpecChip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
       align-self: flex-start;
       width: fit-content;
       max-width: 100%;
@@ -166,11 +167,15 @@ interface SpecChip {
       border-radius: var(--sb-radius-pill);
       box-shadow: var(--sb-shadow-sm);
       padding: 5px 8px 5px 12px;
+      scrollbar-width: none;            /* hide the scrollbar; the row scrolls on overflow (mobile/tablet) */
+      -webkit-overflow-scrolling: touch;
     }
+    .cat__filters::-webkit-scrollbar { display: none; }
     .cat__filters-label {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      flex-shrink: 0;
       color: var(--sb-text-subtle);
       font-weight: 700;
       font-size: var(--sb-body-sm-size);
@@ -179,6 +184,8 @@ interface SpecChip {
     .cat__chip {
       min-height: 34px;
       padding: 0 16px;
+      flex-shrink: 0;
+      white-space: nowrap;
       border: none;
       border-radius: var(--sb-radius-pill);
       background: transparent;
@@ -316,8 +323,8 @@ export class CatalogueComponent {
   }
 
   /**
-   * Route to the session detail (S3). That route doesn't exist yet, so the app's wildcard lands the
-   * student back on home until S3 ships — a soft placeholder, no broken build (plan F4/F5).
+   * Route to the S3 session detail (`/sessions/:id`). A **route string, not an import** — the catalogue
+   * never depends on `feature-sessions`, keeping the module boundary intact (S3 plan F8).
    */
   openSessionById(sessionId: string): void {
     this.closeModal();

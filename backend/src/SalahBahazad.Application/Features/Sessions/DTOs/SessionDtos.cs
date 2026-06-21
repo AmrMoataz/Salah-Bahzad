@@ -4,6 +4,8 @@ using SessionVideoEntity = SalahBahazad.Domain.Entities.SessionVideo;
 using SessionMaterialEntity = SalahBahazad.Domain.Entities.SessionMaterial;
 using QuizSettingEntity = SalahBahazad.Domain.Entities.QuizSetting;
 using AuditEntryEntity = SalahBahazad.Domain.Entities.AuditEntry;
+using UserAssignmentEntity = SalahBahazad.Domain.Entities.UserAssignment;
+using UserQuizEntity = SalahBahazad.Domain.Entities.UserQuiz;
 
 namespace SalahBahazad.Application.Features.Sessions.DTOs;
 
@@ -122,6 +124,143 @@ public sealed record SessionActivityDto(
 /// <summary>A short-lived signed URL for an on-demand asset download (a session material).</summary>
 public sealed record SignedUrlDto(string Url, DateTimeOffset ExpiresAtUtc);
 
+// ── Student portal · My sessions (S3, contract §A/§B/§E) ─────────────────────────────────────────
+
+/// <summary>The <c>?state=</c> filter chip for the My-Sessions list (student S3, contract §A.1). The frontend
+/// filters the loaded set client-side; the param exists for completeness and is honoured server-side. Parsed
+/// leniently by the endpoint — an unrecognised value means "no filter".</summary>
+public enum MySessionState
+{
+    NotStarted,
+    InProgress,
+    Completed,
+    ExpiringSoon,
+    Expired,
+}
+
+/// <summary>The caller's <b>completion</b> state for an enrolled session (contract §A.2/§E.2) — independent of
+/// expiry, so the UI can pair e.g. <c>Completed</c> with an "Expired" chip. <c>Completed</c> iff every video has
+/// a spent view; <c>NotStarted</c> iff none does; else <c>InProgress</c>.</summary>
+public enum MySessionCompletionState
+{
+    NotStarted,
+    InProgress,
+    Completed,
+}
+
+/// <summary>One playlist video's lock badge (contract §E.3), computed in the same order the 5C gate authorises so
+/// the badge <b>predicts</b> the Play result; the gate stays authoritative on Play.</summary>
+public enum MyVideoLockState
+{
+    Playable,
+    QuizLocked,
+    Expired,
+    Exhausted,
+    NotReady,
+}
+
+/// <summary>The session's gate-banner state (contract §E.4): <c>Expired</c> if past expiry; else
+/// <c>QuizRequired</c> if a gating quiz is unpassed; else <c>Open</c>.</summary>
+public enum MySessionGateState
+{
+    Open,
+    QuizRequired,
+    Expired,
+}
+
+/// <summary>A My-Sessions list row (student S3, contract §A.2): the caller's enrolled session with derived
+/// progress + expiry + completion state. <c>isExpired</c> is derived from <c>ExpiresAtUtc</c> vs now (the writer
+/// never flips <c>EnrollmentStatus</c>); <c>thumbnailUrl</c> is a short-lived signed R2 URL (null when none).</summary>
+public sealed record MySessionDto(
+    Guid Id,
+    Guid EnrollmentId,
+    string Title,
+    string? GradeName,
+    string? SubjectName,
+    string? SpecializationName,
+    string? ThumbnailUrl,
+    int VideoCount,
+    int VideosWatched,
+    int ProgressPercent,
+    DateTimeOffset EnrolledAtUtc,
+    DateTimeOffset? ExpiresAtUtc,
+    bool IsExpired,
+    MySessionCompletionState State);
+
+/// <summary>One playlist row for the session-detail view (contract §B.1). <c>lengthSeconds</c> is 0 until the
+/// video is <c>Ready</c> (ffprobe-computed); <c>accessAllowed</c>/<c>accessRemaining</c> are the caller's own
+/// per-video budget; <c>lockState</c> mirrors the 5C gate order (§E.3).</summary>
+public sealed record MySessionVideoDto(
+    Guid Id,
+    string Title,
+    int Order,
+    int LengthSeconds,
+    VideoProcessingStatus ProcessingStatus,
+    int AccessAllowed,
+    int AccessRemaining,
+    MyVideoLockState LockState);
+
+/// <summary>A session-detail material row (contract §B.1): names only — the bytes are fetched via the signed-URL
+/// read (§C). <c>kind</c> is the upper-case extension label.</summary>
+public sealed record MySessionMaterialDto(
+    Guid Id,
+    string FileName,
+    string Kind,
+    long SizeBytes);
+
+/// <summary>The caller's assignment entry status for a session (contract §B.1) — reachable even when the session
+/// is expired (FR-STU-SES-001). Score/correct are null until <c>Completed</c>.</summary>
+public sealed record MyAssignmentStatusDto(
+    Guid UserAssignmentId,
+    AssignmentStatus Status,
+    int? ScoreMarks,
+    int MaxMarks,
+    int? CorrectCount,
+    int QuestionCount,
+    DateTimeOffset? CompletedAtUtc);
+
+/// <summary>The caller's gating-quiz entry status for a session (contract §B.1) — null in the parent when the
+/// session is not quiz-gated. <c>attemptCount</c> is the total attempts allowed.</summary>
+public sealed record MyQuizStatusDto(
+    Guid UserQuizId,
+    bool Passed,
+    int? BestPercent,
+    int MinPassPercent,
+    int AttemptsUsed,
+    int AttemptCount,
+    int TimeLimitMinutes,
+    int QuestionCount);
+
+/// <summary>The full study view for one enrolled session (student S3, contract §B.1): header, progress, gate
+/// banner, the ordered video playlist with per-video lock state, materials (names only), and the assignment +
+/// quiz entry status.</summary>
+public sealed record MySessionDetailDto(
+    Guid Id,
+    string Title,
+    string? Description,
+    Guid GradeId,
+    string? GradeName,
+    Guid SubjectId,
+    string? SubjectName,
+    Guid SpecializationId,
+    string? SpecializationName,
+    string? ThumbnailUrl,
+    Guid EnrollmentId,
+    DateTimeOffset EnrolledAtUtc,
+    DateTimeOffset? ExpiresAtUtc,
+    bool IsExpired,
+    int VideoCount,
+    int VideosWatched,
+    int ProgressPercent,
+    MySessionGateState GateState,
+    bool HasGatingQuiz,
+    bool QuizPassed,
+    int MinPassPercent,
+    IReadOnlyList<MySessionVideoDto> Videos,
+    IReadOnlyList<MySessionMaterialDto> Materials,
+    MyAssignmentStatusDto? Assignment,
+    MyQuizStatusDto? Quiz);
+
 /// <summary>Manual entity → DTO mappings (no AutoMapper, per backend/CLAUDE.md).</summary>
 public static class SessionMappings
 {
@@ -220,6 +359,99 @@ public static class SessionMappings
         prerequisiteSatisfied,
         enrollmentState,
         enrolledExpiresAtUtc);
+
+    // ── Student portal · My sessions (S3) ────────────────────────────────────────────────────────
+
+    public static MySessionDto ToMyDto(
+        this SessionEntity s,
+        Guid enrollmentId,
+        string? gradeName,
+        string? subjectName,
+        string? specializationName,
+        string? thumbnailUrl,
+        int videoCount,
+        int videosWatched,
+        int progressPercent,
+        DateTimeOffset enrolledAtUtc,
+        DateTimeOffset? expiresAtUtc,
+        bool isExpired,
+        MySessionCompletionState state) => new(
+        s.Id,
+        enrollmentId,
+        s.Title,
+        gradeName,
+        subjectName,
+        specializationName,
+        thumbnailUrl,
+        videoCount,
+        videosWatched,
+        progressPercent,
+        enrolledAtUtc,
+        expiresAtUtc,
+        isExpired,
+        state);
+
+    public static MySessionVideoDto ToMyVideoDto(
+        this SessionVideoEntity v, int accessAllowed, int accessRemaining, MyVideoLockState lockState) => new(
+        v.Id, v.Title, v.Order, v.LengthSeconds, v.ProcessingStatus, accessAllowed, accessRemaining, lockState);
+
+    public static MySessionMaterialDto ToMyMaterialDto(this SessionMaterialEntity m) => new(
+        m.Id, m.FileName, MaterialKind(m.FileName, m.ContentType), m.SizeBytes);
+
+    public static MyAssignmentStatusDto ToMyStatusDto(this UserAssignmentEntity a) => new(
+        a.Id, a.Status, a.ScoreMarks, a.MaxMarks, a.CorrectCount, a.QuestionCount, a.CompletedAtUtc);
+
+    public static MyQuizStatusDto ToMyStatusDto(this UserQuizEntity q) => new(
+        q.Id, q.Passed, q.BestPercent, q.MinPassPercent, q.AttemptsUsed, q.AttemptCount, q.TimeLimitMinutes,
+        q.QuestionCount);
+
+    public static MySessionDetailDto ToMyDetailDto(
+        this SessionEntity s,
+        string? gradeName,
+        Guid subjectId,
+        string? subjectName,
+        string? specializationName,
+        string? thumbnailUrl,
+        Guid enrollmentId,
+        DateTimeOffset enrolledAtUtc,
+        DateTimeOffset? expiresAtUtc,
+        bool isExpired,
+        int videoCount,
+        int videosWatched,
+        int progressPercent,
+        MySessionGateState gateState,
+        bool hasGatingQuiz,
+        bool quizPassed,
+        int minPassPercent,
+        IReadOnlyList<MySessionVideoDto> videos,
+        IReadOnlyList<MySessionMaterialDto> materials,
+        MyAssignmentStatusDto? assignment,
+        MyQuizStatusDto? quiz) => new(
+        s.Id,
+        s.Title,
+        s.Description,
+        s.GradeId,
+        gradeName,
+        subjectId,
+        subjectName,
+        s.SpecializationId,
+        specializationName,
+        thumbnailUrl,
+        enrollmentId,
+        enrolledAtUtc,
+        expiresAtUtc,
+        isExpired,
+        videoCount,
+        videosWatched,
+        progressPercent,
+        gateState,
+        hasGatingQuiz,
+        quizPassed,
+        minPassPercent,
+        videos,
+        materials,
+        assignment,
+        quiz);
 
     /// <summary>Upper-case file-kind label for the UI, from the file extension (PDF/PNG/CSV/JPG…).</summary>
     private static string MaterialKind(string fileName, string contentType)

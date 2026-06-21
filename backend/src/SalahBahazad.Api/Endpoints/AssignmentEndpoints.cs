@@ -5,6 +5,7 @@ using SalahBahazad.Application.Features.Assignments.Commands.AnswerQuestion;
 using SalahBahazad.Application.Features.Assignments.Commands.RecordAssessmentEvents;
 using SalahBahazad.Application.Features.Assignments.DTOs;
 using SalahBahazad.Application.Features.Assignments.Queries.GetMyAssignment;
+using SalahBahazad.Application.Features.Assignments.Queries.GetMyAssignmentReview;
 using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Api.Endpoints;
@@ -47,11 +48,24 @@ internal sealed class AssignmentEndpoints : IEndpointGroup
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status403Forbidden)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+
+        // The ONLY student surface exposing correctness, gated to the caller's own Completed assignment (§B).
+        group.MapGet("/{assignmentId:guid}/review", GetReviewAsync)
+            .RequireStudent()
+            .WithName("GetMyAssignmentReview")
+            .WithSummary("The caller's own completed assignment with the answer key and score")
+            .Produces<StudentAssignmentReviewDto>()
+            .Produces<ProblemDetails>(StatusCodes.Status403Forbidden)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetBySessionAsync(
         Guid sessionId, ISender sender, CancellationToken cancellationToken)
         => Results.Ok(await sender.Send(new GetMyAssignmentQuery(sessionId), cancellationToken));
+
+    private static async Task<IResult> GetReviewAsync(
+        Guid assignmentId, ISender sender, CancellationToken cancellationToken)
+        => Results.Ok(await sender.Send(new GetMyAssignmentReviewQuery(assignmentId), cancellationToken));
 
     private static async Task<IResult> AnswerAsync(
         Guid assignmentId,

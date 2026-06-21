@@ -41,6 +41,30 @@ export const appRoutes: Routes = [
           import('@sb/student-portal/feature-catalogue').then((m) => m.CatalogueComponent),
       },
       {
+        // S3 — the My Sessions hub (spotlight layout).
+        path: 'sessions',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-sessions').then((m) => m.MySessionsComponent),
+      },
+      {
+        // S3 — the session-detail study screen + deep-link Play (the `:id` is bound via input binding).
+        path: 'sessions/:id',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-sessions').then((m) => m.SessionDetailComponent),
+      },
+      {
+        // S4 — the open-book Assignment runner (reached from the S3 detail card; `:id` via input binding).
+        path: 'sessions/:id/assignment',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-assessment').then((m) => m.AssignmentRunnerComponent),
+      },
+      {
+        // S4 — the answer-key review (`Completed` only; `:id` via input binding).
+        path: 'sessions/:id/assignment/review',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-assessment').then((m) => m.AssignmentReviewComponent),
+      },
+      {
         // The shell's Redeem FAB target: the catalogue with the enroll modal auto-opened (blank).
         // Routed (not imported) so the shell never depends on feature-catalogue (module boundary).
         path: 'redeem',

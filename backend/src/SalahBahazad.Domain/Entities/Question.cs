@@ -42,7 +42,8 @@ public sealed class Question : TenantEntityBase, ISoftDeletable
         bool isValidForQuiz,
         string? hintUrl,
         IReadOnlyList<QuestionOptionDraft> optionDrafts,
-        string? imageObjectKey = null)
+        string? imageObjectKey = null,
+        Guid? id = null)
     {
         if (sessionId == Guid.Empty)
             throw new ArgumentException("A question must belong to a session.", nameof(sessionId));
@@ -51,8 +52,12 @@ public sealed class Question : TenantEntityBase, ISoftDeletable
         // The image (if any) is uploaded to storage *before* this call so its key is set atomically here.
         QuestionRules.RequireBody(bodyLatex, imageObjectKey);
 
+        // An optional caller-supplied id lets the handler name the image's storage key after the question id
+        // *before* construction (so the key can be uploaded first, satisfying RequireBody for an image-only
+        // question); otherwise the UUIDv7 field default applies.
         var question = new Question
         {
+            Id = id ?? Guid.CreateVersion7(),
             SessionId = sessionId,
             BodyLatex = QuestionRules.Normalize(bodyLatex),
             ImageObjectKey = QuestionRules.Normalize(imageObjectKey),

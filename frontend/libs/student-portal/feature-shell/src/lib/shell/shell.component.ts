@@ -25,19 +25,20 @@ const ICON = {
   profile: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>'),
 };
 
-// S0 gates everything but Home off (the placeholder home). Catalogue / My Sessions / Profile are
-// rendered disabled ("Soon") so the chrome matches the prototype; their phases flip `disabled` off.
+// S0 gates everything but Home off (the placeholder home). Catalogue + My Sessions are live (S2/S3);
+// Profile stays disabled ("Soon") until S6. Phases flip each item's `disabled` off as they land.
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
   { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
-  { label: 'My Sessions', route: '/sessions', icon: ICON.sessions, disabled: true },
+  { label: 'My Sessions', route: '/sessions', icon: ICON.sessions },
   { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
 ];
 
-// The mobile bottom-nav: two items, the centre Redeem FAB, then one item.
+// The mobile bottom-nav: two items, the centre Redeem FAB, then two items.
 const BOTTOM_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
   { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
+  { label: 'Sessions', route: '/sessions', icon: ICON.sessions },
   { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
 ];
 

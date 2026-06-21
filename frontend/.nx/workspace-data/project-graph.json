@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "student-portal-feature-assessment": {
+      "name": "student-portal-feature-assessment",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-assessment",
+        "name": "student-portal-feature-assessment",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-assessment/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-assessment"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-assessment/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "student-portal-feature-catalogue": {
       "name": "student-portal-feature-catalogue",
       "type": "lib",
@@ -58,6 +94,42 @@
             ],
             "options": {
               "jestConfig": "libs/admin-portal/feature-attendance/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "student-portal-feature-sessions": {
+      "name": "student-portal-feature-sessions",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-sessions",
+        "name": "student-portal-feature-sessions",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-sessions/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-sessions"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-sessions/jest.config.ts"
             },
             "configurations": {},
             "parallelism": true,
@@ -16133,6 +16205,43 @@
     }
   },
   "dependencies": {
+    "student-portal-feature-assessment": [
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-assessment",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "student-portal-feature-catalogue": [
       {
         "source": "student-portal-feature-catalogue",
@@ -16218,6 +16327,43 @@
       },
       {
         "source": "admin-portal-feature-attendance",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
+    "student-portal-feature-sessions": [
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-sessions",
         "target": "npm:jest-preset-angular",
         "type": "static"
       }
@@ -16662,17 +16808,17 @@
       },
       {
         "source": "student-portal-data-access",
-        "target": "npm:@angular/router",
-        "type": "static"
-      },
-      {
-        "source": "student-portal-data-access",
         "target": "npm:@angular/common",
         "type": "static"
       },
       {
         "source": "student-portal-data-access",
         "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:@angular/router",
         "type": "static"
       },
       {
@@ -16784,6 +16930,16 @@
       {
         "source": "student-portal",
         "target": "student-portal-feature-catalogue",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-sessions",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-assessment",
         "type": "dynamic"
       },
       {
@@ -39147,5 +39303,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1782055457563
+  "computedAt": 1782079411792
 }
