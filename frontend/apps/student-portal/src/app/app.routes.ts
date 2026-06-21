@@ -29,16 +29,24 @@ export const appRoutes: Routes = [
       import('@sb/student-portal/feature-shell').then((m) => m.ShellComponent),
     children: [
       {
-        // S0 placeholder home (the catalogue/sessions/profile children land in S2/S3/S6).
+        // S0 placeholder home (the sessions/profile children land in S3/S6).
         path: '',
         loadComponent: () =>
           import('./placeholders/home-placeholder.component').then((m) => m.HomePlaceholderComponent),
       },
       {
-        // S0 placeholder for the Redeem FAB target (the enroll modal is S2).
-        path: 'redeem',
+        // S2 — the catalogue discovery screen + enroll-by-code modal.
+        path: 'catalogue',
         loadComponent: () =>
-          import('./placeholders/redeem-placeholder.component').then((m) => m.RedeemPlaceholderComponent),
+          import('@sb/student-portal/feature-catalogue').then((m) => m.CatalogueComponent),
+      },
+      {
+        // The shell's Redeem FAB target: the catalogue with the enroll modal auto-opened (blank).
+        // Routed (not imported) so the shell never depends on feature-catalogue (module boundary).
+        path: 'redeem',
+        data: { openRedeem: true },
+        loadComponent: () =>
+          import('@sb/student-portal/feature-catalogue').then((m) => m.CatalogueComponent),
       },
     ],
   },

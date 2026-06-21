@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   computed,
@@ -9,6 +10,7 @@ import {
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectOption } from '../select/select.component';
@@ -29,6 +31,7 @@ import { SelectOption } from '../select/select.component';
   ],
   template: `
     <div
+      #field
       class="sb-combo__field"
       [class.sb-combo__field--open]="open()"
       [class.sb-combo__field--invalid]="invalid()"
@@ -74,7 +77,13 @@ import { SelectOption } from '../select/select.component';
     </div>
 
     @if (open()) {
-      <ul class="sb-combo__menu" role="listbox">
+      <ul
+        class="sb-combo__menu"
+        role="listbox"
+        [style.top.px]="menuPos()?.top"
+        [style.left.px]="menuPos()?.left"
+        [style.width.px]="menuPos()?.width"
+      >
         @if (filtered().length === 0) {
           <li class="sb-combo__empty">{{ emptyText() }}</li>
         }
@@ -171,10 +180,7 @@ import { SelectOption } from '../select/select.component';
     .sb-combo__chevron--open { transform: rotate(180deg); }
 
     .sb-combo__menu {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
+      position: fixed;
       z-index: var(--sb-z-dropdown);
       margin: 0;
       padding: var(--sb-space-1);
@@ -211,6 +217,7 @@ import { SelectOption } from '../select/select.component';
 })
 export class ComboboxComponent implements ControlValueAccessor {
   readonly #host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly fieldRef = viewChild<ElementRef<HTMLElement>>('field');
 
   readonly options = input<SelectOption[]>([]);
   readonly placeholder = input('Type to search…');
@@ -224,6 +231,33 @@ export class ComboboxComponent implements ControlValueAccessor {
   protected readonly value = signal<string | null>(null);
   protected readonly active = signal(0);
   protected readonly isDisabled = signal(false);
+
+  /**
+   * Viewport coordinates for the (fixed-position) menu. Fixed positioning lets the menu escape any
+   * ancestor `overflow: hidden` (e.g. cards) and sticky/transform stacking contexts that would
+   * otherwise clip it or paint it behind sibling cards. Kept in sync while open (open/type/scroll/resize).
+   */
+  protected readonly menuPos = signal<{ top: number; left: number; width: number } | null>(null);
+
+  constructor() {
+    // Capture phase so scrolls inside any ancestor scroll container (not just the window) reposition.
+    const sync = (): void => {
+      if (this.open()) this.#reposition();
+    };
+    window.addEventListener('scroll', sync, true);
+    window.addEventListener('resize', sync);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('scroll', sync, true);
+      window.removeEventListener('resize', sync);
+    });
+  }
+
+  #reposition(): void {
+    const field = this.fieldRef()?.nativeElement;
+    if (!field) return;
+    const r = field.getBoundingClientRect();
+    this.menuPos.set({ top: r.bottom + 6, left: r.left, width: r.width });
+  }
 
   protected readonly selected = computed(() => {
     const current = this.value();
@@ -262,12 +296,14 @@ export class ComboboxComponent implements ControlValueAccessor {
   // ── Interaction ─────────────────────────────────────────────────
   onFocus(): void {
     if (this.isDisabled()) return;
+    this.#reposition();
     this.open.set(true);
     this.active.set(0);
   }
 
   onInput(event: Event): void {
     this.query.set((event.target as HTMLInputElement).value);
+    this.#reposition();
     this.open.set(true);
     this.active.set(0);
   }
@@ -293,6 +329,7 @@ export class ComboboxComponent implements ControlValueAccessor {
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
+        if (!this.open()) this.#reposition();
         this.open.set(true);
         this.active.update((i) => Math.min(options.length - 1, i + 1));
         break;

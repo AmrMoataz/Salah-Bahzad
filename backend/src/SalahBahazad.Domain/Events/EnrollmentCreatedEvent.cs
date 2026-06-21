@@ -9,9 +9,9 @@ namespace SalahBahazad.Domain.Events;
 /// prerequisite-quiz snapshot generation (FR-PLAT-ASG-001, FR-PLAT-QZ-001).
 /// </summary>
 public sealed record EnrollmentCreatedEvent(
-    Guid EnrollmentId, Guid StudentId, Guid SessionId, EnrollmentMethod Method) : IAuditableDomainEvent
+    Guid EnrollmentId, Guid StudentId, Guid SessionId, EnrollmentMethod Method, string SessionName, string studentName) : IAuditableDomainEvent
 {
     public DateTimeOffset OccurredAtUtc { get; } = DateTimeOffset.UtcNow;
     public string AuditAction => "EnrollmentCreated";
-    public string AuditSummary => $"Enrollment created via {Method}.";
+    public string AuditSummary => $"Enrollment to {SessionName} created for {studentName} via {Method}.";
 }

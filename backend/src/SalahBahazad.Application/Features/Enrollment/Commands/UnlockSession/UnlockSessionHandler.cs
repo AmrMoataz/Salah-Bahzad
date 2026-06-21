@@ -31,7 +31,7 @@ internal sealed class UnlockSessionHandler(
             throw new ConflictException("Only an active student can be granted access to a session.");
 
         var enrollment = await EnrollmentWorkflow.EnrollOrExtendAsync(
-            db, currentUser.TenantId, session, command.StudentId,
+            db, currentUser.TenantId, session, command.StudentId, student.FullName,
             EnrollmentMethod.Unlock, codeId: null, amount: 0m, clock.GetUtcNow(), cancellationToken);
 
         await db.SaveChangesAsync(cancellationToken);

@@ -12,6 +12,14 @@ export type {
   StudentAuthState,
 } from './lib/auth/student-auth.models';
 
+export { CatalogueService } from './lib/catalogue/catalogue.service';
+export type {
+  EnrollmentState,
+  CatalogueSession,
+  CatalogueFilters,
+  Enrollment,
+} from './lib/catalogue/catalogue.models';
+
 export { RegistrationService, registrationConfig } from './lib/registration/registration.service';
 export {
   ID_IMAGE_MAX_BYTES,

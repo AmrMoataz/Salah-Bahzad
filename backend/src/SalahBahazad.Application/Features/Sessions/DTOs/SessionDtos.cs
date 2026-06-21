@@ -20,6 +20,40 @@ public sealed record SessionListDto(
     int VideoCount,
     int EnrolledCount);
 
+/// <summary>The caller's own state for a catalogue session (student S2, contract §C.1). <c>Expired</c> is
+/// <b>derived</b> from <c>ExpiresAtUtc</c> vs now — the writer never flips <c>EnrollmentStatus</c> to Expired.</summary>
+public enum CatalogueEnrollmentState
+{
+    NotEnrolled,
+    Enrolled,
+    Expired,
+    Refunded,
+}
+
+/// <summary>A published-catalogue card for the student portal (FR-STU-CAT-001/002/004, contract §A.2). Shaped to
+/// the prototype's <c>SessionThumb</c>: display fields + a prerequisite badge/flag + the caller's own enrollment
+/// state. <c>subjectId</c>/<c>subjectName</c> are derived via the specialization; <c>thumbnailUrl</c> is a
+/// short-lived signed R2 URL (null when no thumbnail).</summary>
+public sealed record CatalogueSessionDto(
+    Guid Id,
+    string Title,
+    string? Description,
+    decimal Price,
+    string? ThumbnailUrl,
+    Guid GradeId,
+    string? GradeName,
+    Guid SubjectId,
+    string? SubjectName,
+    Guid SpecializationId,
+    string? SpecializationName,
+    int VideoCount,
+    int ValidityDays,
+    Guid? PrerequisiteSessionId,
+    string? PrerequisiteTitle,
+    bool PrerequisiteSatisfied,
+    CatalogueEnrollmentState EnrollmentState,
+    DateTimeOffset? EnrolledExpiresAtUtc);
+
 /// <summary>An ordered video within a session (FR-PLAT-SES-002). <c>lengthSeconds</c> is computed by the transcode pipeline.</summary>
 public sealed record SessionVideoDto(
     Guid Id,
@@ -155,6 +189,37 @@ public static class SessionMappings
         enrolledCount,
         s.CreatedAtUtc,
         s.UpdatedAtUtc);
+
+    public static CatalogueSessionDto ToCatalogueDto(
+        this SessionEntity s,
+        string? gradeName,
+        Guid subjectId,
+        string? subjectName,
+        string? specializationName,
+        int videoCount,
+        string? thumbnailUrl,
+        string? prerequisiteTitle,
+        bool prerequisiteSatisfied,
+        CatalogueEnrollmentState enrollmentState,
+        DateTimeOffset? enrolledExpiresAtUtc) => new(
+        s.Id,
+        s.Title,
+        s.Description,
+        s.Price,
+        thumbnailUrl,
+        s.GradeId,
+        gradeName,
+        subjectId,
+        subjectName,
+        s.SpecializationId,
+        specializationName,
+        videoCount,
+        s.ValidityDays,
+        s.PrerequisiteSessionId,
+        prerequisiteTitle,
+        prerequisiteSatisfied,
+        enrollmentState,
+        enrolledExpiresAtUtc);
 
     /// <summary>Upper-case file-kind label for the UI, from the file extension (PDF/PNG/CSV/JPG…).</summary>
     private static string MaterialKind(string fileName, string contentType)

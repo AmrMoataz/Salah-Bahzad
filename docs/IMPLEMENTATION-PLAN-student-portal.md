@@ -172,6 +172,26 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 - **Exit:** a new account is created `Pending` with ID image in private R2 + terms recorded + a registration `AuditEntry`; the student cannot sign in until approved; rejection reason renders.
 
 ### S2 — Catalogue & enrollment
+> **Status: ✅ MET (2026-06-21)** — backend (the one new `GET /api/me/catalogue`) + frontend (`feature-catalogue` +
+> enroll modal) built; **wiring proven live on the Aspire stack — all 8 scripted checks green, ZERO contract drift**
+> (the 9th, the browser catalogue walkthrough, is the user's visual step, as S0 #9 / S1 #7 — and was in fact partly
+> exercised live: the user ran a concurrent admin-mint→student-redeem→card-flip in the browser mid-run). Verified:
+> published-only + the exact `CatalogueSessionDto` shape + DESC-by-`CreatedAtUtc` + a thumbnail **signed-URL that
+> resolves** (`200 image/png`) + empty-tenant `[]`; the four filters narrow (spec/grade/subject/search, case-insensitive,
+> AND-combined); `enrollmentState` NotEnrolled→Enrolled(+expiry)→**Expired (DERIVED via past `ExpiresAtUtc`, `Status`
+> left `Active`)**→Refunded; `prerequisiteSatisfied` false→true around completing the prereq assignment (vacuous-true
+> when the prereq has no questions); **tenant isolation both directions** (seeded a self-contained tenant B); per-caller
+> IDOR (one session reads three different states across three students) + `401` anon/`403` staff/`200` student; the full
+> **mint→redeem `201`+`Location`+`EnrollmentDto` → code `Used`+enrollment+2 video-access counters+payment `Completed`+
+> attendance shell+assignment(+quiz) snapshot+`CodeRedeemed`/`ActorType=Student` audit → catalogue card flips to
+> `Enrolled`** loop, including the **prereq gate end-to-end** (`409` "Complete the prerequisite assignment first." →
+> satisfy prereq → `201`); and the redeem error ladder (the **six `409` detail strings verbatim** + two `400`s). One
+> non-blocking finding (Phase-4 / cross-cutting, **not** S2): the redeem audit's `Portal` is read from an `X-Portal`
+> request header that **neither frontend sends**, so `Portal` is null for redeem (the backend honours it when present —
+> proven — and the security-relevant `ActorType=Student` is correct). The catalogue read + reused redeem engine match
+> the frozen contract field-for-field. See `IMPLEMENTATION-PLAN-student-s2-{backend,frontend,wiring}.md` +
+> `docs/contracts/student-s2-catalogue-enroll.md`.
+
 **Goal:** browse published sessions and enroll by code.
 - **Backend:** **new** `GET /api/me/catalogue` (`RequireStudent`) — published, tenant-scoped sessions; filter by grade/subject/specialization; returns price, description, prerequisite badge, and the caller's enrollment state per session. (Redeem already exists.)
 - **Frontend:** `feature-catalogue` — header + spec filter + cards grid (`SessionThumb`, Tag, prereq badge, price, enroll CTA) + mascot empty state (prototype § CATALOGUE); **enroll modal** (`CodeInput` segmented + paste → `POST /api/enrollments/redeem`, success → go to session) (§ Enroll modal). The **request-a-spot** modal (§ Request a spot modal) is **not built** (deferred, §3.3).

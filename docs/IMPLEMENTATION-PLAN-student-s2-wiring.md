@@ -116,6 +116,54 @@ a redeem).
 
 ---
 
+## ✅ MET — run log (2026-06-21)
+
+**Result: all 8 scripted checks GREEN, ZERO contract drift.** Check #9 (browser walkthrough) is the user's visual step
+— and was partly exercised live (see the concurrency note). Proven on the running Aspire stack via the **`:4300`
+student proxy**; DB verified by `docker exec` psql. Student-role + staff JWTs were **minted directly** against the dev
+`Jwt:Secret` (the sanctioned S0/phase4 technique) — the API issues `nameid`/`role` (JwtSecurityTokenHandler outbound
+map) + `tenant_id`/`token_type`/`device_id`, so the mint uses those exact short claim names; HS256, `iss=salah-bahzad-api`,
+`aud=salah-bahzad-admin`. Primary **Student A = "Amr Moataz" `019eea33`** (clean slate).
+
+**Stack note:** the AppHost recycled mid-run (Postgres `postgres-fszvhmgt`→`postgres-eduqdxgh`; MinIO renamed; the
+thumbnail signed-URL host moved across `:60896`→`:62686`), confirming the *discover-by-image every call* discipline.
+Data also shifted (Session 1 went Draft/Archived→**Published** with a 2-level prereq chain) — re-baselined and re-verified
+state before every assertion.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | Catalogue shape / published-only / DESC / thumbnail | **PASS** — 5 published sessions (the 2 `Draft` absent); `CatalogueSessionDto` keys match §A.2 exactly; DESC by `CreatedAtUtc`; names resolved (grade/subject/spec); `videoCount` correct; `thumbnailUrl` null for non-thumb, and the signed R2 URL **resolves `200 image/png`**. `price 0` (Free) + `Draft`+`Archived` exclusion proven in tenant B; **empty tenant → `[]` (200)**. |
+| 2 | Filters (§A.1) | **PASS** — `specializationId`→3 (Caluclus) / 2 (Algebra); `gradeId`→5; `subjectId` (derived via spec)→5; `search` case-insensitive substring (`095`→2, `PHASE`→1); no-match→`[]`; grade+spec AND-combo→2. |
+| 3 | `enrollmentState` (§C.1) | **PASS** — NotEnrolled → **Enrolled** (`enrolledExpiresAtUtc` set) → **Expired (DERIVED:** back-dated `ExpiresAtUtc`, `Status` left `Active(0)`, catalogue computes Expired**)** → **Refunded** (staff refund → `Status=2`). All on ST_Amr/Session 1. |
+| 4 | `prerequisiteSatisfied` (§C.2) | **PASS** — Phase3smoke (prereq=Session 1, 5 questions) read **false** w/ `prerequisiteTitle="Session 1"`; after marking ST_Amr's Session 1 assignment `Completed` → **true**. No-prereq 5C sessions → true; Session 1 (prereq=Session 2, **0 questions**) → vacuously true. Mirrors the redeem gate in #8. |
+| 5 | Tenant isolation (NFR-SEC-010) | **PASS** — seeded a self-contained **tenant B** (own taxonomy + published-free + published-paid + draft + archived). Tenant-B student sees **only** B's 2 published (incl. `price 0`); tenant-A student sees **only** A's 5. Zero leakage either way. |
+| 6 | Per-caller IDOR + auth gating | **PASS** — the **same** session (Phase3smoke) reads **NotEnrolled / Enrolled(+expiry) / Refunded** for ST_Amr / ST_Lean / ST_Test respectively (and `prerequisiteSatisfied` is per-caller too). Anon→**401**, staff JWT→**403**, student JWT→**200**. |
+| 7 | Redeem happy path → card flip | **PASS** — staff `POST /api/codes/batches` (`201`) → `POST /api/enrollments/redeem` (Student A) → **`201`** `EnrollmentDto` (`status:Active, method:Code, amount:150==price`, `expiresAtUtc=now+3d`) + `Location: /api/enrollments/{id}`. DB: code→**`Used(2)`**+`RedeemedBy/At`; one `enrollments` row (Active/Code/150); **2** `enrollment_video_access` rows (=#videos, AccessAllowed/Remaining 3); `payment_transactions` **Completed**/150; `attendance` shell; `user_assignments` snapshot (5q); `audit_entries` `CodeRedeemed`/`ActorType=Student`. Catalogue card → **Enrolled**. **Prereq gate end-to-end:** Phase3smoke redeem `409` while unmet → after satisfying → **`201`** (and that redeem generated the `user_quizzes` snapshot from the prereq; with `X-Portal: student` the audit logged `Portal=student`). |
+| 8 | Redeem error ladder (§B.3) | **PASS** — the six `409` `detail` strings **verbatim**: invalid (bogus serial), not-available (disabled code), price-mismatch (price bumped after mint, then restored), already-enrolled, prereq-unmet; plus **`400`** for empty serial and `>20`-char serial (FluentValidation). |
+| 9 | Browser catalogue @ `:4300` | **User step** — partly exercised live (concurrency note). |
+
+**Concurrency corroboration (not a bug):** mid-run, ST_Amr appeared **Enrolled in 5C-095115** from a redeem I never issued (code `SB-B97J2-DQXSP`, value `100`=price, redeemed `14:47:46`, audit `Portal` null). Traced it: the code was minted at `14:47:29` (batch `CODES-20260621-05`) by staff **`019ed951` ("Amr Moataz")** — the user's own interactive admin session, **not** my Head-Teacher token — and redeemed ~17 s later in the student browser. So the user ran a live **admin-mint → student-redeem → catalogue-flip** during the run (the documented "user clicks the live UI concurrently" pattern), which **independently corroborates the Portal finding**: a genuine browser redeem logged `Portal=null` because no frontend sends `X-Portal`. The price-mismatch test (which ran later, ~`14:51`) correctly `409`'d and wrote **no** enrollment — the engine is sound.
+
+**Finding (non-blocking, Phase-4 / cross-cutting — flag for the audit/frontend owners, not S2):** `audit_entries.Portal`
+for redeem (and other non-auth state changes) is sourced from the **`X-Portal` request header** (`AuditContextAccessor`);
+**neither the admin nor the student Angular app sends it** (`grep` of `frontend/**/*.ts` for `X-Portal` → no matches), so
+`Portal` is **null** for redeem. Only the auth-exchange handlers hard-code `Portal:"student"`. The backend plumbing is
+correct (sending `X-Portal: student` logged `Portal=student`), and `ActorType=Student`/`ActorRole=Student` — the
+security-relevant attribution — is always correct. The contract §D's "`Portal=student`" for redeem is therefore an
+**unwired UX-attribution detail on the frontend**, not a catalogue/redeem-engine defect (the redeem engine is reused
+verbatim from Phase 4). Suggested fix: have the student-portal HTTP interceptor attach `X-Portal: student` (and admin
+`X-Portal: admin`).
+
+**Gotchas worth keeping:** (1) Aspire recycled mid-run — *discover PG/MinIO by image every call*; the `:4300` proxy
+auto-rebinds, the DB volume persisted. (2) Dev DB = snake_case tables + **PascalCase quoted columns**; real names are
+`attendance` (singular) and `enrollment_video_access` (singular). (3) **derived `Expired`** never shows in
+`enrollments."Status"` — it stays `Active(0)`; the catalogue computes it from `ExpiresAtUtc` vs `now`. (4) Re-redeeming a
+code for an `Expired`/`Refunded` enrollment **extends in place** (no `409`) — so the already-enrolled `409` must be tested
+while the enrollment is `Active`. (5) ST_Amr left **Enrolled (Active) in Phase3smoke** with video-access + attendance +
+assignment + quiz — the deliberate **S3 precondition**; tenant-B fixture cleaned up; Session 1 left `Refunded`.
+
+---
+
 ## Kickoff prompt (paste into a fresh Claude session at the repo root)
 
 ```

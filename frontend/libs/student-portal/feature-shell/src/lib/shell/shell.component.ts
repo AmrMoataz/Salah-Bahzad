@@ -29,7 +29,7 @@ const ICON = {
 // rendered disabled ("Soon") so the chrome matches the prototype; their phases flip `disabled` off.
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
-  { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue, disabled: true },
+  { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
   { label: 'My Sessions', route: '/sessions', icon: ICON.sessions, disabled: true },
   { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
 ];
@@ -37,7 +37,7 @@ const NAV_ITEMS: NavItem[] = [
 // The mobile bottom-nav: two items, the centre Redeem FAB, then one item.
 const BOTTOM_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
-  { label: 'Sessions', route: '/sessions', icon: ICON.sessions, disabled: true },
+  { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
   { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
 ];
 

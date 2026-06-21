@@ -1,18 +1,18 @@
 {
   "run": {
-    "command": "nx build student-portal --skip-nx-cache",
-    "startTime": "2026-06-21T13:09:22.225Z",
-    "endTime": "2026-06-21T13:09:30.596Z",
+    "command": "nx test student-portal-feature-catalogue --skip-nx-cache",
+    "startTime": "2026-06-21T15:24:17.588Z",
+    "endTime": "2026-06-21T15:24:23.456Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "student-portal:build:production",
-      "target": "build",
-      "projectName": "student-portal",
-      "hash": "18392135828781011418",
-      "startTime": "2026-06-21T13:09:22.243Z",
-      "endTime": "2026-06-21T13:09:30.584Z",
+      "taskId": "student-portal-feature-catalogue:test",
+      "target": "test",
+      "projectName": "student-portal-feature-catalogue",
+      "hash": "8730519421633643216",
+      "startTime": "2026-06-21T15:24:17.604Z",
+      "endTime": "2026-06-21T15:24:23.454Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

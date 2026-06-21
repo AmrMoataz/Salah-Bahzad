@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "student-portal-feature-catalogue": {
+      "name": "student-portal-feature-catalogue",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-catalogue",
+        "name": "student-portal-feature-catalogue",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-catalogue/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-catalogue"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-catalogue/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-attendance": {
       "name": "admin-portal-feature-attendance",
       "type": "lib",
@@ -16097,6 +16133,48 @@
     }
   },
   "dependencies": {
+    "student-portal-feature-catalogue": [
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-catalogue",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-attendance": [
       {
         "source": "admin-portal-feature-attendance",
@@ -16701,6 +16779,11 @@
       {
         "source": "student-portal",
         "target": "student-portal-feature-shell",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-catalogue",
         "type": "dynamic"
       },
       {
@@ -39064,5 +39147,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1782047675658
+  "computedAt": 1782055457563
 }

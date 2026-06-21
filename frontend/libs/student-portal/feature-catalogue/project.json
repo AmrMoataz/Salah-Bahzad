@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "student-portal-feature-catalogue",
+  "projectType": "library",
+  "sourceRoot": "libs/student-portal/feature-catalogue/src",
+  "prefix": "sb",
+  "tags": ["scope:student-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/student-portal/feature-catalogue"],
+      "options": {
+        "jestConfig": "libs/student-portal/feature-catalogue/jest.config.ts"
+      }
+    }
+  }
+}

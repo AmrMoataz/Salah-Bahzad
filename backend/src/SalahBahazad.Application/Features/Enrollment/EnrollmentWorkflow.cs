@@ -23,7 +23,8 @@ internal static class EnrollmentWorkflow
         Guid tenantId,
         SessionEntity session,
         Guid studentId,
-        EnrollmentMethod method,
+        string studentName,
+		EnrollmentMethod method,
         Guid? codeId,
         decimal amount,
         DateTimeOffset now,
@@ -50,7 +51,7 @@ internal static class EnrollmentWorkflow
         }
         else
         {
-            enrollment = EnrollmentEntity.Create(tenantId, studentId, session, method, codeId, amount, now);
+            enrollment = EnrollmentEntity.Create(tenantId, studentId, studentName, session, method, codeId, amount, now);
             db.Enrollments.Add(enrollment);
         }
 

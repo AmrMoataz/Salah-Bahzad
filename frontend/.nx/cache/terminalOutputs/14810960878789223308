@@ -1,0 +1,421 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-catalogue [39m[27m[0m [2mlibs/student-portal/feature-catalogue/src/lib/code-input/[22m[1mcode-input.component.spec.ts[22m
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-catalogue [39m[27m[0m [2mlibs/student-portal/feature-catalogue/src/lib/enroll-modal/[22m[1menroll-modal.component.spec.ts[22m
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m student-portal-feature-catalogue [39m[27m[0m [2mlibs/student-portal/feature-catalogue/src/lib/catalogue/[22m[1mcatalogue.component.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m58[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Assignment'.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                         ~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m71[0m - [91merror[0m[90m TS2304: [0mCannot find name 'content'.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                      ~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m79[0m - [91merror[0m[90m TS2304: [0mCannot find name 'badges'.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m79[0m - [91merror[0m[90m TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m87[0m - [91merror[0m[90m TS2304: [0mCannot find name 'an'.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                                      ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m90[0m - [91merror[0m[90m TS2552: [0mCannot find name 'optional'. Did you mean 'Option'?
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                                         ~~~~~~~~[0m
+
+      [96mnode_modules/typescript/lib/lib.dom.d.ts[0m:[93m28546[0m:[93m13[0m
+        [7m28546[0m declare var Option: {
+        [7m     [0m [96m            ~~~~~~[0m
+        'Option' is declared here.
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m90[0m - [91merror[0m[90m TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                                         ~~~~~~~~[0m
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'prerequisite'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m     ~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m21[0m - [91merror[0m[90m TS2304: [0mCannot find name 'badge'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                    ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m28[0m - [91merror[0m[90m TS2304: [0mCannot find name 'the'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                           ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m32[0m - [91merror[0m[90m TS2304: [0mCannot find name 'price'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                               ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m39[0m - [91merror[0m[90m TS2362: [0mThe left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                      ~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m51[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Free'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                  ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m60[0m - [91merror[0m[90m TS2304: [0mCannot find name 'and'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                           ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m64[0m - [91merror[0m[90m TS2304: [0mCannot find name 'a'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                               ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m66[0m - [91merror[0m[90m TS2304: [0mCannot find name 'CTA'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                                 ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m70[0m - [91merror[0m[90m TS2304: [0mCannot find name 'driven'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                                     ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m77[0m - [91merror[0m[90m TS2304: [0mCannot find name 'by'.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                                            ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m24[0m:[93m4[0m - [91merror[0m[90m TS2363: [0mThe right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+    [7m24[0m  * `prerequisiteSatisfied`:
+    [7m  [0m [91m   ~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m26[0m:[93m21[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Open'.
+
+    [7m26[0m  * - `Enrolled` → **Open** (emits `open`).
+    [7m  [0m [91m                    ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m26[0m:[93m29[0m - [91merror[0m[90m TS2304: [0mCannot find name 'emits'.
+
+    [7m26[0m  * - `Enrolled` → **Open** (emits `open`).
+    [7m  [0m [91m                            ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'has'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m     ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m10[0m - [91merror[0m[90m TS2304: [0mCannot find name 'an'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m         ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m15[0m - [91merror[0m[90m TS2304: [0mCannot find name 'unmet'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m              ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m23[0m - [91merror[0m[90m TS2304: [0mCannot find name 'prerequisite'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                      ~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m38[0m - [91merror[0m[90m TS2304: [0mCannot find name 'an'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                     ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m41[0m - [91merror[0m[90m TS2304: [0mCannot find name 'amber'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                        ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m69[0m - [91merror[0m[90m TS2304: [0mCannot find name 'badge'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                    ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m77[0m - [91merror[0m[90m TS2304: [0mCannot find name 'a'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                            ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m79[0m - [91merror[0m[90m TS2304: [0mCannot find name 'dimmed'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m88[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Locked'.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                                       ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'button'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m     ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m14[0m - [91merror[0m[90m TS2304: [0mCannot find name 'disabled'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m             ~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m29[0m - [91merror[0m[90m TS2304: [0mCannot find name 'server'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                            ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m36[0m - [91merror[0m[90m TS2304: [0mCannot find name 'stays'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                   ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m42[0m - [91merror[0m[90m TS2304: [0mCannot find name 'authoritative'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                         ~~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m63[0m - [91merror[0m[90m TS2304: [0mCannot find name 'is'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                                              ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m66[0m - [91merror[0m[90m TS2304: [0mCannot find name 'UX'.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                                                 ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'prerequisite'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m     ~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m21[0m - [91merror[0m[90m TS2304: [0mCannot find name 'met'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                    ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m28[0m - [91merror[0m[90m TS2304: [0mCannot find name 'or'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                           ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m31[0m - [91merror[0m[90m TS2304: [0mCannot find name 'none'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                              ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m39[0m - [91merror[0m[90m TS2304: [0mCannot find name 'a'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                      ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m41[0m - [91merror[0m[90m TS2304: [0mCannot find name 'green'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                        ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m77[0m - [91merror[0m[90m TS2304: [0mCannot find name 'badge'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                            ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m83[0m - [91merror[0m[90m TS2304: [0mCannot find name 'when'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                  ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m88[0m - [91merror[0m[90m TS2304: [0mCannot find name 'there'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                       ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m94[0m - [91merror[0m[90m TS2304: [0mCannot find name 'is'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                             ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m97[0m - [91merror[0m[90m TS2304: [0mCannot find name 'one'.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                                ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m97[0m - [91merror[0m[90m TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                                ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'and'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m     ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m10[0m - [91merror[0m[90m TS2304: [0mCannot find name 'an'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m         ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m13[0m - [91merror[0m[90m TS2304: [0mCannot find name 'active'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m            ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m22[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Enroll'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m                     ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m31[0m - [91merror[0m[90m TS2304: [0mCannot find name 'button'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m39[0m - [91merror[0m[90m TS2304: [0mCannot find name 'emits'.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m                                      ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m31[0m:[93m3[0m - [91merror[0m[90m TS2363: [0mThe right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+    [7m31[0m  */
+    [7m  [0m [91m  ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m56[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                       ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m79[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m22[0m:[93m90[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m22[0m  * (video-count · material-count · validity), **Quiz**/**Assignment** content badges, an optional
+    [7m  [0m [91m                                                                                         ~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m4[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m   ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                               ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m49[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m57[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                        ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m64[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                               ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m66[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                                 ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m23[0m:[93m70[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m23[0m  * **prerequisite** badge, the price (`EGP n` / **Free**), and a CTA driven by `enrollmentState` +
+    [7m  [0m [91m                                                                     ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m24[0m:[93m2[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m24[0m  * `prerequisiteSatisfied`:
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m24[0m:[93m27[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m24[0m  * `prerequisiteSatisfied`:
+    [7m  [0m [91m                          ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m25[0m:[93m2[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m25[0m  *
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m26[0m:[93m2[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m26[0m  * - `Enrolled` → **Open** (emits `open`).
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m26[0m:[93m17[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+    [7m26[0m  * - `Enrolled` → **Open** (emits `open`).
+    [7m  [0m [91m                ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m26[0m:[93m19[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m26[0m  * - `Enrolled` → **Open** (emits `open`).
+    [7m  [0m [91m                  ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m2[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m10[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m         ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m36[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                   ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m38[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                     ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m41[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                        ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m69[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                    ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m27[0m:[93m79[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m27[0m  * - has an **unmet** prerequisite → an amber "Requires: *{title}*" badge + a dimmed **Locked**
+    [7m  [0m [91m                                                                              ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m2[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m29[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                            ~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m36[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                   ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m56[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                                       ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m28[0m:[93m63[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m28[0m  *   button (disabled). The server stays authoritative — this is UX (`FR-STU-CAT-002`).
+    [7m  [0m [91m                                                              ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m2[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m4[0m - [91merror[0m[90m TS17006: [0mAn unary expression with the '-' operator is not allowed in the left-hand side of an exponentiation expression. Consider enclosing the expression in parentheses.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m   ~~~~~~~~~~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m31[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                              ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m35[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                  ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m37[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                    ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m39[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                      ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m41[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                        ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m77[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                            ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m83[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                  ~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m88[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                       ~~~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m29[0m:[93m94[0m - [91merror[0m[90m TS1228: [0mA type predicate is only allowed in return type position for functions and methods.
+
+    [7m29[0m  * - prerequisite **met** (or none) → a green "Prerequisite met: *{title}*" badge when there is one,
+    [7m  [0m [91m                                                                                             ~~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m2[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m30[0m:[93m10[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m30[0m  *   and an active **Enroll** button (emits `enroll`).
+    [7m  [0m [91m         ~~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m31[0m:[93m2[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+    [7m31[0m  */
+    [7m  [0m [91m ~[0m
+    [96mlibs/student-portal/feature-catalogue/src/lib/session-thumb/session-thumb.component.ts[0m:[93m31[0m:[93m3[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+    [7m31[0m  */
+    [7m  [0m [91m  ~[0m
+
+[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m2 passed[39m[22m, 3 total
+[1mTests:       [22m[1m[32m13 passed[39m[22m, 13 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        3.807 s, estimated 4 s
+[2mRan all test suites[22m[2m.[22m

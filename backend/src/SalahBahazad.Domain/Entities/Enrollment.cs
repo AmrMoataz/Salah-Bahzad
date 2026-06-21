@@ -50,6 +50,7 @@ public sealed class Enrollment : TenantEntityBase, ISoftDeletable
     public static Enrollment Create(
         Guid tenantId,
         Guid studentId,
+        string studentName,
         Session session,
         EnrollmentMethod method,
         Guid? codeId,
@@ -76,7 +77,7 @@ public sealed class Enrollment : TenantEntityBase, ISoftDeletable
         enrollment.SetTenant(tenantId);
         enrollment.ProvisionVideoAccess(session, reset: false);
         enrollment.RecordPayment(method, amount, codeId, now);
-        enrollment.AddDomainEvent(new EnrollmentCreatedEvent(enrollment.Id, studentId, session.Id, method));
+        enrollment.AddDomainEvent(new EnrollmentCreatedEvent(enrollment.Id, studentId, session.Id, method, session.Title, studentName));
         return enrollment;
     }
 

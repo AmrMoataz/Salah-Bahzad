@@ -30,16 +30,20 @@ internal sealed class RedeemCodeHandler(
             .FirstOrDefaultAsync(s => s.Id == code.SessionId, cancellationToken)
             ?? throw new ConflictException("The session for this code is no longer available.");
 
-        // Re-check value == price at redemption so a later price change blocks stale codes (FR-PLAT-COD-003).
-        if (code.Value != session.Price)
+		var student = await db.Students
+		   .FirstOrDefaultAsync(s => s.Id == studentId, cancellationToken)
+		   ?? throw new NotFoundException("Student", studentId);
+
+		// Re-check value == price at redemption so a later price change blocks stale codes (FR-PLAT-COD-003).
+		if (code.Value != session.Price)
             throw new ConflictException("This code's value no longer matches the session price.");
 
         var now = clock.GetUtcNow();
 
         // Shared cycle of truth (also enforces the one-active-enrollment 409, FR-PLAT-ENR-006).
         var enrollment = await EnrollmentWorkflow.EnrollOrExtendAsync(
-            db, currentUser.TenantId, session, studentId,
-            EnrollmentMethod.Code, code.Id, code.Value, now, cancellationToken);
+            db, currentUser.TenantId, session, studentId, student.FullName,
+			EnrollmentMethod.Code, code.Id, code.Value, now, cancellationToken);
 
         code.MarkRedeemed(studentId, enrollment.Id, now);
 
