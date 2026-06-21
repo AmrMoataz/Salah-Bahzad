@@ -166,8 +166,8 @@ public class SessionTests
     {
         var session = NewDraft();
 
-        var v1 = session.AddVideo("Intro", 8, 3, "sessions/t/videos/a.mp4");
-        var v2 = session.AddVideo("Part 2", 12, 3, "sessions/t/videos/b.mp4");
+        var v1 = session.AddVideo("Intro", 3, "sessions/t/videos/a.mp4");
+        var v2 = session.AddVideo("Part 2", 3, "sessions/t/videos/b.mp4");
 
         session.Videos.Should().HaveCount(2);
         v1.Order.Should().Be(0);
@@ -175,13 +175,11 @@ public class SessionTests
         v1.ProcessingStatus.Should().Be(VideoProcessingStatus.Pending);
     }
 
-    [Theory]
-    [InlineData(-1, 3)]
-    [InlineData(8, -1)]
-    public void AddVideo_rejects_negative_length_or_access_count(int length, int accessCount)
+    [Fact]
+    public void AddVideo_rejects_negative_access_count()
     {
         var session = NewDraft();
-        var act = () => session.AddVideo("V", length, accessCount, "k");
+        var act = () => session.AddVideo("V", -1, "k");
         act.Should().Throw<ArgumentException>();
     }
 
@@ -189,13 +187,12 @@ public class SessionTests
     public void UpdateVideo_replacing_source_resets_to_pending()
     {
         var session = NewDraft();
-        var video = session.AddVideo("V", 8, 3, "k1");
+        var video = session.AddVideo("V", 3, "k1");
         video.MarkReady();
 
-        session.UpdateVideo(video.Id, "V2", 9, 5, "k2");
+        session.UpdateVideo(video.Id, "V2", 5, "k2");
 
         video.Title.Should().Be("V2");
-        video.LengthMinutes.Should().Be(9);
         video.AccessCount.Should().Be(5);
         video.SourceObjectKey.Should().Be("k2");
         video.ProcessingStatus.Should().Be(VideoProcessingStatus.Pending);
@@ -205,10 +202,10 @@ public class SessionTests
     public void UpdateVideo_metadata_only_keeps_status_and_source()
     {
         var session = NewDraft();
-        var video = session.AddVideo("V", 8, 3, "k1");
+        var video = session.AddVideo("V", 3, "k1");
         video.MarkReady();
 
-        session.UpdateVideo(video.Id, "V2", 9, 5, newSourceObjectKey: null);
+        session.UpdateVideo(video.Id, "V2", 5, newSourceObjectKey: null);
 
         video.SourceObjectKey.Should().Be("k1");
         video.ProcessingStatus.Should().Be(VideoProcessingStatus.Ready);
@@ -218,9 +215,9 @@ public class SessionTests
     public void ReorderVideos_reassigns_order()
     {
         var session = NewDraft();
-        var a = session.AddVideo("a", 1, 1, "ka");
-        var b = session.AddVideo("b", 1, 1, "kb");
-        var c = session.AddVideo("c", 1, 1, "kc");
+        var a = session.AddVideo("a", 1, "ka");
+        var b = session.AddVideo("b", 1, "kb");
+        var c = session.AddVideo("c", 1, "kc");
 
         session.ReorderVideos([c.Id, a.Id, b.Id]);
 
@@ -233,8 +230,8 @@ public class SessionTests
     public void ReorderVideos_rejects_mismatched_set()
     {
         var session = NewDraft();
-        var a = session.AddVideo("a", 1, 1, "ka");
-        session.AddVideo("b", 1, 1, "kb");
+        var a = session.AddVideo("a", 1, "ka");
+        session.AddVideo("b", 1, "kb");
 
         var act = () => session.ReorderVideos([a.Id]); // missing one
         act.Should().Throw<InvalidOperationException>();

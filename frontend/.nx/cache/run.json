@@ -1,18 +1,18 @@
 {
   "run": {
-    "command": "nx build admin-portal --skip-nx-cache",
-    "startTime": "2026-06-20T19:50:08.569Z",
-    "endTime": "2026-06-20T19:50:47.946Z",
+    "command": "nx test admin-portal-feature-students",
+    "startTime": "2026-06-21T08:09:28.688Z",
+    "endTime": "2026-06-21T08:09:50.423Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "admin-portal:build:production",
-      "target": "build",
-      "projectName": "admin-portal",
-      "hash": "4817328164972304435",
-      "startTime": "2026-06-20T19:50:08.587Z",
-      "endTime": "2026-06-20T19:50:47.919Z",
+      "taskId": "admin-portal-feature-students:test",
+      "target": "test",
+      "projectName": "admin-portal-feature-students",
+      "hash": "4395329514249665213",
+      "startTime": "2026-06-21T08:09:28.704Z",
+      "endTime": "2026-06-21T08:09:50.413Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0

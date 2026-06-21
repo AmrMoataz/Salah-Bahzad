@@ -111,6 +111,10 @@ Desktop is already covered by your existing desktop app. Until the **mobile** ap
 4. **Watermark:** painted by the app player with the student's serial/phone (`FR-PLAT-VID-004`).
 5. **Assets:** images/docs in R2 (public vs private-signed) per §6.
 
+> **Implementation detail:** for the *mechanics* of the transcode + streaming pipeline (the ffmpeg commands, the AES-128
+> key-info file, the storage layout, and the gate → handoff → redeem → key flow), see
+> [`hls-transcoding-and-streaming.md`](hls-transcoding-and-streaming.md).
+
 ---
 
 ➡️ Next: [06 — Database & event-sourcing assessment](06-database-and-event-sourcing-assessment.md) · [08 — App functional requirements](08-functional-app.md) · [09 — App non-functional requirements](09-non-functional-app.md)

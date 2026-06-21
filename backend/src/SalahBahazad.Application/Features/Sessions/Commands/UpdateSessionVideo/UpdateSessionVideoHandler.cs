@@ -44,7 +44,7 @@ internal sealed class UpdateSessionVideoHandler(
                 ?? throw new NotFoundException("Session", command.SessionId);
 
             var video = session.UpdateVideo(
-                command.VideoId, command.Title, command.LengthMinutes, command.AccessCount, newObjectKey);
+                command.VideoId, command.Title, command.AccessCount, newObjectKey);
             await db.SaveChangesAsync(cancellationToken);
 
             await auditWriter.WriteAsync(

@@ -41,7 +41,7 @@ public sealed class AttendanceReviewApiTests(SalahBahazadApiFactory factory)
         row.StudentName.Should().Be(student.FullName);
         row.AssignmentPercent.Should().Be(100);
         row.VideosTotal.Should().Be(2);          // seeded video count
-        row.VideosWatched.Should().Be(0);        // 5C
+        row.VideosWatched.Should().Be(0);        // no videos played in this test
         row.BestQuizPercent.Should().BeNull();   // 5B-2
         row.QuizAttemptCount.Should().Be(0);     // 5B-2
 

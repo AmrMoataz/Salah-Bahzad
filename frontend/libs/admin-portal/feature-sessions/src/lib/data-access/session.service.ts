@@ -193,15 +193,13 @@ export class SessionService {
     id: string,
     file: File,
     title: string,
-    lengthMinutes: number,
     accessCount: number,
     onProgress?: (percent: number) => void,
   ): Promise<SessionVideoDto> {
     // Metadata first, file LAST: the backend streams the source straight to R2 with a MultipartReader
-    // and needs the title/length/access fields before it reaches the (multi-GB) file part.
+    // and needs the title/access fields before it reaches the (multi-GB) file part.
     const form = new FormData();
     form.append('title', title);
-    form.append('lengthMinutes', String(lengthMinutes));
     form.append('accessCount', String(accessCount));
     form.append('file', file);
     const req = new HttpRequest('POST', `${this.#api()}/api/sessions/${id}/videos`, form, {
@@ -218,18 +216,16 @@ export class SessionService {
     );
   }
 
-  /** Edit video metadata (title / length / access) and optionally replace the source (contract §2.13). */
+  /** Edit video metadata (title / access) and optionally replace the source (contract §2.13). */
   updateVideo(
     id: string,
     videoId: string,
     title: string,
-    lengthMinutes: number,
     accessCount: number,
     file?: File,
   ): Promise<SessionVideoDto> {
     const form = new FormData();
     form.append('title', title);
-    form.append('lengthMinutes', String(lengthMinutes));
     form.append('accessCount', String(accessCount));
     if (file) form.append('file', file);
     return firstValueFrom(

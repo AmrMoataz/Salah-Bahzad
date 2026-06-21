@@ -16,7 +16,6 @@ public sealed record UpdateSessionVideoCommand(
     Guid SessionId,
     Guid VideoId,
     string Title,
-    int LengthMinutes,
     int AccessCount,
     Stream? Content,
     string? ContentType,

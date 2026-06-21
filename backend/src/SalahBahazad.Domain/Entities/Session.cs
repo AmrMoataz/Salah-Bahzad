@@ -159,20 +159,21 @@ public sealed class Session : TenantEntityBase, ISoftDeletable
     }
 
     // ── Videos (FR-PLAT-SES-002, FR-ADM-SES-003) ───────────────────────────────
-    public SessionVideo AddVideo(string title, int lengthMinutes, int accessCount, string sourceObjectKey)
+    public SessionVideo AddVideo(string title, int accessCount, string sourceObjectKey)
     {
         var nextOrder = _videos.Count == 0 ? 0 : _videos.Max(v => v.Order) + 1;
-        var video = SessionVideo.Create(Id, title, nextOrder, lengthMinutes, accessCount, sourceObjectKey);
+        var video = SessionVideo.Create(Id, title, nextOrder, accessCount, sourceObjectKey);
         _videos.Add(video);
         return video;
     }
 
-    /// <summary>Edits a video's metadata and, when a new source is uploaded, replaces it (re-transcodes).</summary>
+    /// <summary>Edits a video's metadata and, when a new source is uploaded, replaces it (re-transcodes).
+    /// The run length is computed by the transcode pipeline, not edited here.</summary>
     public SessionVideo UpdateVideo(
-        Guid videoId, string title, int lengthMinutes, int accessCount, string? newSourceObjectKey)
+        Guid videoId, string title, int accessCount, string? newSourceObjectKey)
     {
         var video = FindVideo(videoId);
-        video.UpdateMetadata(title, lengthMinutes, accessCount);
+        video.UpdateMetadata(title, accessCount);
         if (!string.IsNullOrWhiteSpace(newSourceObjectKey))
             video.ReplaceSource(newSourceObjectKey);
         return video;

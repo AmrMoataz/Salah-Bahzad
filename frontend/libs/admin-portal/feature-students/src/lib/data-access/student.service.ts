@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import {
   GradeRef,
   PagedResult,
+  StudentAttendanceProgress,
   StudentAuditEntry,
   StudentDetail,
   StudentEnrollmentDto,
@@ -125,6 +126,20 @@ export class StudentService {
     return firstValueFrom(
       this.#http.get<PagedResult<StudentEnrollmentDto>>(
         `${this.#apiUrl()}/api/students/${id}/enrollments`,
+        { params },
+      ),
+    );
+  }
+
+  /**
+   * A student's per-session attendance progress (videos watched + best quiz %) for the detail's
+   * "Enrollments & attendance" card (FR-ADM-ATT-002). The server enforces `AttendanceRead`.
+   */
+  listAttendance(id: string, page = 1, pageSize = 50): Promise<PagedResult<StudentAttendanceProgress>> {
+    const params = new HttpParams().set('page', String(page)).set('pageSize', String(pageSize));
+    return firstValueFrom(
+      this.#http.get<PagedResult<StudentAttendanceProgress>>(
+        `${this.#apiUrl()}/api/attendance/students/${id}`,
         { params },
       ),
     );

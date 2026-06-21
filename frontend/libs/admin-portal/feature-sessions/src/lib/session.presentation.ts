@@ -30,6 +30,15 @@ export function videoStatusPill(status: VideoProcessingStatus): PillVariant {
   }
 }
 
+/** Video length as MM:SS once transcoded; a status hint while it is still processing (FR-PLAT-VID-003). */
+export function videoLength(video: { lengthSeconds: number; processingStatus: VideoProcessingStatus }): string {
+  if (video.processingStatus !== 'Ready') return 'Processing…';
+  const total = Math.max(0, Math.round(video.lengthSeconds));
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
 /**
  * Stable subject-accent key for a string (specialization id/name) — matches the prototype's
  * `specAccent`: the icon tiles and tags stay a consistent colour per specialization.

@@ -46,6 +46,7 @@ import {
   money,
   statusPill,
   subjectAccent,
+  videoLength,
   videoStatusPill,
 } from '../session.presentation';
 
@@ -213,7 +214,7 @@ type DetailTab = 'overview' | 'videos' | 'materials' | 'bank' | 'enrolled' | 'ac
             <sb-table [columns]="videoColumns" [rows]="s.videos" [rowKey]="videoKey">
               <ng-template sbTableCell="order" let-v>{{ v.order + 1 }}</ng-template>
               <ng-template sbTableCell="title" let-v><span class="sd__strong">{{ v.title }}</span></ng-template>
-              <ng-template sbTableCell="length" let-v>{{ v.lengthMinutes }} min</ng-template>
+              <ng-template sbTableCell="length" let-v>{{ vLength(v) }}</ng-template>
               <ng-template sbTableCell="status" let-v>
                 <sb-status-pill [variant]="vPill(v.processingStatus)">{{ v.processingStatus }}</sb-status-pill>
               </ng-template>
@@ -890,6 +891,7 @@ export class SessionDetailComponent {
   // Presentation helpers
   pillFor = statusPill;
   vPill = videoStatusPill;
+  vLength = videoLength;
   price = money;
   size = fileSize;
   at = dateTime;

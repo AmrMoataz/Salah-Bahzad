@@ -34,12 +34,15 @@ internal static class AttendanceProjector
 
         var attendanceByStudent = (await db.Attendances
                 .Where(a => a.SessionId == sessionId && studentIds.Contains(a.StudentId))
-                .Select(a => new { a.StudentId, a.AssignmentScore, a.VideosWatched })
+                .Select(a => new { a.StudentId, a.AssignmentScore })
                 .ToListAsync(cancellationToken))
             .ToDictionary(a => a.StudentId);
 
         // Quiz best-of + attempt count, joined per enrollment (5B-2; null/0 when no quiz gates the session).
         var quizByEnrollment = await QuizByEnrollmentAsync(db, enrollmentIds, cancellationToken);
+
+        // Videos watched, derived from the per-video access counters the 5C playback gate decrements.
+        var watchedByEnrollment = await WatchedByEnrollmentAsync(db, enrollmentIds, cancellationToken);
 
         return [.. enrollments.Select(e =>
         {
@@ -49,7 +52,7 @@ internal static class AttendanceProjector
                 EnrollmentId: e.Id,
                 StudentId: e.StudentId,
                 StudentName: studentNames.GetValueOrDefault(e.StudentId),
-                VideosWatched: att?.VideosWatched ?? 0,
+                VideosWatched: watchedByEnrollment.GetValueOrDefault(e.Id),
                 VideosTotal: videosTotal,
                 AssignmentPercent: att?.AssignmentScore,
                 BestQuizPercent: quiz?.BestPercent,
@@ -84,12 +87,15 @@ internal static class AttendanceProjector
 
         var attendanceBySession = (await db.Attendances
                 .Where(a => a.StudentId == studentId && sessionIds.Contains(a.SessionId))
-                .Select(a => new { a.SessionId, a.AssignmentScore, a.VideosWatched })
+                .Select(a => new { a.SessionId, a.AssignmentScore })
                 .ToListAsync(cancellationToken))
             .ToDictionary(a => a.SessionId);
 
         // Quiz best-of + attempt count, joined per enrollment (5B-2; null/0 when no quiz gates the session).
         var quizByEnrollment = await QuizByEnrollmentAsync(db, enrollmentIds, cancellationToken);
+
+        // Videos watched, derived from the per-video access counters the 5C playback gate decrements.
+        var watchedByEnrollment = await WatchedByEnrollmentAsync(db, enrollmentIds, cancellationToken);
 
         return [.. enrollments.Select(e =>
         {
@@ -99,7 +105,7 @@ internal static class AttendanceProjector
                 EnrollmentId: e.Id,
                 SessionId: e.SessionId,
                 SessionTitle: sessionTitles.GetValueOrDefault(e.SessionId),
-                VideosWatched: att?.VideosWatched ?? 0,
+                VideosWatched: watchedByEnrollment.GetValueOrDefault(e.Id),
                 VideosTotal: videoTotals.GetValueOrDefault(e.SessionId),
                 AssignmentPercent: att?.AssignmentScore,
                 BestQuizPercent: quiz?.BestPercent,
@@ -117,6 +123,17 @@ internal static class AttendanceProjector
                 .Select(q => new { q.EnrollmentId, q.BestPercent, q.AttemptsUsed })
                 .ToListAsync(cancellationToken))
             .ToDictionary(q => q.EnrollmentId, q => new QuizMetrics(q.BestPercent, q.AttemptsUsed));
+
+    /// <summary>Distinct videos watched per enrollment — the count of per-video access counters with a spent
+    /// view (<c>AccessRemaining &lt; AccessAllowed</c>), decremented by the 5C playback gate (FR-PLAT-ATT-001/002,
+    /// FR-PLAT-VID-002). Keyed by enrollment id; resets naturally on re-enroll (counters reset to full).</summary>
+    private static async Task<Dictionary<Guid, int>> WatchedByEnrollmentAsync(
+        IAppDbContext db, IReadOnlyList<Guid> enrollmentIds, CancellationToken cancellationToken)
+        => await db.Enrollments
+            .AsNoTracking()
+            .Where(e => enrollmentIds.Contains(e.Id))
+            .Select(e => new { e.Id, Watched = e.VideoAccesses.Count(a => a.AccessRemaining < a.AccessAllowed) })
+            .ToDictionaryAsync(x => x.Id, x => x.Watched, cancellationToken);
 
     private sealed record QuizMetrics(int? BestPercent, int AttemptsUsed);
 }

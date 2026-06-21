@@ -45,13 +45,13 @@ export interface SessionListDto {
   enrolledCount: number;
 }
 
-/** An ordered session video with its admin-entered length + per-enrollment access cap (FR-PLAT-SES-002). */
+/** An ordered session video with its transcode-computed length + per-enrollment access cap (FR-PLAT-SES-002). */
 export interface SessionVideoDto {
   id: string;
   title: string;
   order: number;
-  /** Admin-entered running time in minutes (no transcode-derived duration until Phase 5). */
-  lengthMinutes: number;
+  /** Running time in seconds — computed by the transcode pipeline (ffprobe); 0 until Ready. */
+  lengthSeconds: number;
   accessCount: number;
   processingStatus: VideoProcessingStatus;
   createdAtUtc: string;

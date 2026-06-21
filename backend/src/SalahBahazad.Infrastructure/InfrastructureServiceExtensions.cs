@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SalahBahazad.Application.Common;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Infrastructure.Persistence;
 using SalahBahazad.Infrastructure.Persistence.Interceptors;
@@ -51,8 +52,21 @@ public static class InfrastructureServiceExtensions
         // Explicit audit writer for read-access / anonymous entries the interceptor cannot capture.
         services.AddScoped<IAuditWriter, AuditWriter>();
 
-        // Video transcode seam — stubbed in Phase 3 (marks Ready); Hangfire + HLS is Phase 5.
-        services.AddScoped<IVideoProcessingQueue, StubVideoProcessingQueue>();
+        // Video transcode + secure-playback seams (Phase 5C, FR-PLAT-VID-*). The real Hangfire + ffmpeg HLS
+        // pipeline (VideoTranscodeJob) replaces the Phase-3 stub; the handoff store backs the one-time codes.
+        services.AddScoped<IVideoProcessingQueue, HangfireVideoProcessingQueue>();
+        services.AddScoped<Jobs.VideoTranscodeJob>();
+        services.AddSingleton<IMediaTranscoder, FfmpegMediaTranscoder>();
+        services.AddSingleton<IPlaybackHandoffStore, RedisPlaybackHandoffStore>();
+
+        // ffmpeg + playback TTL options (env-bound, NFR-SEC-002).
+        var transcodeOptions = configuration.GetSection(TranscodeOptions.SectionName).Get<TranscodeOptions>()
+            ?? new TranscodeOptions();
+        services.AddSingleton(transcodeOptions);
+
+        var playbackOptions = configuration.GetSection(PlaybackOptions.SectionName).Get<PlaybackOptions>()
+            ?? new PlaybackOptions();
+        services.AddSingleton(playbackOptions);
 
         // Enrollment side-effect seam — Phase 5B-1 makes this real: snapshots the question bank into a
         // per-student assignment on enrol/extend (idempotent). Prerequisite-quiz snapshot is still 5B-2

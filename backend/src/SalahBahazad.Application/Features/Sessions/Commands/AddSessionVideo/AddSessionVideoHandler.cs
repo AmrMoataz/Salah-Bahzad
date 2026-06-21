@@ -37,7 +37,7 @@ internal sealed class AddSessionVideoHandler(
                 .FirstOrDefaultAsync(s => s.Id == command.SessionId, cancellationToken)
                 ?? throw new NotFoundException("Session", command.SessionId);
 
-            var video = session.AddVideo(command.Title, command.LengthMinutes, command.AccessCount, objectKey);
+            var video = session.AddVideo(command.Title, command.AccessCount, objectKey);
             await db.SaveChangesAsync(cancellationToken);
 
             // Session-keyed semantic entry so this shows in the session Activity feed (FR-PLAT-SES-009);

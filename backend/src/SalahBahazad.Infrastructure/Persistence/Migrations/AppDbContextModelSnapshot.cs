@@ -4181,11 +4181,15 @@ namespace SalahBahazad.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HlsKeyObjectKey")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
                     b.Property<string>("HlsManifestKey")
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
 
-                    b.Property<int>("LengthMinutes")
+                    b.Property<int>("LengthSeconds")
                         .HasColumnType("integer");
 
                     b.Property<int>("Order")

@@ -18,7 +18,7 @@ public sealed record SessionVideoResponse(
     Guid Id,
     string Title,
     int Order,
-    int LengthMinutes,
+    int LengthSeconds,
     int AccessCount,
     string ProcessingStatus,
     DateTimeOffset CreatedAtUtc);

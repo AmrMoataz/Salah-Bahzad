@@ -38,6 +38,13 @@ var minio = builder.AddContainer("minio", "minio/minio", "latest")
     .WithHttpEndpoint(targetPort: 9001, name: "console")
     .WithVolume("minio-data", "/data");
 
+// ── Transcode (ffmpeg) ───────────────────────────────────────────────────────
+// The API shells out to ffmpeg for HLS transcoding (FR-PLAT-VID-003). Resolve an ABSOLUTE path here and inject
+// it, so the API works regardless of its own (possibly stale) PATH — a freshly installed ffmpeg is picked up
+// without restarting the whole shell. Discovered from PATH or the common winget/choco install locations; when
+// not found we inject nothing and the API falls back to "ffmpeg" on PATH.
+var ffmpegPath = ResolveFfmpeg();
+
 // ── Backend API ────────────────────────────────────────────────────────────
 // Propagate the AppHost's environment (Development / Staging) down to the API
 // so it loads the correct appsettings.{Environment}.json.
@@ -55,6 +62,9 @@ var api = builder.AddProject<Projects.SalahBahazad_Api>("api")
     .WithEnvironment("R2__BucketPrivate", "sb-dev-private")
     .WaitFor(minio);
 
+if (ffmpegPath is not null)
+    api.WithEnvironment("Transcode__FfmpegPath", ffmpegPath);
+
 // ── Admin Portal (Angular / Nx) ────────────────────────────────────────────
 // Aspire injects services__api__http__0 (and https variant); proxy.conf.js
 // reads that variable so the Angular dev-server proxies /api to the live API.
@@ -65,3 +75,25 @@ builder.AddNpmApp("admin-portal", "../../../frontend", "start")
     .ExcludeFromManifest();
 
 builder.Build().Run();
+
+// Finds an absolute ffmpeg path from PATH or the common winget/choco install locations, so the API gets a
+// path that resolves even if its own process PATH predates the ffmpeg install. Returns null when not found.
+static string? ResolveFfmpeg()
+{
+    var exe = OperatingSystem.IsWindows() ? "ffmpeg.exe" : "ffmpeg";
+    var candidates = new List<string>();
+
+    foreach (var dir in (Environment.GetEnvironmentVariable("PATH") ?? string.Empty)
+        .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        try { candidates.Add(Path.Combine(dir, exe)); }
+        catch { /* a malformed PATH entry — skip it */ }
+    }
+
+    var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    if (!string.IsNullOrEmpty(localAppData))
+        candidates.Add(Path.Combine(localAppData, "Microsoft", "WinGet", "Links", exe));
+    candidates.Add(@"C:\ProgramData\chocolatey\bin\ffmpeg.exe");
+
+    return candidates.FirstOrDefault(File.Exists);
+}

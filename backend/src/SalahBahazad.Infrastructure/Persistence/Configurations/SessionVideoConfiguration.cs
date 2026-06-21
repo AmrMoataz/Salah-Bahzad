@@ -21,12 +21,13 @@ internal sealed class SessionVideoConfiguration : IEntityTypeConfiguration<Sessi
         builder.Property(v => v.SessionId).IsRequired();
         builder.Property(v => v.Title).HasMaxLength(200).IsRequired();
         builder.Property(v => v.Order).IsRequired();
-        builder.Property(v => v.LengthMinutes).IsRequired();
+        builder.Property(v => v.LengthSeconds).IsRequired();
         builder.Property(v => v.AccessCount).IsRequired();
 
         // R2 keys only (FR-PLAT-VID-007).
         builder.Property(v => v.SourceObjectKey).HasMaxLength(512).IsRequired();
         builder.Property(v => v.HlsManifestKey).HasMaxLength(512);
+        builder.Property(v => v.HlsKeyObjectKey).HasMaxLength(512);
 
         builder.Property(v => v.ProcessingStatus).IsRequired();
 

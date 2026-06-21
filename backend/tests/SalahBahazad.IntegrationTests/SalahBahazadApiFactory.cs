@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using SalahBahazad.Application.Common;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
@@ -98,6 +99,14 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
             services.AddScoped<IEnrollmentSideEffects>(sp =>
                 new RecordingEnrollmentSideEffects(
                     sp.GetRequiredService<RealEnrollmentSideEffects>(), EnrollmentSideEffects));
+
+            // Video transcode (Phase 5C): fake ffmpeg (no binary in CI) and run the job inline so a video is
+            // Ready synchronously — matching the Phase-3 stub timing the content tests rely on. Real ffmpeg +
+            // Hangfire are proven in live wiring + the opt-in real-ffmpeg test.
+            services.RemoveAll<IMediaTranscoder>();
+            services.AddSingleton<IMediaTranscoder, FakeMediaTranscoder>();
+            services.RemoveAll<IVideoProcessingQueue>();
+            services.AddScoped<IVideoProcessingQueue, InlineVideoProcessingQueue>();
         });
     }
 
@@ -347,7 +356,7 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
             tenantId, $"Session {Guid.NewGuid():N}", "Seeded session", price, validityDays, gradeId, specializationId);
 
         for (var i = 0; i < videoCount; i++)
-            session.AddVideo($"Lesson {i + 1}", 10, accessPerVideo, $"sessions/{tenantId}/videos/{Guid.NewGuid():N}.mp4");
+            session.AddVideo($"Lesson {i + 1}", accessPerVideo, $"sessions/{tenantId}/videos/{Guid.NewGuid():N}.mp4");
 
         if (status == SessionStatus.Published)
             session.Publish();
@@ -355,6 +364,34 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         db.Sessions.Add(session);
         await db.SaveChangesAsync();
         return session;
+    }
+
+    /// <summary>
+    /// Marks a seeded (Pending) video Ready and uploads a tiny encrypted-HLS set (manifest + one segment + the
+    /// 16-byte key) to MinIO under the video's HLS prefix — so the playback gate, redeem (signed segment URL),
+    /// and key endpoint resolve against real storage without going through the upload/transcode flow.
+    /// </summary>
+    public async Task SeedReadyHlsAsync(Guid videoId)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var storage = scope.ServiceProvider.GetRequiredService<IFileStorage>();
+
+        var video = await db.SessionVideos.FirstAsync(v => v.Id == videoId);
+        var prefix = HlsConventions.HlsPrefix(video.SourceObjectKey, videoId);
+        var manifestKey = HlsConventions.ManifestKey(prefix);
+        var keyObjectKey = HlsConventions.KeyObjectKey(prefix);
+        var segmentKey = HlsConventions.SegmentKey(manifestKey, "seg_000.ts");
+
+        await storage.UploadPrivateAsync(
+            manifestKey,
+            new MemoryStream(Encoding.UTF8.GetBytes(FakeMediaTranscoder.BuildManifest())),
+            "application/vnd.apple.mpegurl");
+        await storage.UploadPrivateAsync(segmentKey, new MemoryStream([1, 2, 3, 4, 5, 6, 7, 8]), "video/mp2t");
+        await storage.UploadPrivateAsync(keyObjectKey, new MemoryStream(FakeMediaTranscoder.Key), "application/octet-stream");
+
+        video.MarkReady(manifestKey, keyObjectKey);
+        await db.SaveChangesAsync();
     }
 
     public async Task<Question> SeedQuestionAsync(

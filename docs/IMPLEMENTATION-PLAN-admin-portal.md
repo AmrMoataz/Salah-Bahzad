@@ -214,6 +214,30 @@ Each phase: Goal · Backend · Frontend (Angular) · key requirement IDs · Exit
   - **5C — Secure video gate** (`FR-PLAT-VID-001..007`): server access gate + per-video counter decrement + audited
     playback + short-lived signed HLS URL + one-time handoff code. Backend-only in this engagement; needs R2/MinIO +
     HLS infra wired in Aspire. No admin player screen (student-portal/native-app surface).
+    **Planned (2026-06-21, docs only — chosen next step):** the final sub-phase; closes the admin-portal plan's backend
+    scope. **Decision (user-confirmed): full real transcode** — ffmpeg produces **AES-128-encrypted HLS** (not a
+    passthrough), shelled out from the existing in-API Hangfire worker (**ffmpeg is the only new prerequisite**; MinIO/R2,
+    Redis, and Hangfire are already wired from 5B-2, so **no AppHost infra add**). Three `RequireStudent` REST routes —
+    the gate (authorize→decrement→audit→**one-time handoff code**, with six specific failure `reason`s), redeem
+    (one-time code → per-redeem signed-segment manifest), and the gated AES-128 **key endpoint** — replacing the Phase-3
+    `StubVideoProcessingQueue`. Reads 5B-2's `UserQuiz.Passed` and spends Phase-4's `EnrollmentVideoAccess.AccessRemaining`.
+    **One gated migration** (`session_videos.hls_key_object_key`); handoff codes are Redis-only; the DB still stores keys
+    only. **Deferred to the student/native engagement:** `FR-PLAT-VID-004` watermark (player) and the OS black-out half
+    of `005` (native). Backend-only ⇒ **no frontend stream**: a frozen contract + **backend + wiring** streams —
+    `docs/contracts/phase5c-video-gate.md` (3 endpoints) + `IMPLEMENTATION-PLAN-phase5c-{backend,wiring}.md`.
+    **Met (2026-06-21):** built (186 unit + 129 integration green, only the pre-existing QuestionBank image test
+    fails) and proven end-to-end on the running Aspire stack with **real ffmpeg** — **22/22** live checks, **ZERO
+    drift**. Real ffmpeg transcodes the uploaded source to AES-128 HLS (`Ready`, `hls_key_object_key` persisted, key
+    object in MinIO); the gate issues a one-time handoff + decrements the per-video budget + audits
+    `VideoPlaybackStarted` as **Student**; redeem returns a per-playback manifest whose signed segment URL fetches
+    from MinIO (200) and whose `#EXT-X-KEY` URI is the gated key endpoint; the key endpoint serves the 16-byte key
+    without decrementing; one-time-code reuse → 410; all six reasons (`not_ready`/`not_enrolled`/`enrollment_expired`/
+    `quiz_required`/`no_views_remaining`/`handoff_expired`); default-deny (anon→401, staff→403) and tenant isolation
+    (cross-tenant→404) hold. **Infra:** the AppHost now resolves ffmpeg's absolute path and injects
+    `Transcode__FfmpegPath` so the API runs it regardless of its own PATH. Full log in
+    `IMPLEMENTATION-PLAN-phase5c-wiring.md`. **This closes the admin-portal plan's backend scope (Phases 0–5).** The
+    only remaining `FR-PLAT-VID` items are `004` (player watermark) + the OS black-out half of `005` — both the
+    student/native engagement.
 
 ### Cross-cutting (every phase)
 Business-rule tests as features land — enrollment, grading, quiz scoring/forfeit, code lifecycle, tenant isolation (`NFR-MAINT-001`); OpenAPI kept current; responsive phone/tablet/desktop (`NFR-COMPAT-002`); WCAG 2.1 AA (`NFR-A11Y-001`); naming avoids the old typos (`NFR-MAINT-004`).

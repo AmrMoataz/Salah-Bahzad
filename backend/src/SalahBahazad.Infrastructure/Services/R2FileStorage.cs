@@ -155,4 +155,15 @@ internal sealed class R2FileStorage(IAmazonS3 s3, R2Options options, TimeProvide
 
         return new SignedUrl(url, expiresAt);
     }
+
+    public async Task<Stream> OpenReadAsync(string key, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        var response = await s3.GetObjectAsync(
+            new GetObjectRequest { BucketName = options.BucketPrivate, Key = key }, cancellationToken);
+
+        // The network response stream is the caller's to dispose (it owns the underlying HTTP response).
+        return response.ResponseStream;
+    }
 }

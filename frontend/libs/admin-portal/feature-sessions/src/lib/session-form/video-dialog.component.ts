@@ -16,26 +16,24 @@ import {
 } from '@sb/shared/ui';
 import { SessionVideoDto } from '../data-access/session.models';
 
-/** Add-mode payload: a new source file plus its admin-entered metadata (contract §2.12). */
+/** Add-mode payload: a new source file plus its metadata (contract §2.12). Length is computed by transcode. */
 export interface AddVideoPayload {
   file: File;
   title: string;
-  lengthMinutes: number;
   accessCount: number;
 }
 
-/** Edit-mode payload: metadata only — title, length and access (contract §2.13). */
+/** Edit-mode payload: metadata only — title and access (contract §2.13). */
 export interface EditVideoPayload {
   title: string;
-  lengthMinutes: number;
   accessCount: number;
 }
 
 /**
- * Add / edit video modal (FR-ADM-SES-003, mockup `scrSessionEdit`). Both modes collect a title, the
- * admin-entered running length (minutes) and the per-enrollment access count; <code>add</code> mode
- * also uploads the source file through the secure pipeline. The parent performs the request and shows
- * upload progress.
+ * Add / edit video modal (FR-ADM-SES-003, mockup `scrSessionEdit`). Both modes collect a title and the
+ * per-enrollment access count; <code>add</code> mode also uploads the source file through the secure pipeline.
+ * The running length is computed by the transcode pipeline (ffprobe), so it is not entered here. The parent
+ * performs the request and shows upload progress.
  */
 @Component({
   selector: 'sb-video-dialog',
@@ -65,16 +63,6 @@ export interface EditVideoPayload {
         <sb-form-field label="Title" fieldId="vd-title" [error]="titleError()" [required]="true">
           <input id="vd-title" type="text" class="sb-input" [value]="title()" (input)="onTitle($event)"
                  placeholder="e.g. Worked examples" autocomplete="off" />
-        </sb-form-field>
-
-        <sb-form-field
-          label="Length (minutes)"
-          fieldId="vd-length"
-          hint="Running time you enter (used for display until the Phase 5 transcode computes it)."
-          [error]="lengthError()"
-        >
-          <input id="vd-length" type="number" min="0" class="sb-input" [value]="lengthMinutes()"
-                 (input)="onLength($event)" />
         </sb-form-field>
 
         <sb-form-field
@@ -130,7 +118,6 @@ export class VideoDialogComponent {
 
   readonly file = signal<File | null>(null);
   readonly title = signal('');
-  readonly lengthMinutes = signal(10);
   readonly accessCount = signal(3);
   readonly touched = signal(false);
 
@@ -146,9 +133,6 @@ export class VideoDialogComponent {
   readonly titleError = computed(() =>
     this.touched() && !this.title().trim() ? 'A title is required.' : '',
   );
-  readonly lengthError = computed(() =>
-    this.touched() && this.lengthMinutes() < 0 ? 'Length cannot be negative.' : '',
-  );
   readonly accessError = computed(() =>
     this.touched() && this.accessCount() < 0 ? 'Access count cannot be negative.' : '',
   );
@@ -162,7 +146,6 @@ export class VideoDialogComponent {
         this.touched.set(false);
         this.file.set(null);
         this.title.set(editing ? v?.title ?? '' : '');
-        this.lengthMinutes.set(editing ? v?.lengthMinutes ?? 10 : 10);
         this.accessCount.set(v?.accessCount ?? 3);
       }
     });
@@ -174,19 +157,15 @@ export class VideoDialogComponent {
   onTitle(event: Event): void {
     this.title.set((event.target as HTMLInputElement).value);
   }
-  onLength(event: Event): void {
-    this.lengthMinutes.set(Number((event.target as HTMLInputElement).value));
-  }
   onAccess(event: Event): void {
     this.accessCount.set(Number((event.target as HTMLInputElement).value));
   }
 
   submit(): void {
     this.touched.set(true);
-    if (!this.title().trim() || this.lengthMinutes() < 0 || this.accessCount() < 0) return;
+    if (!this.title().trim() || this.accessCount() < 0) return;
     const meta = {
       title: this.title().trim(),
-      lengthMinutes: this.lengthMinutes(),
       accessCount: this.accessCount(),
     };
     if (this.mode() === 'add') {

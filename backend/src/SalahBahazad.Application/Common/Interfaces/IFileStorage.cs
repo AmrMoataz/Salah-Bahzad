@@ -38,6 +38,15 @@ public interface IFileStorage
     /// </summary>
     Task<SignedUrl> GetSignedReadUrlAsync(
         string key, TimeSpan? ttl = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Opens a forward-only read stream over the private object at <paramref name="key"/>, for the small
+    /// private bytes the backend must serve <b>itself</b> rather than via a signed URL — the HLS AES-128
+    /// content key (delivered only through the gated key endpoint) and a stored HLS manifest (rewritten
+    /// per-playback). The caller MUST authorise first (FR-PLAT-AST-003, FR-PLAT-VID-003). The returned
+    /// stream is the caller's to dispose; throws if the object is absent.
+    /// </summary>
+    Task<Stream> OpenReadAsync(string key, CancellationToken cancellationToken = default);
 }
 
 /// <summary>A pre-signed read URL and the instant it expires.</summary>

@@ -10,7 +10,6 @@ internal sealed class UpdateSessionVideoValidator : AbstractValidator<UpdateSess
         RuleFor(x => x.SessionId).NotEmpty();
         RuleFor(x => x.VideoId).NotEmpty();
         RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
-        RuleFor(x => x.LengthMinutes).GreaterThanOrEqualTo(0);
         RuleFor(x => x.AccessCount).GreaterThanOrEqualTo(0);
 
         // Validate the file only when a replacement is supplied (metadata-only edits send no file).

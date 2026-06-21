@@ -14,7 +14,7 @@ public class EnrollmentTests
     {
         var session = SessionEntity.Create(Tenant, "Algebra", null, 100m, validityDays, Guid.NewGuid(), Guid.NewGuid());
         for (var i = 0; i < accessCounts.Length; i++)
-            session.AddVideo($"v{i}", 10, accessCounts[i], $"k{i}");
+            session.AddVideo($"v{i}", accessCounts[i], $"k{i}");
         return session;
     }
 
@@ -113,8 +113,8 @@ public class EnrollmentTests
         enrollment.Refund(start, null); // make it non-active so it can be extended/reused
 
         // The video's budget is raised and a new video is added before re-enrolling.
-        session.UpdateVideo(firstVideoId, "v0", 10, 5, newSourceObjectKey: null);
-        session.AddVideo("v-new", 10, 4, "k-new");
+        session.UpdateVideo(firstVideoId, "v0", 5, newSourceObjectKey: null);
+        session.AddVideo("v-new", 4, "k-new");
 
         var later = start.AddDays(10);
         enrollment.Extend(session, EnrollmentMethod.Code, Guid.NewGuid(), 120m, later);

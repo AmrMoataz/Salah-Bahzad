@@ -2,8 +2,9 @@ namespace SalahBahazad.Application.Features.Attendance.DTOs;
 
 /// <summary>
 /// One enrolled student's row in a session's attendance matrix (contract §B #4, FR-ADM-ATT-001).
-/// <c>videosWatched</c> is fed by the 5C video gate (0 until then); <c>bestQuizPercent</c>/<c>quizAttemptCount</c>
-/// arrive in 5B-2 (null/0 until then). <c>assignmentPercent</c> is the auto-graded score, null until completion.
+/// <c>videosWatched</c> = distinct videos with a spent view (derived from the per-video access counters the 5C
+/// playback gate decrements); <c>bestQuizPercent</c>/<c>quizAttemptCount</c> from 5B-2 (null/0 when no gating
+/// quiz). <c>assignmentPercent</c> is the auto-graded score, null until completion.
 /// </summary>
 public sealed record SessionAttendanceRowDto(
     Guid EnrollmentId,

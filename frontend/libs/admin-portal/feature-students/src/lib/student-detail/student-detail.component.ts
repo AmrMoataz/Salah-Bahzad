@@ -15,6 +15,7 @@ import {
   ButtonComponent,
   CardComponent,
   ConfirmDialogComponent,
+  ProgressComponent,
   SbTab,
   SbTableColumn,
   StatusPillComponent,
@@ -24,6 +25,7 @@ import {
   ToastService,
 } from '@sb/shared/ui';
 import {
+  StudentAttendanceProgress,
   StudentAuditEntry,
   StudentDetail,
   StudentEnrollmentDto,
@@ -53,8 +55,9 @@ interface IdImageState {
 /**
  * Student 360° detail (FR-ADM-STU-002/005/006/008, FR-PLAT-DEV-006, mockup `scrStudentDetail`).
  * Titled cards: Profile (with the ID image loaded on demand via a signed URL, audited per view —
- * FR-PLAT-AST-003), Bound device, Enrollments & attendance (Phase 4/5 placeholder), and History tabs
- * (login + activity from the audit log). Lifecycle actions are permission-gated and toasted.
+ * FR-PLAT-AST-003), Bound device, Enrollments & attendance (per-session video/quiz progress —
+ * FR-ADM-ATT-002), and History tabs (login + activity from the audit log). Lifecycle actions are
+ * permission-gated and toasted.
  */
 @Component({
   selector: 'sb-student-detail',
@@ -66,6 +69,7 @@ interface IdImageState {
     ButtonComponent,
     StatusPillComponent,
     AlertComponent,
+    ProgressComponent,
     TabsComponent,
     TableComponent,
     TableCellDirective,
@@ -198,7 +202,28 @@ interface IdImageState {
         <!-- Right column -->
         <div class="det__col">
           <sb-card title="Enrollments & attendance">
-            <p class="det__muted">Enrolment, transactions and attendance progress arrive with sessions, codes and assignments in Phase 4/5.</p>
+            @if (canViewAttendance()) {
+              <a cardActions class="det__report" routerLink="/attendance">Full report</a>
+            }
+            @if (!canViewAttendance()) {
+              <p class="det__muted">Attendance reporting requires the Attendance permission.</p>
+            } @else if (attendanceLoading() && attendance().length === 0) {
+              <p class="det__muted">Loading progress…</p>
+            } @else if (attendance().length === 0) {
+              <p class="det__muted">No enrolments yet. Progress appears once the student enrols in a session.</p>
+            } @else {
+              <ul class="det__prog">
+                @for (p of attendance(); track p.enrollmentId) {
+                  <li>
+                    <div class="det__prog-head">
+                      <span class="det__strong">{{ p.sessionTitle ?? 'Session' }}</span>
+                      <span class="det__prog-meta">{{ p.videosWatched }}/{{ p.videosTotal }} videos · quiz {{ quizLabel(p) }}</span>
+                    </div>
+                    <sb-progress [value]="watchPct(p)" [variant]="quizVariant(p)" />
+                  </li>
+                }
+              </ul>
+            }
           </sb-card>
 
           <sb-card title="History">
@@ -365,6 +390,13 @@ interface IdImageState {
     .det__hist { margin-top: var(--sb-space-3); }
     .det__hist-empty { padding: var(--sb-space-4) 0; }
     .det__more { margin-top: var(--sb-space-3); }
+
+    /* Enrollments & attendance progress */
+    .det__report { background: none; border: none; color: var(--sb-link); font-weight: 700; font-size: var(--sb-body-sm-size); text-decoration: none; cursor: pointer; }
+    .det__report:hover { color: var(--sb-link-hover); text-decoration: underline; }
+    .det__prog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sb-space-4); }
+    .det__prog-head { display: flex; justify-content: space-between; gap: var(--sb-space-3); margin-bottom: var(--sb-space-2); font-size: var(--sb-body-sm-size); }
+    .det__prog-meta { color: var(--sb-text-muted); white-space: nowrap; }
   `],
 })
 export class StudentDetailComponent {
@@ -385,6 +417,7 @@ export class StudentDetailComponent {
   readonly canEdit = computed(() => this.#auth.hasPermission('StudentsEdit'));
   readonly canDeactivate = computed(() => this.#auth.hasPermission('StudentsDeactivate'));
   readonly canDeviceClear = computed(() => this.#auth.hasPermission('StudentsDeviceClear'));
+  readonly canViewAttendance = computed(() => this.#auth.hasPermission('AttendanceRead'));
 
   // ID image (loaded on demand)
   readonly idImage = signal<IdImageState | null>(null);
@@ -404,6 +437,10 @@ export class StudentDetailComponent {
   readonly enrollmentsPage = signal(0);
   readonly enrollmentsLoading = signal(false);
   readonly enrollmentsHasMore = computed(() => this.enrollments().length < this.enrollmentsTotal());
+
+  // Enrollments & attendance progress card (loaded eagerly with the student, gated by AttendanceRead)
+  readonly attendance = signal<StudentAttendanceProgress[]>([]);
+  readonly attendanceLoading = signal(false);
 
   readonly tabs: readonly SbTab[] = [
     { id: 'logins', label: 'Login history' },
@@ -472,6 +509,7 @@ export class StudentDetailComponent {
       this.student.set(s);
       void this.#service.loadGrades();
       void this.#loadLogins(true);
+      if (this.canViewAttendance()) void this.#loadAttendance();
     } catch {
       this.loadError.set('Could not load this student. It may not exist or you may not have access.');
     }
@@ -488,6 +526,7 @@ export class StudentDetailComponent {
     this.enrollments.set([]);
     this.enrollmentsTotal.set(0);
     this.enrollmentsPage.set(0);
+    this.attendance.set([]);
   }
 
   onTabChange(id: string): void {
@@ -519,6 +558,18 @@ export class StudentDetailComponent {
       /* leave what we have */
     } finally {
       this.enrollmentsLoading.set(false);
+    }
+  }
+
+  async #loadAttendance(): Promise<void> {
+    this.attendanceLoading.set(true);
+    try {
+      const res = await this.#service.listAttendance(this.id(), 1, 50);
+      this.attendance.set(res.items);
+    } catch {
+      /* leave empty — the card shows its empty state */
+    } finally {
+      this.attendanceLoading.set(false);
     }
   }
 
@@ -673,6 +724,16 @@ export class StudentDetailComponent {
   at = dateTime;
   methodPill = methodPill;
   amount = amount;
+
+  watchPct(p: StudentAttendanceProgress): number {
+    return p.videosTotal > 0 ? Math.round((p.videosWatched / p.videosTotal) * 100) : 0;
+  }
+  quizVariant(p: StudentAttendanceProgress): 'success' | 'warning' {
+    return (p.bestQuizPercent ?? 0) >= 60 ? 'success' : 'warning';
+  }
+  quizLabel(p: StudentAttendanceProgress): string {
+    return p.bestQuizPercent !== null ? `${p.bestQuizPercent}%` : '—';
+  }
 
   action(value: string): string {
     const spaced = value.replace(/[._]/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').trim();

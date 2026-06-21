@@ -122,6 +122,21 @@ export interface StudentEnrollmentDto {
   codeSerial: string | null;
 }
 
+/**
+ * One session's attendance progress in a student's breakdown (GET /api/attendance/students/{id},
+ * FR-ADM-ATT-002): videos watched vs total, the auto-graded assignment score, and the best quiz score.
+ */
+export interface StudentAttendanceProgress {
+  enrollmentId: string;
+  sessionId: string;
+  sessionTitle: string | null;
+  videosWatched: number;
+  videosTotal: number;
+  assignmentPercent: number | null;
+  bestQuizPercent: number | null;
+  quizAttemptCount: number;
+}
+
 /** Query params for the paged/filterable student list (FR-ADM-STU-001). */
 export interface StudentListQuery {
   search?: string;

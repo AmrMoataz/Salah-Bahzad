@@ -20,12 +20,12 @@ public sealed record SessionListDto(
     int VideoCount,
     int EnrolledCount);
 
-/// <summary>An ordered video within a session (FR-PLAT-SES-002). <c>lengthMinutes</c> is admin-entered.</summary>
+/// <summary>An ordered video within a session (FR-PLAT-SES-002). <c>lengthSeconds</c> is computed by the transcode pipeline.</summary>
 public sealed record SessionVideoDto(
     Guid Id,
     string Title,
     int Order,
-    int LengthMinutes,
+    int LengthSeconds,
     int AccessCount,
     VideoProcessingStatus ProcessingStatus,
     DateTimeOffset CreatedAtUtc);
@@ -110,7 +110,7 @@ public static class SessionMappings
         enrolledCount);
 
     public static SessionVideoDto ToDto(this SessionVideoEntity v) => new(
-        v.Id, v.Title, v.Order, v.LengthMinutes, v.AccessCount, v.ProcessingStatus, v.CreatedAtUtc);
+        v.Id, v.Title, v.Order, v.LengthSeconds, v.AccessCount, v.ProcessingStatus, v.CreatedAtUtc);
 
     public static SessionMaterialDto ToDto(this SessionMaterialEntity m) => new(
         m.Id, m.FileName, MaterialKind(m.FileName, m.ContentType), m.SizeBytes, m.CreatedAtUtc);

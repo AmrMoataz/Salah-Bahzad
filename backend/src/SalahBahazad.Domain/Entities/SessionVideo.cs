@@ -7,8 +7,8 @@ namespace SalahBahazad.Domain.Entities;
 /// An ordered video within a <see cref="Session"/> (FR-PLAT-SES-002, FR-ADM-SES-003), each with its own
 /// per-enrollment <see cref="AccessCount"/> (view cap). A child of the Session aggregate — added, edited,
 /// reordered, and removed only through the <see cref="Session"/> root. The source is uploaded to R2 and the
-/// DB keeps only the object key / HLS manifest reference (FR-PLAT-VID-007). <see cref="LengthMinutes"/> is
-/// admin-entered metadata (real duration comes from the Phase 5 transcode pipeline).
+/// DB keeps only the object key / HLS manifest reference (FR-PLAT-VID-007). <see cref="LengthSeconds"/> is
+/// computed by the transcode pipeline (ffprobe) — not admin-entered.
 /// </summary>
 public sealed class SessionVideo : EntityBase
 {
@@ -20,8 +20,9 @@ public sealed class SessionVideo : EntityBase
     /// <summary>Zero-based position within the session's video list (FR-ADM-SES-003 reorder).</summary>
     public int Order { get; private set; }
 
-    /// <summary>Admin-entered run length in minutes shown in the UI (e.g. "8:00").</summary>
-    public int LengthMinutes { get; private set; }
+    /// <summary>Run length in seconds — computed by the transcode pipeline (ffprobe) and set on
+    /// <see cref="MarkReady"/>; 0 until <see cref="VideoProcessingStatus.Ready"/>. Displayed as MM:SS.</summary>
+    public int LengthSeconds { get; private set; }
 
     /// <summary>Allowed views per enrollment for this video (FR-PLAT-SES-002).</summary>
     public int AccessCount { get; private set; }
@@ -32,34 +33,38 @@ public sealed class SessionVideo : EntityBase
     /// <summary>R2 key of the HLS manifest once transcoded; null until <see cref="VideoProcessingStatus.Ready"/>.</summary>
     public string? HlsManifestKey { get; private set; }
 
+    /// <summary>R2 key of the AES-128 content-key object once transcoded; null until
+    /// <see cref="VideoProcessingStatus.Ready"/> (FR-PLAT-VID-003). Served only by the gated key endpoint —
+    /// never public, never embedded in the manifest.</summary>
+    public string? HlsKeyObjectKey { get; private set; }
+
     public VideoProcessingStatus ProcessingStatus { get; private set; } = VideoProcessingStatus.Pending;
 
     internal static SessionVideo Create(
-        Guid sessionId, string title, int order, int lengthMinutes, int accessCount, string sourceObjectKey)
+        Guid sessionId, string title, int order, int accessCount, string sourceObjectKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceObjectKey);
-        Validate(lengthMinutes, accessCount);
+        Validate(accessCount);
 
         return new SessionVideo
         {
             SessionId = sessionId,
             Title = title.Trim(),
             Order = order,
-            LengthMinutes = lengthMinutes,
+            LengthSeconds = 0, // computed by the transcode pipeline once Ready
             AccessCount = accessCount,
             SourceObjectKey = sourceObjectKey,
             ProcessingStatus = VideoProcessingStatus.Pending,
         };
     }
 
-    internal void UpdateMetadata(string title, int lengthMinutes, int accessCount)
+    internal void UpdateMetadata(string title, int accessCount)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
-        Validate(lengthMinutes, accessCount);
+        Validate(accessCount);
 
         Title = title.Trim();
-        LengthMinutes = lengthMinutes;
         AccessCount = accessCount;
     }
 
@@ -69,6 +74,7 @@ public sealed class SessionVideo : EntityBase
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceObjectKey);
         SourceObjectKey = sourceObjectKey;
         HlsManifestKey = null;
+        HlsKeyObjectKey = null;
         ProcessingStatus = VideoProcessingStatus.Pending;
     }
 
@@ -77,18 +83,20 @@ public sealed class SessionVideo : EntityBase
     // ── Transcode pipeline transitions (driven by IVideoProcessingQueue, FR-PLAT-VID-001..006) ──
     public void MarkProcessing() => ProcessingStatus = VideoProcessingStatus.Processing;
 
-    public void MarkReady(string? hlsManifestKey = null)
+    /// <summary>Marks the video ready with its HLS keys and the ffprobe-computed duration (seconds).</summary>
+    public void MarkReady(string? hlsManifestKey = null, string? hlsKeyObjectKey = null, int durationSeconds = 0)
     {
         HlsManifestKey = string.IsNullOrWhiteSpace(hlsManifestKey) ? null : hlsManifestKey;
+        HlsKeyObjectKey = string.IsNullOrWhiteSpace(hlsKeyObjectKey) ? null : hlsKeyObjectKey;
+        if (durationSeconds > 0)
+            LengthSeconds = durationSeconds;
         ProcessingStatus = VideoProcessingStatus.Ready;
     }
 
     public void MarkFailed() => ProcessingStatus = VideoProcessingStatus.Failed;
 
-    private static void Validate(int lengthMinutes, int accessCount)
+    private static void Validate(int accessCount)
     {
-        if (lengthMinutes < 0)
-            throw new ArgumentOutOfRangeException(nameof(lengthMinutes), "Video length cannot be negative.");
         if (accessCount < 0)
             throw new ArgumentOutOfRangeException(nameof(accessCount), "Access count cannot be negative.");
     }

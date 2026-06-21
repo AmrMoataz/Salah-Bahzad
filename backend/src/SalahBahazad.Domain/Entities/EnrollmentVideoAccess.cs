@@ -37,4 +37,16 @@ public sealed class EnrollmentVideoAccess : EntityBase, IAuditViaEventOnly
         AccessAllowed = accessCount;
         AccessRemaining = accessCount;
     }
+
+    /// <summary>
+    /// Spends one view at the playback gate (FR-PLAT-VID-002). The gate checks <see cref="AccessRemaining"/> first
+    /// and surfaces a <c>no_views_remaining</c> reason; this guard is the last-line domain invariant
+    /// (<see cref="InvalidOperationException"/> if the budget is already exhausted).
+    /// </summary>
+    public void Decrement()
+    {
+        if (AccessRemaining <= 0)
+            throw new InvalidOperationException("No views remaining for this video.");
+        AccessRemaining--;
+    }
 }

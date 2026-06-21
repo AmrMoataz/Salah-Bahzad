@@ -66,6 +66,9 @@ function makeService() {
       totalPages: 1,
     }),
     getIdImageUrl: jest.fn(),
+    listAttendance: jest
+      .fn()
+      .mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 50, totalPages: 0 }),
     error: () => null,
   };
 }

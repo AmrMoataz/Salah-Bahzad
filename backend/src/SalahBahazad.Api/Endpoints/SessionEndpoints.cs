@@ -264,7 +264,6 @@ internal sealed class SessionEndpoints : IEndpointGroup
         var reader = new MultipartReader(MultipartUpload.GetBoundary(request.ContentType!), request.Body);
 
         string? title = null;
-        var lengthMinutes = 0;
         var accessCount = 0;
 
         MultipartSection? section;
@@ -282,7 +281,7 @@ internal sealed class SessionEndpoints : IEndpointGroup
                 await using var capped = new LengthLimitingStream(section.Body, AddSessionVideoCommand.MaxBytes);
                 var result = await sender.Send(
                     new AddSessionVideoCommand(
-                        id, title, lengthMinutes, accessCount,
+                        id, title, accessCount,
                         capped, section.ContentType ?? "application/octet-stream",
                         request.ContentLength ?? 0,
                         HeaderUtilities.RemoveQuotes(disposition.FileName).Value ?? "video"),
@@ -297,7 +296,6 @@ internal sealed class SessionEndpoints : IEndpointGroup
                 switch (name)
                 {
                     case "title": title = value; break;
-                    case "lengthMinutes": int.TryParse(value, out lengthMinutes); break;
                     case "accessCount": int.TryParse(value, out accessCount); break;
                 }
             }
@@ -319,7 +317,6 @@ internal sealed class SessionEndpoints : IEndpointGroup
         var reader = new MultipartReader(MultipartUpload.GetBoundary(request.ContentType!), request.Body);
 
         string? title = null;
-        var lengthMinutes = 0;
         var accessCount = 0;
 
         MultipartSection? section;
@@ -334,7 +331,7 @@ internal sealed class SessionEndpoints : IEndpointGroup
                 await using var capped = new LengthLimitingStream(section.Body, AddSessionVideoCommand.MaxBytes);
                 var replaced = await sender.Send(
                     new UpdateSessionVideoCommand(
-                        id, videoId, title ?? string.Empty, lengthMinutes, accessCount,
+                        id, videoId, title ?? string.Empty, accessCount,
                         capped, section.ContentType ?? "application/octet-stream",
                         request.ContentLength ?? 0,
                         HeaderUtilities.RemoveQuotes(disposition.FileName).Value ?? "video"),
@@ -349,7 +346,6 @@ internal sealed class SessionEndpoints : IEndpointGroup
                 switch (name)
                 {
                     case "title": title = value; break;
-                    case "lengthMinutes": int.TryParse(value, out lengthMinutes); break;
                     case "accessCount": int.TryParse(value, out accessCount); break;
                 }
             }
@@ -358,7 +354,7 @@ internal sealed class SessionEndpoints : IEndpointGroup
         // No file part: a metadata-only edit (the file fields stay null).
         var result = await sender.Send(
             new UpdateSessionVideoCommand(
-                id, videoId, title ?? string.Empty, lengthMinutes, accessCount, null, null, null, null),
+                id, videoId, title ?? string.Empty, accessCount, null, null, null, null),
             cancellationToken);
         return Results.Ok(result);
     }

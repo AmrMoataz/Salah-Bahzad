@@ -8,7 +8,6 @@ internal sealed class AddSessionVideoValidator : AbstractValidator<AddSessionVid
     {
         RuleFor(x => x.SessionId).NotEmpty();
         RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
-        RuleFor(x => x.LengthMinutes).GreaterThanOrEqualTo(0);
         RuleFor(x => x.AccessCount).GreaterThanOrEqualTo(0);
 
         RuleFor(x => x.ContentType)

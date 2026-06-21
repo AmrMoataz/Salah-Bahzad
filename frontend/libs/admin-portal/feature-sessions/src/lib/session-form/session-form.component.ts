@@ -29,7 +29,7 @@ import {
   SessionVideoDto,
 } from '../data-access/session.models';
 import { SessionService } from '../data-access/session.service';
-import { fileSize, statusPill, videoStatusPill } from '../session.presentation';
+import { fileSize, statusPill, videoLength, videoStatusPill } from '../session.presentation';
 import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video-dialog.component';
 
 /**
@@ -168,7 +168,7 @@ import { AddVideoPayload, EditVideoPayload, VideoDialogComponent } from './video
                     <span class="sf__vbody">
                       <span class="sf__vtitle">{{ i + 1 }}. {{ v.title }}</span>
                       <span class="sf__vsub">
-                        <span class="sf__vmeta">{{ v.lengthMinutes }} min · secure HLS</span>
+                        <span class="sf__vmeta">{{ vLength(v) }} · secure HLS</span>
                         <sb-status-pill [variant]="vPill(v.processingStatus)">{{ v.processingStatus }}</sb-status-pill>
                       </span>
                     </span>
@@ -667,7 +667,6 @@ export class SessionFormComponent {
         id,
         payload.file,
         payload.title,
-        payload.lengthMinutes,
         payload.accessCount,
         (pct) => this.uploadProgress.set(pct),
       );
@@ -690,7 +689,7 @@ export class SessionFormComponent {
     this.videoError.set(null);
     try {
       const updated = await this.#service.updateVideo(
-        id, video.id, payload.title, payload.lengthMinutes, payload.accessCount,
+        id, video.id, payload.title, payload.accessCount,
       );
       this.#patchVideos((list) => list.map((v) => (v.id === updated.id ? updated : v)));
       this.videoDialogOpen.set(false);
@@ -858,5 +857,6 @@ export class SessionFormComponent {
   // Presentation helpers
   pillFor = statusPill;
   vPill = videoStatusPill;
+  vLength = videoLength;
   size = fileSize;
 }

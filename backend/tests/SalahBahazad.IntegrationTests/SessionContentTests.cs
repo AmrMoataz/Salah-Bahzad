@@ -40,15 +40,15 @@ public sealed class SessionContentTests(SalahBahazadApiFactory factory)
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var created = await response.Content.ReadFromJsonAsync<SessionVideoResponse>(TestJson.Options);
         created!.Title.Should().Be("Lesson 1");
-        created.LengthMinutes.Should().Be(8);
         created.AccessCount.Should().Be(3);
         created.ProcessingStatus.Should().Be("Pending"); // 201 snapshot per the contract
 
-        // The stub transcode flips it to Ready, observable on the next read.
+        // The transcode flips it to Ready and fills the ffprobe-measured duration, observable on the next read.
         var detail = await client.GetFromJsonAsync<SessionDetailResponse>(
             $"/api/sessions/{session.Id}", TestJson.Options);
         detail!.Videos.Should().ContainSingle();
         detail.Videos[0].ProcessingStatus.Should().Be("Ready");
+        detail.Videos[0].LengthSeconds.Should().Be(2); // FakeMediaTranscoder reports a 2s duration
     }
 
     [Fact]

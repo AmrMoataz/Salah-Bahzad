@@ -42,6 +42,11 @@ internal sealed class GlobalExceptionHandler(
         if (errors is not null)
             problemDetails.Extensions["errors"] = errors;
 
+        // Stable machine-readable code (e.g. the video gate's no_views_remaining) for clients to branch on
+        // without parsing prose (FR-PLAT-VID-006).
+        if (exception is IProblemReason { Reason: { } reason })
+            problemDetails.Extensions["reason"] = reason;
+
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
@@ -62,6 +67,7 @@ internal sealed class GlobalExceptionHandler(
             NotFoundException => (StatusCodes.Status404NotFound, "Resource not found.", null),
             ConflictException => (StatusCodes.Status409Conflict, "Conflict.", null),
             ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden.", null),
+            GoneException => (StatusCodes.Status410Gone, "Gone.", null),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized.", null),
             // Malformed multipart / over-size source uploads (streaming cap, bad boundary) — client errors.
             InvalidDataException => (StatusCodes.Status400BadRequest, "Malformed or oversized request.", null),

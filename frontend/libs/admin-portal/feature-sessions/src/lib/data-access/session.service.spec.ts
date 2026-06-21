@@ -193,19 +193,18 @@ describe('SessionService', () => {
   });
 
   it('updateVideo() PUTs multipart metadata to /videos/{id} (contract §2.13)', async () => {
-    const promise = service.updateVideo('s1', 'v1', 'Lecture 1', 8, 5);
+    const promise = service.updateVideo('s1', 'v1', 'Lecture 1', 5);
     const req = http.expectOne((r) => r.url.endsWith('/api/sessions/s1/videos/v1'));
     expect(req.request.method).toBe('PUT');
     expect(req.request.body instanceof FormData).toBe(true);
     const form = req.request.body as FormData;
     expect(form.get('title')).toBe('Lecture 1');
-    expect(form.get('lengthMinutes')).toBe('8');
     expect(form.get('accessCount')).toBe('5');
     req.flush({
       id: 'v1',
       title: 'Lecture 1',
       order: 0,
-      lengthMinutes: 8,
+      lengthSeconds: 480,
       accessCount: 5,
       processingStatus: 'Ready',
       createdAtUtc: '2026-06-01T00:00:00Z',
@@ -213,22 +212,21 @@ describe('SessionService', () => {
     expect((await promise).accessCount).toBe(5);
   });
 
-  it('addVideo() POSTs multipart form-data (file + title + lengthMinutes + accessCount)', async () => {
+  it('addVideo() POSTs multipart form-data (file + title + accessCount)', async () => {
     const file = new File(['x'], 'lec.mp4', { type: 'video/mp4' });
-    const promise = service.addVideo('s1', file, 'Lecture 1', 8, 3);
+    const promise = service.addVideo('s1', file, 'Lecture 1', 3);
 
     const req = http.expectOne((r) => r.url.endsWith('/api/sessions/s1/videos'));
     expect(req.request.method).toBe('POST');
     expect(req.request.body instanceof FormData).toBe(true);
     const form = req.request.body as FormData;
     expect(form.get('title')).toBe('Lecture 1');
-    expect(form.get('lengthMinutes')).toBe('8');
     expect(form.get('accessCount')).toBe('3');
     req.flush({
       id: 'v9',
       title: 'Lecture 1',
       order: 0,
-      lengthMinutes: 8,
+      lengthSeconds: 480,
       accessCount: 3,
       processingStatus: 'Pending',
       createdAtUtc: '2026-06-01T00:00:00Z',
