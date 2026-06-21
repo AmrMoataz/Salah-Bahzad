@@ -129,6 +129,9 @@ public static class InfrastructureServiceExtensions
         // Platform JWT
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
+        // Device-binding token service (FR-PLAT-DEV-005) — HMAC over Device:SigningKey (or Jwt:Secret).
+        services.AddSingleton<IDeviceBindingService, DeviceBindingService>();
+
         var jwtSecret = configuration["Jwt:Secret"]
             ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
 

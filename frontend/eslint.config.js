@@ -37,6 +37,10 @@ module.exports = [
               onlyDependOnLibsWithTags: ['scope:admin-portal', 'scope:shared'],
             },
             {
+              sourceTag: 'scope:student-portal',
+              onlyDependOnLibsWithTags: ['scope:student-portal', 'scope:shared'],
+            },
+            {
               sourceTag: 'scope:shared',
               onlyDependOnLibsWithTags: ['scope:shared'],
             },

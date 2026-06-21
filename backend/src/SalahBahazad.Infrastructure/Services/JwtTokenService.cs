@@ -17,19 +17,17 @@ internal sealed class JwtTokenService(IConfiguration configuration, TimeProvider
 {
     private static readonly JwtSecurityTokenHandler Handler = new();
 
-    public PlatformToken IssueAccessToken(Staff staff)
-    {
-        var expiry = clock.GetUtcNow().AddMinutes(
-            configuration.GetValue("Jwt:AccessTokenMinutes", 15));
-        return BuildToken(staff, expiry, "access");
-    }
+    public PlatformToken IssueAccessToken(Staff staff) =>
+        BuildToken(staff.Id, staff.TenantId, staff.Role.ToString(), deviceId: null, AccessExpiry(), "access");
 
-    public PlatformToken IssueRefreshToken(Staff staff)
-    {
-        var expiry = clock.GetUtcNow().AddDays(
-            configuration.GetValue("Jwt:RefreshTokenDays", 7));
-        return BuildToken(staff, expiry, "refresh");
-    }
+    public PlatformToken IssueRefreshToken(Staff staff) =>
+        BuildToken(staff.Id, staff.TenantId, staff.Role.ToString(), deviceId: null, RefreshExpiry(), "refresh");
+
+    public PlatformToken IssueStudentAccessToken(Student student, Guid deviceId) =>
+        BuildToken(student.Id, student.TenantId, "Student", deviceId, AccessExpiry(), "access");
+
+    public PlatformToken IssueStudentRefreshToken(Student student, Guid deviceId) =>
+        BuildToken(student.Id, student.TenantId, "Student", deviceId, RefreshExpiry(), "refresh");
 
     public TokenPrincipal? ValidateRefreshToken(string refreshToken)
     {
@@ -52,11 +50,12 @@ internal sealed class JwtTokenService(IConfiguration configuration, TimeProvider
             var tokenType = principal.FindFirstValue("token_type");
             if (tokenType != "refresh") return null;
 
-            var staffId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var tenantId = Guid.Parse(principal.FindFirstValue("tenant_id")!);
             var role = principal.FindFirstValue(ClaimTypes.Role)!;
+            var deviceId = principal.FindFirstValue("device_id"); // null for staff tokens
 
-            return new TokenPrincipal(staffId, tenantId, role);
+            return new TokenPrincipal(userId, tenantId, role, deviceId);
         }
         catch
         {
@@ -64,15 +63,27 @@ internal sealed class JwtTokenService(IConfiguration configuration, TimeProvider
         }
     }
 
-    private PlatformToken BuildToken(Staff staff, DateTimeOffset expiry, string tokenType)
+    private DateTimeOffset AccessExpiry() =>
+        clock.GetUtcNow().AddMinutes(configuration.GetValue("Jwt:AccessTokenMinutes", 15));
+
+    private DateTimeOffset RefreshExpiry() =>
+        clock.GetUtcNow().AddDays(configuration.GetValue("Jwt:RefreshTokenDays", 7));
+
+    private PlatformToken BuildToken(
+        Guid userId, Guid tenantId, string role, Guid? deviceId, DateTimeOffset expiry, string tokenType)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, staff.Id.ToString()),
-            new("tenant_id", staff.TenantId.ToString()),
-            new(ClaimTypes.Role, staff.Role.ToString()),
+            new(ClaimTypes.NameIdentifier, userId.ToString()),
+            new("tenant_id", tenantId.ToString()),
+            new(ClaimTypes.Role, role),
             new("token_type", tokenType),
         };
+
+        // Student tokens carry the bound device so CurrentUserResolver can attribute audit and the
+        // refresh handler can re-verify the binding (FR-PLAT-DEV-001/003).
+        if (deviceId is { } id)
+            claims.Add(new Claim("device_id", id.ToString()));
 
         var key = GetSigningKey();
         var descriptor = new SecurityTokenDescriptor

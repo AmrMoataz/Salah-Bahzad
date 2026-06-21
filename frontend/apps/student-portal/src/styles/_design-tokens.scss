@@ -1,0 +1,210 @@
+// ============================================================================
+// Salah Bahzad — Design tokens (Student Portal)
+//
+// SOURCE OF TRUTH: `.claude/Salah Bahzad Student Portal/_ds/
+//   salah-bahzad-design-system-1a8c19a8-bb92-4a32-8558-0faf8e57a0f3/tokens/*.css`
+// (the exported student design system + the `Student Portal.html` prototype).
+// This file is a faithful mirror of those token files — the canonical `--sb-*`
+// scheme, identical in value to the admin portal's mirror (both apps share one
+// design system). Do NOT invent or rename tokens here — if a value needs to
+// change, change it in the design system and re-mirror. Fonts are loaded in
+// `index.html` (Google Fonts), so the upstream `@font-face` block is omitted.
+// ============================================================================
+
+:root {
+  // ---------- Brand palette (expressive) ----------
+  --sb-blue:           #2C6FB3;
+  --sb-blue-bright:    #3E8EDE;
+  --sb-navy:           #1E3A5F;
+  --sb-green:          #46A33E;
+  --sb-green-deep:     #2F7D2A;
+  --sb-red:            #E23B33;
+  --sb-mustard:        #F3C12E;
+  --sb-mint:           #86C7A6;
+  --sb-orange:         #E8743B;
+  --sb-purple:         #6E3FA6;
+  --sb-pink:           #E85FA8;
+  --sb-cream:          #F3F2E0;
+  --sb-ink:            #1A1A1A;
+  --sb-mascot-skin:    #E7B488;
+  --sb-mascot-beard:   #3A2A1F;
+
+  // ---------- Primary ramp (blue) ----------
+  --sb-primary-50:   #EAF2FB;
+  --sb-primary-100:  #D2E4F6;
+  --sb-primary-200:  #A8C9EC;
+  --sb-primary-300:  #7CADE1;
+  --sb-primary-400:  #5495D6;
+  --sb-primary-500:  #3E8EDE;
+  --sb-primary-600:  #2C6FB3;
+  --sb-primary-700:  #245C95;
+  --sb-primary-800:  #1E4A78;
+  --sb-primary-900:  #1E3A5F;
+
+  // ---------- Accent ramp (green) ----------
+  --sb-accent-50:   #EBF5E9;
+  --sb-accent-100:  #D4EACF;
+  --sb-accent-200:  #ABD7A3;
+  --sb-accent-300:  #7FC375;
+  --sb-accent-400:  #5BB052;
+  --sb-accent-500:  #4FA945;
+  --sb-accent-600:  #46A33E;
+  --sb-accent-700:  #357E30;
+  --sb-accent-800:  #2A6326;
+  --sb-accent-900:  #1F491D;
+
+  // ---------- Neutrals (warm) ----------
+  --sb-neutral-0:    #FFFFFF;
+  --sb-neutral-25:   #FBFBF7;
+  --sb-neutral-50:   #F6F6F0;
+  --sb-neutral-100:  #ECEBE2;
+  --sb-neutral-200:  #DAD8CC;
+  --sb-neutral-300:  #BFBDB0;
+  --sb-neutral-400:  #98968A;
+  --sb-neutral-500:  #6F6E63;
+  --sb-neutral-600:  #54534A;
+  --sb-neutral-700:  #3D3C35;
+  --sb-neutral-800:  #2A2924;
+  --sb-neutral-900:  #1A1A16;
+
+  // ---------- Semantic ----------
+  --sb-success-fg:     #2A6326;
+  --sb-success:        #46A33E;
+  --sb-success-bg:     #EBF5E9;
+  --sb-success-border: #ABD7A3;
+
+  --sb-danger-fg:      #A52A24;
+  --sb-danger:         #E23B33;
+  --sb-danger-bg:      #FBE8E6;
+  --sb-danger-border:  #F3B4B0;
+
+  --sb-warning-fg:     #8A6A00;
+  --sb-warning:        #F3C12E;
+  --sb-warning-bg:     #FEF6DD;
+  --sb-warning-border: #F5E2A0;
+
+  --sb-info-fg:        #1E4A78;
+  --sb-info:           #3E8EDE;
+  --sb-info-bg:        #E8F2FC;
+  --sb-info-border:    #A8C9EC;
+
+  // ---------- Subject accents (base / tint / deep) ----------
+  --sb-subject-blue:        #3E8EDE;  --sb-subject-blue-bg:    #E8F2FC;  --sb-subject-blue-deep:    #1E4A78;
+  --sb-subject-green:       #46A33E;  --sb-subject-green-bg:   #EBF5E9;  --sb-subject-green-deep:   #2A6326;
+  --sb-subject-red:         #E23B33;  --sb-subject-red-bg:     #FBE8E6;  --sb-subject-red-deep:     #A52A24;
+  --sb-subject-mustard:     #F3C12E;  --sb-subject-mustard-bg: #FEF6DD;  --sb-subject-mustard-deep: #8A6A00;
+  --sb-subject-mint:        #86C7A6;  --sb-subject-mint-bg:    #EAF5EF;  --sb-subject-mint-deep:    #2F6B52;
+  --sb-subject-orange:      #E8743B;  --sb-subject-orange-bg:  #FCEDE3;  --sb-subject-orange-deep:  #A24A1E;
+  --sb-subject-purple:      #6E3FA6;  --sb-subject-purple-bg:  #F0E9F8;  --sb-subject-purple-deep:  #4A2A72;
+  --sb-subject-pink:        #E85FA8;  --sb-subject-pink-bg:    #FCE8F2;  --sb-subject-pink-deep:    #9A2E64;
+
+  // ---------- Semantic UI roles ----------
+  --sb-bg:              var(--sb-neutral-25);
+  --sb-surface:         var(--sb-neutral-0);
+  --sb-surface-sunken:  var(--sb-neutral-50);
+  --sb-border:          var(--sb-neutral-200);
+  --sb-border-strong:   var(--sb-neutral-300);
+  --sb-text:            var(--sb-neutral-900);
+  --sb-text-muted:      var(--sb-neutral-500);
+  --sb-text-subtle:     var(--sb-neutral-400);
+  --sb-primary:         var(--sb-primary-600);
+  --sb-primary-hover:   var(--sb-primary-700);
+  --sb-primary-active:  var(--sb-primary-800);
+  --sb-accent:          var(--sb-accent-600);
+  --sb-on-primary:      #FFFFFF;
+  --sb-link:            var(--sb-primary-600);
+  --sb-link-hover:      var(--sb-primary-700);
+  --sb-focus-ring:      rgba(62, 142, 222, 0.45);
+  --sb-scrim:           rgba(26, 26, 22, 0.45);
+
+  // ---------- Font families ----------
+  // Loaded via Google Fonts in index.html: Nunito Sans (sans) + Caveat (display).
+  --sb-font-sans:    "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sb-font-mono:    "Cascadia Mono", "Courier New", monospace;
+  --sb-font-display: "Caveat", cursive;
+  --sb-font-marker:  "Permanent Marker", cursive;
+
+  // ---------- Display type ----------
+  --sb-display-xl-size: 48px;  --sb-display-xl-weight: 700;  --sb-display-xl-line: 1.2;
+  --sb-display-lg-size: 40px;  --sb-display-lg-weight: 700;  --sb-display-lg-line: 1.2;
+  --sb-display-md-size: 32px;  --sb-display-md-weight: 700;  --sb-display-md-line: 1.3;
+
+  // ---------- Heading type ----------
+  --sb-heading-xl-size: 28px;  --sb-heading-xl-weight: 600;  --sb-heading-xl-line: 1.4;
+  --sb-heading-lg-size: 24px;  --sb-heading-lg-weight: 600;  --sb-heading-lg-line: 1.4;
+  --sb-heading-md-size: 20px;  --sb-heading-md-weight: 600;  --sb-heading-md-line: 1.4;
+  --sb-heading-sm-size: 18px;  --sb-heading-sm-weight: 600;  --sb-heading-sm-line: 1.4;
+  --sb-heading-xs-size: 16px;  --sb-heading-xs-weight: 600;  --sb-heading-xs-line: 1.5;
+
+  // ---------- Body type ----------
+  --sb-body-lg-size: 16px;  --sb-body-lg-weight: 400;  --sb-body-lg-line: 1.6;
+  --sb-body-md-size: 14px;  --sb-body-md-weight: 400;  --sb-body-md-line: 1.6;
+  --sb-body-sm-size: 12px;  --sb-body-sm-weight: 400;  --sb-body-sm-line: 1.5;
+
+  // ---------- Label type ----------
+  --sb-label-lg-size: 14px;  --sb-label-lg-weight: 600;  --sb-label-lg-line: 1.4;
+  --sb-label-md-size: 12px;  --sb-label-md-weight: 600;  --sb-label-md-line: 1.4;
+  --sb-label-sm-size: 11px;  --sb-label-sm-weight: 600;  --sb-label-sm-line: 1.4;
+
+  // ---------- Code / mono type ----------
+  --sb-code-size: 13px;  --sb-code-weight: 400;  --sb-code-line: 1.5;
+
+  // ---------- Spacing (4px base unit) ----------
+  --sb-space-0:  0;
+  --sb-space-1:  0.25rem;  // 4
+  --sb-space-2:  0.5rem;   // 8
+  --sb-space-3:  0.75rem;  // 12
+  --sb-space-4:  1rem;     // 16
+  --sb-space-5:  1.25rem;  // 20
+  --sb-space-6:  1.5rem;   // 24
+  --sb-space-7:  1.75rem;  // 28
+  --sb-space-8:  2rem;     // 32
+  --sb-space-10: 2.5rem;   // 40
+  --sb-space-12: 3rem;     // 48
+  --sb-space-16: 4rem;     // 64
+  --sb-space-20: 5rem;     // 80
+  --sb-space-24: 6rem;     // 96
+
+  // ---------- Border radius ----------
+  --sb-radius-xs:     4px;
+  --sb-radius-sm:     6px;
+  --sb-radius-md:     10px;
+  --sb-radius-lg:     14px;
+  --sb-radius-xl:     20px;
+  --sb-radius-2xl:    28px;
+  --sb-radius-pill:   999px;
+  --sb-radius-circle: 50%;
+
+  // ---------- Z-index ----------
+  --sb-z-base:     0;
+  --sb-z-dropdown: 1000;
+  --sb-z-sticky:   1100;
+  --sb-z-overlay:  1200;
+  --sb-z-modal:    1300;
+  --sb-z-toast:    1400;
+  --sb-z-tooltip:  1500;
+
+  // ---------- Motion (timing & easing) ----------
+  --sb-timing-fast:     150ms;
+  --sb-timing:          250ms;
+  --sb-timing-slow:     400ms;
+  --sb-easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --sb-easing-out:      cubic-bezier(0, 0, 0.2, 1);
+  --sb-easing-in:       cubic-bezier(0.4, 0, 1, 1);
+
+  // ---------- Shadows ----------
+  --sb-shadow-xs:    0 1px 2px rgba(26, 26, 22, 0.06);
+  --sb-shadow-sm:    0 2px 6px rgba(26, 26, 22, 0.08);
+  --sb-shadow-md:    0 6px 16px rgba(26, 26, 22, 0.10);
+  --sb-shadow-lg:    0 14px 32px rgba(26, 26, 22, 0.12);
+  --sb-shadow-xl:    0 24px 48px rgba(26, 26, 22, 0.16);
+  --sb-shadow-focus: 0 0 0 3px var(--sb-focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sb-timing-fast: 0ms;
+    --sb-timing:      0ms;
+    --sb-timing-slow: 0ms;
+  }
+}

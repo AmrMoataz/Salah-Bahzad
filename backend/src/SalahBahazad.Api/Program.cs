@@ -103,7 +103,9 @@ try
         opts.AddFixedWindowLimiter("auth", limiter =>
         {
             limiter.Window = TimeSpan.FromMinutes(1);
-            limiter.PermitLimit = 10;
+            // Config-overridable so the integration suite (which shares this single global bucket across many
+            // auth calls on one host) isn't throttled; production keeps the tight default (NFR-SEC-006).
+            limiter.PermitLimit = builder.Configuration.GetValue("RateLimiting:AuthPermitLimit", 10);
             limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
             limiter.QueueLimit = 0;
         });

@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "student-portal-feature-auth",
+  "projectType": "library",
+  "sourceRoot": "libs/student-portal/feature-auth/src",
+  "prefix": "sb",
+  "tags": ["scope:student-portal", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/student-portal/feature-auth"],
+      "options": {
+        "jestConfig": "libs/student-portal/feature-auth/jest.config.ts"
+      }
+    }
+  }
+}

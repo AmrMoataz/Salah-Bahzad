@@ -1,0 +1,22 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-data-access [39m[27m[0m [2mlibs/student-portal/data-access/src/lib/auth/[22m[1mstudent-auth.store.spec.ts[22m
+  StudentAuthStore
+    [32m√[39m [2mexchanges email/password sign-in: maps StudentAuthResponse, persists, and lands in the shell (17 ms)[22m
+    [32m√[39m [2mexchanges Google sign-in the same way (3 ms)[22m
+    [32m√[39m [2mmaps a 403 "account_pending" to status() + statusDetail() and routes to /status (7 ms)[22m
+    [32m√[39m [2mmaps a 403 "account_rejected" to status() + statusDetail() and routes to /status (1 ms)[22m
+    [32m√[39m [2mmaps a 403 "account_inactive" to status() + statusDetail() and routes to /status (14 ms)[22m
+    [32m√[39m [2mmaps a 403 "device_not_recognized" to status() + statusDetail() and routes to /status (1 ms)[22m
+    [32m√[39m [2msurfaces a 401 "no student access" as a form error (not a status screen) (15 ms)[22m
+    [32m√[39m [2mmaps Firebase auth errors to friendly copy (4 ms)[22m
+    [32m√[39m [2msingle-flights refresh: concurrent 401-driven refreshes hit /api/auth/refresh once (3 ms)[22m
+    [32m√[39m [2mclears the session and routes to /login when refresh is rejected (3 ms)[22m
+    [32m√[39m [2mrestoreSession rehydrates from sessionStorage (1 ms)[22m
+    [32m√[39m [2msigns out via Firebase, clears the session, and routes to /login (2 ms)[22m
+    [32m√[39m [2mrequests a Firebase password reset for the given email (1 ms)[22m
+
+[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
+[1mTests:       [22m[1m[32m13 passed[39m[22m, 13 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        1.956 s, estimated 4 s
+[2mRan all test suites[22m[2m.[22m

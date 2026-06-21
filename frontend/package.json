@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "nx serve admin-portal",
+    "start:student": "nx serve student-portal",
     "build": "nx build admin-portal",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",

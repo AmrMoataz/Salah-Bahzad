@@ -1,0 +1,8 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "student-portal",
+  "projectType": "application",
+  "prefix": "sb",
+  "sourceRoot": "apps/student-portal/src",
+  "tags": ["scope:student-portal", "type:app"]
+}

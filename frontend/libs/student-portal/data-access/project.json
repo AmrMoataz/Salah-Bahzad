@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "student-portal-data-access",
+  "projectType": "library",
+  "sourceRoot": "libs/student-portal/data-access/src",
+  "prefix": "sb",
+  "tags": ["scope:student-portal", "type:data-access"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/student-portal/data-access"],
+      "options": {
+        "jestConfig": "libs/student-portal/data-access/jest.config.ts"
+      }
+    }
+  }
+}

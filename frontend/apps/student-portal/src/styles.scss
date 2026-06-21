@@ -1,0 +1,84 @@
+// ── Design tokens ─────────────────────────────────────────────────────────
+// Single source of truth: the Salah Bahzad **Student Portal** design system
+// exported under `.claude/Salah Bahzad Student Portal/_ds/.../tokens/`.
+// `_design-tokens.scss` is a faithful mirror of those files (same canonical
+// `--sb-*` scheme as the admin portal — the two share one design system).
+// Keep this forward-only — never override token values here.
+@use 'styles/design-tokens';
+
+// ── Reset / base ──────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sb-font-sans);
+  font-size: var(--sb-body-lg-size);
+  line-height: 1.5;
+  color: var(--sb-text);
+  background-color: var(--sb-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Typography baseline ───────────────────────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--sb-text);
+}
+
+p { margin: 0; }
+
+a {
+  color: var(--sb-link);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; color: var(--sb-link-hover); }
+}
+
+// ── Focus visible — global ring (meets WCAG 2.1 AA — NFR-A11Y-001) ────────
+:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-shadow-focus);
+  border-radius: var(--sb-radius-sm);
+}
+
+// ── Scrollbar (subtle) ────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--sb-neutral-300);
+  border-radius: var(--sb-radius-pill);
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ── Utility: visually hidden (accessible) ────────────────────────────────
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

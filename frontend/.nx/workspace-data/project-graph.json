@@ -216,6 +216,78 @@
         "implicitDependencies": []
       }
     },
+    "student-portal-feature-shell": {
+      "name": "student-portal-feature-shell",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-shell",
+        "name": "student-portal-feature-shell",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-shell/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-shell"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-shell/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "student-portal-feature-auth": {
+      "name": "student-portal-feature-auth",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-auth",
+        "name": "student-portal-feature-auth",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-auth/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-auth"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-auth/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-audit": {
       "name": "admin-portal-feature-audit",
       "type": "lib",
@@ -342,6 +414,42 @@
         "implicitDependencies": []
       }
     },
+    "student-portal-data-access": {
+      "name": "student-portal-data-access",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/data-access",
+        "name": "student-portal-data-access",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/data-access/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:data-access"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/data-access"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/data-access/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-auth": {
       "name": "admin-portal-feature-auth",
       "type": "lib",
@@ -376,6 +484,119 @@
         ],
         "implicitDependencies": [],
         "targets": {}
+      }
+    },
+    "student-portal": {
+      "name": "student-portal",
+      "type": "app",
+      "data": {
+        "root": "apps/student-portal",
+        "projectType": "application",
+        "sourceRoot": "apps/student-portal/src",
+        "targets": {
+          "build": {
+            "options": {
+              "cwd": "apps/student-portal",
+              "command": "ng build"
+            },
+            "metadata": {
+              "technologies": [
+                "angular"
+              ],
+              "description": "Run the \"build\" target for \"student-portal\".",
+              "help": {
+                "command": "npx ng run student-portal:build --help",
+                "example": {
+                  "options": {
+                    "localize": true
+                  }
+                }
+              }
+            },
+            "dependsOn": [
+              "^build"
+            ],
+            "outputs": [
+              "{workspaceRoot}/dist\\apps\\student-portal"
+            ],
+            "cache": true,
+            "inputs": [
+              "production",
+              "^production",
+              {
+                "externalDependencies": [
+                  "@angular/cli"
+                ]
+              }
+            ],
+            "configurations": {
+              "production": {
+                "command": "ng run student-portal:build:production"
+              },
+              "staging": {
+                "command": "ng run student-portal:build:staging"
+              },
+              "development": {
+                "command": "ng run student-portal:build:development"
+              }
+            },
+            "defaultConfiguration": "production",
+            "executor": "nx:run-commands",
+            "parallelism": true
+          },
+          "serve": {
+            "options": {
+              "cwd": "apps/student-portal",
+              "command": "ng serve"
+            },
+            "metadata": {
+              "technologies": [
+                "angular"
+              ],
+              "description": "Run the \"serve\" target for \"student-portal\".",
+              "help": {
+                "command": "npx ng run student-portal:serve --help",
+                "example": {
+                  "options": {
+                    "port": 4201
+                  }
+                }
+              }
+            },
+            "continuous": true,
+            "configurations": {
+              "production": {
+                "command": "ng run student-portal:serve:production"
+              },
+              "staging": {
+                "command": "ng run student-portal:serve:staging"
+              },
+              "development": {
+                "command": "ng run student-portal:serve:development"
+              }
+            },
+            "defaultConfiguration": "development",
+            "executor": "nx:run-commands",
+            "parallelism": true
+          }
+        },
+        "name": "student-portal",
+        "tags": [
+          "npm:private",
+          "scope:student-portal",
+          "type:app"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "student-portal",
+            "packageVersion": "0.0.0",
+            "isInPackageManagerWorkspaces": false
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "prefix": "sb",
+        "implicitDependencies": []
       }
     },
     "admin-portal": {
@@ -16118,6 +16339,75 @@
         "type": "static"
       }
     ],
+    "student-portal-feature-shell": [
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:@angular/platform-browser",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-shell",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
+    "student-portal-feature-auth": [
+      {
+        "source": "student-portal-feature-auth",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-auth",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-audit": [
       {
         "source": "admin-portal-feature-audit",
@@ -16276,6 +16566,38 @@
         "type": "static"
       }
     ],
+    "student-portal-data-access": [
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:@angular/fire",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-data-access",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-auth": [
       {
         "source": "admin-portal-feature-auth",
@@ -16327,6 +16649,53 @@
       {
         "source": "shared-data-access",
         "target": "npm:@angular/fire",
+        "type": "static"
+      }
+    ],
+    "student-portal": [
+      {
+        "source": "student-portal",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "npm:@angular/platform-browser",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "npm:@angular/fire",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-auth",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-shell",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "npm:jest-preset-angular",
         "type": "static"
       }
     ],
@@ -16409,6 +16778,11 @@
       {
         "source": "admin-portal",
         "target": "admin-portal-feature-audit",
+        "type": "dynamic"
+      },
+      {
+        "source": "admin-portal",
+        "target": "admin-portal-feature-attendance",
         "type": "dynamic"
       },
       {
@@ -38680,5 +39054,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1782030217067
+  "computedAt": 1782042283907
 }

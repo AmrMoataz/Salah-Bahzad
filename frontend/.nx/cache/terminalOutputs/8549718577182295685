@@ -1,7 +1,0 @@
-
-[0m[7m[1m[31m NX [39m[22m[27m[0m  [31mJest: Failed to parse the TypeScript config file C:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\libs\shared\ui\jest.config.ts[39m
-
-  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed
-Error: Cannot find package 'ts-node' imported from C:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\node_modules\jest-config\build\readConfigFileAndSetRootDir.js
-Pass --verbose to see the stacktrace.
-

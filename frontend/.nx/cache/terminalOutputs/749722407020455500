@@ -1,8 +1,0 @@
-[1mNo tests found, exiting with code 1[22m
-Run with `--passWithNoTests` to exit with code 0
-In [1mC:\Users\Amr\source\repos\SalahBahazad\New System\Salah bahzad\frontend\libs\admin-portal\feature-taxonomy[22m
-  11 files checked.
-  testMatch: [33m**/?(*.)+(spec|test).[jt]s?(x)[39m - 0 matches
-  testPathIgnorePatterns: [33m\\node_modules\\[39m - 11 matches
-  testRegex:  - 0 matches
-Pattern:  - 0 matches

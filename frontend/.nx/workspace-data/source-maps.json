@@ -245,6 +245,252 @@
       "nx/core/project-json"
     ]
   },
+  "apps/student-portal": {
+    "root": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.options": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.dependsOn": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.outputs": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.cache": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.inputs": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.defaultConfiguration": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.executor": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.options.cwd": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.options.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.production": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.production.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.staging": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.staging.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.development": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.configurations.development.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.technologies": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.technologies.0": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.description": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.help": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.help.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.build.metadata.help.example": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.options": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.continuous": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.defaultConfiguration": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.executor": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.options.cwd": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.options.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.production": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.production.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.staging": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.staging.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.development": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.configurations.development.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.technologies": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.technologies.0": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.description": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.help": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.help.command": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "targets.serve.metadata.help.example": [
+      "apps/student-portal/angular.json",
+      "@nx/angular/plugin"
+    ],
+    "name": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "apps/student-portal/package.json",
+      "nx/core/package-json"
+    ],
+    "$schema": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:app": [
+      "apps/student-portal/project.json",
+      "nx/core/project-json"
+    ]
+  },
   "libs/admin-portal/feature-attendance": {
     "root": [
       "libs/admin-portal/feature-attendance/project.json",
@@ -1084,6 +1330,228 @@
     ],
     "targets.test.options.jestConfig": [
       "libs/shared/ui/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "libs/student-portal/data-access": {
+    "root": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:data-access": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/student-portal/data-access/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "libs/student-portal/feature-auth": {
+    "root": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:feature": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/student-portal/feature-auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.test.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "libs/student-portal/feature-shell": {
+    "root": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "name": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.scope:student-portal": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "tags.type:feature": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.executor": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.outputs": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options": [
+      "libs/student-portal/feature-shell/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.test.options.jestConfig": [
+      "libs/student-portal/feature-shell/project.json",
       "nx/core/project-json"
     ],
     "targets.test.cache": [

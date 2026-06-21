@@ -19,7 +19,12 @@ var db = postgres.AddDatabase("DefaultConnection");
 // forfeit-on-disconnect survive horizontal scale (FR-PLAT-QZ-004), and the HybridCache L2. Fixed dev port
 // (mirroring the Postgres/MinIO precedent) so wiring can reach it; injected as ConnectionStrings__redis.
 var redis = builder.AddRedis("redis", port: 6379)
-    .WithDataVolume();
+    .WithDataVolume()
+    // RedisInsight UI sidecar (fixed host port + data volume so the accepted EULA and saved
+    // connection persist across restarts), mirroring the Postgres/MinIO fixed-port precedent above.
+    .WithRedisInsight(ui => ui
+        .WithHostPort(5540)
+        .WithDataVolume());
 
 // ── Object storage (MinIO, S3-compatible) ────────────────────────────────────
 // MinIO emulates Cloudflare R2 locally so the IFileStorage → R2FileStorage path runs offline with the
@@ -72,6 +77,15 @@ builder.AddNpmApp("admin-portal", "../../../frontend", "start")
     .WithReference(api)
     .WithEnvironment("BROWSER", "none")
     .WithHttpEndpoint(targetPort: 4200)
+    .ExcludeFromManifest();
+
+// ── Student Portal (Angular / Nx) ──────────────────────────────────────────
+// Second Angular app, same proxy mechanism (services__api__http__0 → proxy.conf.js). Runs on 4300
+// so it sits alongside the admin portal under one AppHost; its proxy also forwards /hubs (SignalR).
+builder.AddNpmApp("student-portal", "../../../frontend", "start:student")
+    .WithReference(api)
+    .WithEnvironment("BROWSER", "none")
+    .WithHttpEndpoint(targetPort: 4300)
     .ExcludeFromManifest();
 
 builder.Build().Run();

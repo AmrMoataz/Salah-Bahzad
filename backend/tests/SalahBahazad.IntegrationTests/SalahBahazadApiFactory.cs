@@ -79,6 +79,10 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         builder.UseSetting("Jwt:Issuer", JwtIssuer);
         builder.UseSetting("Jwt:Audience", JwtAudience);
 
+        // The "auth" rate limiter is a single global bucket; the suite makes many auth calls on one host, so
+        // lift the limit well above what any single test needs (production keeps the tight default).
+        builder.UseSetting("RateLimiting:AuthPermitLimit", "1000000");
+
         // Point object storage at the MinIO container (the real R2FileStorage path).
         builder.UseSetting("R2:Endpoint", _minio.GetConnectionString());
         builder.UseSetting("R2:AccessKeyId", _minio.GetAccessKey());
@@ -482,6 +486,22 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         db.AuditEntries.Add(entry);
         await db.SaveChangesAsync();
         return entry;
+    }
+
+    /// <summary>
+    /// Pins the fake Firebase verifier so <paramref name="idToken"/> resolves to a known
+    /// <paramref name="firebaseUid"/> — lets sign-in tests target a seeded student (whose UID is random).
+    /// </summary>
+    public void PinFirebaseUser(string idToken, string firebaseUid) =>
+        ((FakeFirebaseAuthService)Services.GetRequiredService<IFirebaseAuthService>()).Pin(idToken, firebaseUid);
+
+    /// <summary>Number of audit rows of a given entity type + action within a tenant (for "exactly one row" checks).</summary>
+    public async Task<int> CountAuditAsync(Guid tenantId, string entityType, string action)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        return await db.AuditEntries
+            .CountAsync(a => a.TenantId == tenantId && a.EntityType == entityType && a.Action == action);
     }
 
     public async Task<AuditEntry?> LatestStaffAuditAsync(Guid tenantId, string action)
