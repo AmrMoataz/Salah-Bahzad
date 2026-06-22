@@ -80,8 +80,18 @@ public sealed class AuditSaveChangesInterceptor(
 
         var auditable = context.ChangeTracker
             .Entries()
-            .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
             .Where(e => e.Entity is not AuditEntry)
+            .Where(e =>
+                e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted
+                // A buffered semantic lifecycle event must always leave exactly one row — even when EF marks the
+                // aggregate root Unchanged because only an owned child moved. A quiz forfeit/timeout on a later
+                // attempt is the canonical case: the owned QuizAttempt changes but RecomputeBest rewrites
+                // BestPercent/Passed with the SAME value (a prior attempt already set the best), so the UserQuiz
+                // root has no scalar change. Without this the buffered IAuditableDomainEvent below was silently
+                // dropped and the forfeit/timeout went un-audited (FR-PLAT-QZ-010, FR-PLAT-AUD-002/-005).
+                || (e.State is EntityState.Unchanged
+                    && e.Entity is EntityBase rootWithEvent
+                    && rootWithEvent.DomainEvents.OfType<IAuditableDomainEvent>().Any()))
             .ToList();
 
         if (auditable.Count == 0)

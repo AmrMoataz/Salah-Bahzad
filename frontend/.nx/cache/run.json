@@ -1,21 +1,9 @@
 {
   "run": {
-    "command": "nx test student-portal-feature-sessions --skip-nx-cache",
-    "startTime": "2026-06-21T22:03:31.814Z",
-    "endTime": "2026-06-21T22:03:38.513Z",
+    "command": "nx serve student-portal --port 4300",
+    "startTime": "2026-06-22T06:28:10.655Z",
+    "endTime": "2026-06-22T07:19:51.974Z",
     "inner": false
   },
-  "tasks": [
-    {
-      "taskId": "student-portal-feature-sessions:test",
-      "target": "test",
-      "projectName": "student-portal-feature-sessions",
-      "hash": "17043493383884626797",
-      "startTime": "2026-06-21T22:03:31.829Z",
-      "endTime": "2026-06-21T22:03:38.510Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    }
-  ]
+  "tasks": []
 }

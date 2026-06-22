@@ -206,6 +206,34 @@ describe('SessionDetailComponent (FR-STU-SES-001..004)', () => {
     expect(root().textContent).toContain('Start attempt');
   });
 
+  it('navigates to the quiz INTRO carrying the session title (F8 — a route string, not an import)', async () => {
+    setup(
+      makeDetail({
+        quiz: {
+          userQuizId: 'uq1',
+          passed: false,
+          bestPercent: null,
+          minPassPercent: 60,
+          attemptsUsed: 0,
+          attemptCount: 3,
+          timeLimitMinutes: 30,
+          questionCount: 8,
+        },
+      }),
+    );
+    await fixture.whenStable();
+    const navSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    const quizCard = root().querySelector('.sd__entry-icon--quiz')?.closest('.sd__card');
+    quizCard?.querySelector<HTMLButtonElement>('sb-button button')?.click();
+
+    expect(navSpy).toHaveBeenCalledWith(['/sessions', 'sess-1', 'quiz'], {
+      state: { sessionTitle: 'Algebra' },
+    });
+    // The "Opens in the next update." placeholder is gone.
+    expect(root().textContent).not.toContain('Opens in the next update');
+  });
+
   it('routes back to /sessions on a 404 (not enrolled / unknown / other tenant) (§B.2)', async () => {
     service = {
       session: jest.fn().mockReturnValue(throwError(() => new HttpErrorResponse({ status: 404 }))),

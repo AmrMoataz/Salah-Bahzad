@@ -33,9 +33,8 @@ internal sealed class MeCatalogueEndpoints : IEndpointGroup
         ISender sender,
         CancellationToken cancellationToken,
         [FromQuery] string? search = null,
-        [FromQuery] Guid? gradeId = null,
         [FromQuery] Guid? subjectId = null,
         [FromQuery] Guid? specializationId = null)
         => Results.Ok(await sender.Send(
-            new ListCatalogueQuery(search, gradeId, subjectId, specializationId), cancellationToken));
+            new ListCatalogueQuery(search, subjectId, specializationId), cancellationToken));
 }

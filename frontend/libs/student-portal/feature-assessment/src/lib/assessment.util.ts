@@ -14,3 +14,28 @@ export function mmss(seconds: number | null | undefined): string {
 export function optionLetter(index: number): string {
   return String.fromCharCode(65 + index);
 }
+
+/** A quiz attempt's terminal status (the live union, mirrored here to avoid a data-access import). */
+type AttemptStatus = 'InProgress' | 'Submitted' | 'Forfeited' | 'TimedOut';
+
+/**
+ * Derive the UI flag from a terminal attempt `status` — the §B review only carries `status`, so the
+ * review header re-derives the Clean/Timeout/Forfeit pill the intro's `attempts[]` get for free (§A #1).
+ */
+export function quizFlagFromStatus(status: AttemptStatus): 'Clean' | 'Timeout' | 'Forfeit' {
+  switch (status) {
+    case 'TimedOut':
+      return 'Timeout';
+    case 'Forfeited':
+      return 'Forfeit';
+    default:
+      return 'Clean'; // Submitted (or the never-reviewed InProgress)
+  }
+}
+
+/** The `StatusPill` variant for an attempt flag — Clean reads neutral, Timeout warns, Forfeit alarms. */
+export function quizFlagVariant(
+  flag: 'Clean' | 'Timeout' | 'Forfeit',
+): 'neutral' | 'warning' | 'danger' {
+  return flag === 'Forfeit' ? 'danger' : flag === 'Timeout' ? 'warning' : 'neutral';
+}

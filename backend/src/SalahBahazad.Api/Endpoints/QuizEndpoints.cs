@@ -7,6 +7,7 @@ using SalahBahazad.Application.Features.Quizzes.Commands.StartQuizAttempt;
 using SalahBahazad.Application.Features.Quizzes.Commands.SubmitQuizAttempt;
 using SalahBahazad.Application.Features.Quizzes.DTOs;
 using SalahBahazad.Application.Features.Quizzes.Queries.GetMyQuiz;
+using SalahBahazad.Application.Features.Quizzes.Queries.GetMyQuizAttemptReview;
 using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.Api.Endpoints;
@@ -15,7 +16,8 @@ namespace SalahBahazad.Api.Endpoints;
 /// The proctored-quiz <b>engine</b> (contract §A #1–5, FR-PLAT-QZ-001..010) — student-facing and backend-only
 /// (no admin screen; the future student portal/app calls it). Every route is gated to a Student-role principal
 /// (<see cref="RequireStudentExtensions"/>): anon → 401, staff → 403. The student/tenant are read from the JWT;
-/// handlers IDOR-check ownership. No <c>isCorrect</c> is exposed here.
+/// handlers IDOR-check ownership. No <c>isCorrect</c> is exposed on the engine routes; the one exception is the
+/// per-attempt answer-key <b>review</b> (§B), gated to the caller's own <b>terminal</b> attempt.
 /// </summary>
 internal sealed class QuizEndpoints : IEndpointGroup
 {
@@ -67,6 +69,16 @@ internal sealed class QuizEndpoints : IEndpointGroup
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status403Forbidden)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+
+        // S5 (§B): the per-attempt answer-key review — the ONLY student route that exposes isCorrect, and only for
+        // the caller's own terminal attempt (an in-progress attempt → 403 quiz_attempt_in_progress).
+        group.MapGet("/attempts/{attemptId:guid}/review", GetAttemptReviewAsync)
+            .RequireStudent()
+            .WithName("GetMyQuizAttemptReview")
+            .WithSummary("The caller's own terminal attempt with the answer key (the only student isCorrect surface)")
+            .Produces<StudentQuizAttemptReviewDto>()
+            .Produces<ProblemDetails>(StatusCodes.Status403Forbidden)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetBySessionAsync(
@@ -104,6 +116,10 @@ internal sealed class QuizEndpoints : IEndpointGroup
             cancellationToken);
         return Results.NoContent();
     }
+
+    private static async Task<IResult> GetAttemptReviewAsync(
+        Guid attemptId, ISender sender, CancellationToken cancellationToken)
+        => Results.Ok(await sender.Send(new GetMyQuizAttemptReviewQuery(attemptId), cancellationToken));
 }
 
 /// <summary>Request body for recording an answer (#3).</summary>

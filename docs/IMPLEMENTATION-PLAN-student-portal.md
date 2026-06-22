@@ -260,11 +260,43 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
   the answer-key review renders (your vs correct + score) for the caller's own **completed** assignment.
 
 ### S5 — Quizzes (proctored)
+> **Status: ✅ MET (2026-06-22)** — backend (the new review read + the additive attempt `id`) + frontend (the quiz
+> intro/runner/results + the new per-attempt review + the SignalR hub client) built; **wiring proven live on the Aspire
+> stack — S5's own surface with ZERO drift** (intro `id`, start/answer/submit, the `≥`-pass boundary 80==80, best-of=max
+> 80→100, focus-not-forfeit, **live hub forfeit-on-disconnect** → `Forfeited`/0, the new `GET …/attempts/{id}/review`
+> with per-option + per-question `isCorrect` / `403 quiz_attempt_in_progress` / `404` IDOR / 401-403-200 / not-audited /
+> the isCorrect split, and **pass→videos-unlock**). The browser walkthrough (#15) is the user's step. **One pre-existing
+> 5B-2 finding, now FIXED (2026-06-22):** the hub **forfeit/timeout wrote no audit row** on a *later* attempt — when
+> `RecomputeBest` left `BestPercent`/`Passed` unchanged the `UserQuiz` root was EF-`Unchanged`, and the
+> `AuditSaveChangesInterceptor` (which only audited Added/Modified/Deleted) dropped the buffered `System` event. Fixed by
+> also auditing `Unchanged` roots carrying an `IAuditableDomainEvent`; +2 regression tests, **63/63** audit+quiz tests
+> green. Goes live on the next API rebuild. See `IMPLEMENTATION-PLAN-student-s5-wiring.md` run log. **NOT committed.**
+
+> **Planning note (2026-06-22) — this is a 3-stream slice, not "frontend-only".** Like S4, the master plan's
+> *"Backend: none"* was an oversight: **`FR-STU-QZ-009`** ("students SHALL review each attempt's questions, **their
+> answers, and the correct answers**") has **no** path — the student quiz shapes deliberately hide `isCorrect`, and the
+> **staff** quiz review (`GET /api/review/quizzes/{enrollmentId}` → `QuizReviewDto`) is **attempt-level scores only**.
+> So S5 adds **one** new read — **`GET /api/me/quizzes/attempts/{attemptId}/review`** (`RequireStudent`, the only
+> student surface that exposes quiz `isCorrect`, gated to the caller's own **terminal** attempt) + **one additive field**
+> (`id` on the attempt-summary list, so the intro can deep-link a review) — the standard **3-stream** split (backend +
+> frontend + wiring), exactly like S4's review read. **No migration.** **Second grounding correction:** the runner timer
+> is **local** (seeded from the start response's `deadlineUtc`/`serverNowUtc`) + **Hangfire-authoritative** — the
+> **`QuizHub` pushes nothing** (its sole job is forfeit-on-disconnect), so §4.2's "server-synced via QuizHub" is wrong.
+> Contract + 3 streams authored: `docs/contracts/student-s5-quizzes.md` +
+> `docs/IMPLEMENTATION-PLAN-student-s5-{backend,frontend,wiring}.md`.
+
 **Goal:** the single-sitting quiz with the live server timer.
-- **Backend:** **none** — `/api/me/quizzes` + `QuizHub` exist; the student app connects to the hub (JWT via the access-token-on-hub-path scheme, not query-string).
-- **Frontend:** `feature-assessment` — quiz intro (time/attempts/best, randomised + pass-mark rules, "one sitting only" alert), runner (sticky server-synced `Timer` bar `warnAt=60`, question dots, focus-loss detection → telemetry + on-screen warning, **forfeit-on-disconnect/navigation** via `beforeunload` + hub disconnect, leave-quiz confirm modal, auto-submit on timer/manual submit), results (pass/fail mascot, score ring, this-attempt + best-of) (prototype § QUIZ INTRO / QUIZ RUNNER / QUIZ RESULTS + Leave-quiz modal).
-- **Reqs:** FR-STU-QZ-001..010, FR-PLAT-QZ-001..010 (best-of, `≥` pass, focus-loss-recorded-not-forfeit, forfeit-on-leave, server timer).
-- **Exit:** an attempt randomises; the timer is authoritative; leaving forfeits with zero (consumes the attempt); focus-loss is logged not forfeited; passing (`≥` min) unlocks the session's videos; best-of is shown.
+- **Backend (one small addition — user-confirmed 2026-06-22):** the five `/api/me/quizzes` engine routes + the `QuizHub`
+  **exist** (5B-2) and are reused as-is; add **one** new read **`GET /api/me/quizzes/attempts/{attemptId}/review`** →
+  `StudentQuizAttemptReviewDto` (per-question/-option `isCorrect` + the attempt score), gated to the caller's own
+  **terminal** attempt (`403 quiz_attempt_in_progress` otherwise, `404` IDOR), **plus** an additive `id` on the
+  attempt-summary DTO so the intro list can deep-link a review. **No migration.** The student app connects to the hub
+  (JWT via the access-token-on-hub-path scheme, not query-string) **only to arm forfeit-on-disconnect** — the hub pushes
+  nothing.
+- **Frontend:** `feature-assessment` — quiz intro (time/attempts/best, randomised + pass-mark rules, "one sitting only" alert), runner (a **local** countdown seeded from `deadlineUtc`/`serverNowUtc` [Hangfire is the authoritative auto-submit], question dots, focus-loss detection → telemetry + on-screen warning, **forfeit-on-disconnect/navigation** via `beforeunload` + hub disconnect, leave-quiz confirm modal, auto-submit on timer/manual submit), results (pass/fail mascot, score ring, this-attempt + best-of), **+ the NEW per-attempt answer-key review screen** (your vs correct answers — the prototype has none, like S4's review) (prototype § QUIZ INTRO / QUIZ RUNNER / QUIZ RESULTS + Leave-quiz modal).
+- **Contract:** `docs/contracts/student-s5-quizzes.md`.
+- **Reqs:** FR-STU-QZ-001..010, FR-PLAT-QZ-001..010 (best-of, `≥` pass, focus-loss-recorded-not-forfeit, forfeit-on-leave, server timer, per-attempt answer-key review).
+- **Exit:** an attempt randomises; the timer is authoritative; leaving forfeits with zero (consumes the attempt); focus-loss is logged not forfeited; passing (`≥` min) unlocks the session's videos; best-of is shown; **the per-attempt answer-key review renders (your vs correct + score) for the caller's own terminal attempt**.
 
 ### S6 — Profile
 **Goal:** self-service account management.
@@ -296,4 +328,4 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 ---
 
 ### Per-phase docs to produce (as each phase starts, mirroring the admin plan)
-`docs/contracts/student-s{1,2,3,4,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. **S4** reuses the 5B-1 engine (`phase5b1-assignments-attendance.md`) but adds **one** new student review read, so it has its **own** contract (`student-s4-assignments.md`) + all **three** streams. **S5** reuses the existing engine contracts (`phase5b2-quizzes.md`, `phase5c-video-gate.md`) and needs only `-frontend` (+ `-wiring`) streams.
+`docs/contracts/student-s{1,2,3,4,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. **S4** reuses the 5B-1 engine (`phase5b1-assignments-attendance.md`) but adds **one** new student review read, so it has its **own** contract (`student-s4-assignments.md`) + all **three** streams. **S5** likewise reuses the existing engine (`phase5b2-quizzes.md`, `phase5c-video-gate.md`) **but**, like S4, adds **one** new student review read (`GET /api/me/quizzes/attempts/{attemptId}/review`, the only student surface exposing quiz `isCorrect`) + one additive attempt-`id` field — so it too has its **own** contract (`student-s5-quizzes.md`) + all **three** streams (`-backend`/`-frontend`/`-wiring`). *(Planning 2026-06-22 revised the earlier "frontend + wiring only" note: `FR-STU-QZ-009`'s per-attempt answer-key review had no backend path.)*

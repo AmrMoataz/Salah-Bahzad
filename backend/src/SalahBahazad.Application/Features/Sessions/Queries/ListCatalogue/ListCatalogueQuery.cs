@@ -12,6 +12,5 @@ namespace SalahBahazad.Application.Features.Sessions.Queries.ListCatalogue;
 /// </summary>
 public sealed record ListCatalogueQuery(
     string? Search = null,
-    Guid? GradeId = null,
     Guid? SubjectId = null,
     Guid? SpecializationId = null) : IRequest<IReadOnlyList<CatalogueSessionDto>>;

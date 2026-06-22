@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard, statusGuard } from '@sb/student-portal/data-access';
+import { quizLeaveGuard } from '@sb/student-portal/feature-assessment';
 
 export const appRoutes: Routes = [
   {
@@ -63,6 +64,26 @@ export const appRoutes: Routes = [
         path: 'sessions/:id/assignment/review',
         loadComponent: () =>
           import('@sb/student-portal/feature-assessment').then((m) => m.AssignmentReviewComponent),
+      },
+      {
+        // S5 — the proctored quiz intro + runner (one route, phase-switched; `:id` via input binding).
+        // The CanDeactivate guard raises the "Leave the quiz?" forfeit confirm on an in-app leave mid-sitting.
+        path: 'sessions/:id/quiz',
+        canDeactivate: [quizLeaveGuard],
+        loadComponent: () =>
+          import('@sb/student-portal/feature-assessment').then((m) => m.QuizIntroComponent),
+      },
+      {
+        // S5 — the score-only results screen (reached from the runner / a refresh re-derives it).
+        path: 'sessions/:id/quiz/results',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-assessment').then((m) => m.QuizResultsComponent),
+      },
+      {
+        // S5 — the NEW per-attempt answer-key review (`:id` + `:attemptId` via input binding).
+        path: 'sessions/:id/quiz/attempts/:attemptId/review',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-assessment').then((m) => m.QuizReviewComponent),
       },
       {
         // The shell's Redeem FAB target: the catalogue with the enroll modal auto-opened (blank).

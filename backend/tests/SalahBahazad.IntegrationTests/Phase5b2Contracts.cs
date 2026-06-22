@@ -7,7 +7,7 @@ namespace SalahBahazad.IntegrationTests;
 public sealed record QuizSettings(int TimeLimitMinutes, int QuestionCount, int AttemptCount, int MinPassPercent);
 
 public sealed record StudentQuizAttemptSummary(
-    int Number, int? ScorePercent, string Status, string Flag, DateTimeOffset StartedAtUtc, DateTimeOffset? SubmittedAtUtc);
+    Guid Id, int Number, int? ScorePercent, string Status, string Flag, DateTimeOffset StartedAtUtc, DateTimeOffset? SubmittedAtUtc);
 
 public sealed record StudentQuiz(
     Guid Id,

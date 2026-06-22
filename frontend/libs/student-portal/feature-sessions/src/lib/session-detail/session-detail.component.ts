@@ -152,7 +152,6 @@ const INSTALL_PROMPT_DELAY_MS = 1500;
                 </div>
                 <p class="sd__entry-status">{{ quizMeta()?.line }}</p>
                 <sb-button variant="secondary" (clicked)="openQuiz()">{{ quizMeta()?.cta }}</sb-button>
-                @if (quizNote()) { <p class="sd__soon">Opens in the next update.</p> }
               </div>
             }
 
@@ -298,9 +297,6 @@ export class SessionDetailComponent implements OnDestroy {
   readonly videoError = signal<string | null>(null);
   readonly installPromptOpen = signal(false);
   readonly lastDeepLink = signal<string | null>(null);
-
-  // Entry-card placeholder note (S5 quiz runner not built yet — do not block the build)
-  readonly quizNote = signal(false);
 
   // Materials
   readonly materialLoadingId = signal<string | null>(null);
@@ -459,9 +455,19 @@ export class SessionDetailComponent implements OnDestroy {
     });
   }
 
+  /**
+   * Open the S5 prerequisite quiz — always lands on the **intro** (`/sessions/:id/quiz`), the canonical
+   * hub for Start / Resume / Try-again and (when passed) the "Review quiz" affordance to the best
+   * terminal attempt's answer key. A route string, not an import — keeps the
+   * `feature-sessions → feature-assessment` boundary intact (master plan F8). The session title rides
+   * the navigation state so the runner / results / review header can use it when the DTO lacks it.
+   */
   openQuiz(): void {
-    // The S5 quiz intro/runner isn't built yet — surface a note (the card only shows when quiz != null).
-    this.quizNote.set(true);
+    const d = this.detail();
+    if (!d?.quiz) return;
+    void this.#router.navigate(['/sessions', this.id(), 'quiz'], {
+      state: { sessionTitle: d.title },
+    });
   }
 
   /** Seam for tests — real navigation throws in jsdom. */

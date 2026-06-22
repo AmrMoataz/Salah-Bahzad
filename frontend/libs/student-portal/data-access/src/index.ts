@@ -52,6 +52,24 @@ export type {
   StudentReviewOption,
 } from './lib/assignments/assignment.models';
 
+export { QuizService } from './lib/quizzes/quiz.service';
+export type {
+  QuizAttemptStatus,
+  QuizAttemptFlag,
+  FocusEventType,
+  QuizSettings,
+  StudentQuizAttemptSummary,
+  StudentQuiz,
+  QuizAttemptOption,
+  QuizAttemptQuestion,
+  QuizAttempt,
+  QuizAttemptResult,
+  FocusEventBody,
+  StudentQuizReviewOption,
+  StudentQuizReviewQuestion,
+  StudentQuizAttemptReview,
+} from './lib/quizzes/quiz.models';
+
 export { RegistrationService, registrationConfig } from './lib/registration/registration.service';
 export {
   ID_IMAGE_MAX_BYTES,

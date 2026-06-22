@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Domain.Enums;
 using SalahBahazad.Infrastructure.Jobs;
 
@@ -71,6 +72,81 @@ public sealed class QuizProctoringTests(SalahBahazadApiFactory factory)
         var audit = await factory.LatestAuditAsync(ctx.Tenant, "UserQuiz", "QuizAttemptForfeited");
         audit.Should().NotBeNull();
         audit!.ActorType.Should().Be("System");
+    }
+
+    // Regression (FR-PLAT-QZ-010): forfeit/timeout of a LATER attempt — after a prior attempt already set the
+    // best-of — must still be audited. RecomputeBest rewrites BestPercent/Passed with the SAME value, so EF marks
+    // the UserQuiz root Unchanged and only the owned QuizAttempt moves. The audit interceptor previously skipped
+    // Unchanged roots and silently dropped the buffered System event, so these went un-audited live.
+    [Fact]
+    public async Task Forfeiting_a_later_attempt_that_does_not_improve_best_is_still_audited_as_System()
+    {
+        var ctx = await factory.SetupGatedQuizAsync(questionCount: 2, attemptCount: 3, minPassPercent: 60);
+
+        // Attempt #1 submitted at 100% → best-of is set; the quiz passes.
+        var first = await ctx.Student.StartAttemptAsync(ctx.Quiz.Id);
+        await ctx.Student.AnswerAttemptAsync(first, correctCount: 2);
+        await ctx.Student.SubmitAttemptAsync(first.AttemptId);
+
+        // Attempt #2 becomes the active sitting, then its single-sitting connection drops. Forfeit it exactly as
+        // the hub's OnDisconnectedAsync does — via IQuizLifecycleService — so the test targets the AUDIT on a
+        // later attempt deterministically (the hub→forfeit wiring itself is covered by
+        // Disconnecting_the_hub_forfeits_the_active_attempt_by_System, and proven live over a real WebSocket).
+        var second = await ctx.Student.StartAttemptAsync(ctx.Quiz.Id);
+        await ctx.Student.AnswerAttemptAsync(second, correctCount: 2); // would be 100% if submitted
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var lifecycle = scope.ServiceProvider.GetRequiredService<IQuizLifecycleService>();
+            var forfeitedSomething = await lifecycle.ForfeitActiveAttemptAsync(ctx.Quiz.Id, ctx.Tenant);
+            forfeitedSomething.Should().BeTrue();
+        }
+
+        var forfeited = await ReadAttemptAsync(ctx.Quiz.Id, second.AttemptId);
+        forfeited.Status.Should().Be(QuizAttemptStatus.Forfeited);
+        forfeited.ScorePercent.Should().Be(0);
+
+        // best-of is unchanged (0 never beats 100) → the root had no scalar change → yet the forfeit IS audited.
+        var best = await factory.QueryDbAsync(db => db.UserQuizzes.IgnoreQueryFilters()
+            .Where(q => q.Id == ctx.Quiz.Id).Select(q => q.BestPercent).FirstAsync());
+        best.Should().Be(100);
+
+        var audit = await factory.LatestAuditAsync(ctx.Tenant, "UserQuiz", "QuizAttemptForfeited");
+        audit.Should().NotBeNull("forfeit must leave a System audit row even when best-of is unchanged");
+        audit!.ActorType.Should().Be("System");
+        audit.ActorId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Timing_out_a_later_attempt_that_does_not_improve_best_is_still_audited_as_System()
+    {
+        var ctx = await factory.SetupGatedQuizAsync(questionCount: 2, attemptCount: 3, minPassPercent: 60);
+
+        var first = await ctx.Student.StartAttemptAsync(ctx.Quiz.Id);
+        await ctx.Student.AnswerAttemptAsync(first, correctCount: 2); // 100%
+        await ctx.Student.SubmitAttemptAsync(first.AttemptId);
+
+        var second = await ctx.Student.StartAttemptAsync(ctx.Quiz.Id);
+        await ctx.Student.AnswerAttemptAsync(second, correctCount: 1); // 50% partial — won't beat 100
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var job = scope.ServiceProvider.GetRequiredService<QuizAutoSubmitJob>();
+            await job.RunAsync(ctx.Quiz.Id, second.AttemptId, ctx.Tenant);
+        }
+
+        var timedOut = await ReadAttemptAsync(ctx.Quiz.Id, second.AttemptId);
+        timedOut.Status.Should().Be(QuizAttemptStatus.TimedOut);
+        timedOut.ScorePercent.Should().Be(50);
+
+        var best = await factory.QueryDbAsync(db => db.UserQuizzes.IgnoreQueryFilters()
+            .Where(q => q.Id == ctx.Quiz.Id).Select(q => q.BestPercent).FirstAsync());
+        best.Should().Be(100); // unchanged → root Unchanged → the timeout still must be audited
+
+        var audit = await factory.LatestAuditAsync(ctx.Tenant, "UserQuiz", "QuizAttemptTimedOut");
+        audit.Should().NotBeNull("timeout must leave a System audit row even when best-of is unchanged");
+        audit!.ActorType.Should().Be("System");
+        audit.ActorId.Should().BeNull();
     }
 
     [Fact]
