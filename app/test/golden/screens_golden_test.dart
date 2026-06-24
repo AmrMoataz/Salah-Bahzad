@@ -16,16 +16,12 @@ void main() {
   setUpAll(loadAppFonts);
 
   Widget wrap(Widget child) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: SbTheme.build(),
-        home: Material(type: MaterialType.transparency, child: child),
-      );
+    debugShowCheckedModeBanner: false,
+    theme: SbTheme.build(),
+    home: Material(type: MaterialType.transparency, child: child),
+  );
 
-  Future<void> pumpAt(
-    WidgetTester tester,
-    Widget child,
-    double width,
-  ) async {
+  Future<void> pumpAt(WidgetTester tester, Widget child, double width) async {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = Size(width, 1200);
     addTearDown(tester.view.resetPhysicalSize);
@@ -56,10 +52,12 @@ void main() {
     });
 
     testWidgets('sign in @ $tag', (WidgetTester tester) async {
-      final TextEditingController email =
-          TextEditingController(text: 'layla.ahmed@student.sb');
-      final TextEditingController password =
-          TextEditingController(text: 'supersecret');
+      final TextEditingController email = TextEditingController(
+        text: 'layla.ahmed@student.sb',
+      );
+      final TextEditingController password = TextEditingController(
+        text: 'supersecret',
+      );
       addTearDown(email.dispose);
       addTearDown(password.dispose);
 

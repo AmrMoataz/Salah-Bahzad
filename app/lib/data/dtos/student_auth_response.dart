@@ -19,22 +19,23 @@ class StudentAuthResponse {
 
   /// The token pair, ready for the keystore.
   Session toSession() => Session(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        accessTokenExpiresAt: accessTokenExpiresAt,
-        refreshTokenExpiresAt: refreshTokenExpiresAt,
-      );
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    accessTokenExpiresAt: accessTokenExpiresAt,
+    refreshTokenExpiresAt: refreshTokenExpiresAt,
+  );
 
   factory StudentAuthResponse.fromJson(Map<String, dynamic> json) {
     return StudentAuthResponse(
       accessToken: json['accessToken'] as String,
       refreshToken: json['refreshToken'] as String,
-      accessTokenExpiresAt:
-          DateTime.parse(json['accessTokenExpiresAt'] as String),
-      refreshTokenExpiresAt:
-          DateTime.parse(json['refreshTokenExpiresAt'] as String),
-      student:
-          StudentSummary.fromJson(json['student'] as Map<String, dynamic>),
+      accessTokenExpiresAt: DateTime.parse(
+        json['accessTokenExpiresAt'] as String,
+      ),
+      refreshTokenExpiresAt: DateTime.parse(
+        json['refreshTokenExpiresAt'] as String,
+      ),
+      student: StudentSummary.fromJson(json['student'] as Map<String, dynamic>),
     );
   }
 }

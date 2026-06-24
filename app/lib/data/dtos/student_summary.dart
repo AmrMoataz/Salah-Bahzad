@@ -29,11 +29,11 @@ class StudentSummary {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'fullName': fullName,
-        'status': status,
-        'boundDevice': boundDevice,
-      };
+    'id': id,
+    'fullName': fullName,
+    'status': status,
+    'boundDevice': boundDevice,
+  };
 
   /// First name for the greeting ("Welcome back, {firstName}").
   String get firstName => fullName.trim().split(RegExp(r'\s+')).first;

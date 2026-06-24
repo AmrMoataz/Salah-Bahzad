@@ -249,6 +249,7 @@ Each phase: **Goal · Backend · App · Design anchor · Reqs · Exit · Streams
 
 ## 11. Per-phase docs to produce (as each phase starts, mirroring the portal plan)
 - **A0:** ✅ **Met (2026-06-24)** — backend + app + wiring all DONE; proven live on Aspire (10/10, zero drift). `IMPLEMENTATION-PLAN-native-app-a0-{backend,app,wiring}.md`.
+- **Auth follow-up — Google sign-in on Windows:** 📋 **Planned (2026-06-25)** — closes the `FR-APP-AUTH-001` Windows gap (`google_sign_in` has no Windows impl); system-browser OAuth loopback (PKCE) → same Firebase `signInWithCredential` → `app-exchange`. App-only, no contract change. `IMPLEMENTATION-PLAN-native-app-google-windows.md`.
 - **A1:** `docs/contracts/native-app-playback.md` (**frozen first** — companion to this plan) + `…-a1-{backend,app,wiring}.md`.
 - **A2:** `…-a2-{app,wiring}.md` (+ the capture-protection manual matrix doc).
 - **A3:** `…-a3-{app,wiring}.md`.

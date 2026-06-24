@@ -30,12 +30,16 @@ class IdleView extends StatelessWidget {
   final VoidCallback onSignOut;
   final bool showAppBar;
 
-  String get _firstName =>
-      fullName.trim().isEmpty ? 'there' : fullName.trim().split(RegExp(r'\s+')).first;
+  String get _firstName => fullName.trim().isEmpty
+      ? 'there'
+      : fullName.trim().split(RegExp(r'\s+')).first;
 
   String get _initials {
-    final List<String> parts =
-        fullName.trim().split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+    final List<String> parts = fullName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((s) => s.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return '··';
     if (parts.length == 1) return parts.first.characters.first.toUpperCase();
     return (parts.first.characters.first + parts.last.characters.first)
@@ -234,7 +238,10 @@ class _Hero extends StatelessWidget {
       ],
     );
 
-    final Widget mascot = Image.asset(SbAssets.relaxing, width: compact ? 130 : 168);
+    final Widget mascot = Image.asset(
+      SbAssets.relaxing,
+      width: compact ? 130 : 168,
+    );
 
     return Container(
       padding: EdgeInsets.all(padding),
@@ -252,7 +259,11 @@ class _Hero extends StatelessWidget {
           if (compact)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[text, const SizedBox(height: 12), Center(child: mascot)],
+              children: <Widget>[
+                text,
+                const SizedBox(height: 12),
+                Center(child: mascot),
+              ],
             )
           else
             Row(
@@ -521,7 +532,9 @@ class _Footer extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: SbColors.ink4,
             side: const BorderSide(color: SbColors.border),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(9),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           ),
           child: const Text(

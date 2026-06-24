@@ -28,7 +28,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
 
   void _signIn() {
     FocusScope.of(context).unfocus();
-    ref.read(authControllerProvider.notifier).signInWithEmail(
+    ref
+        .read(authControllerProvider.notifier)
+        .signInWithEmail(
           email: _email.text,
           password: _password.text,
           rememberMe: _remember,
@@ -47,8 +49,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     final AuthState auth = ref.watch(authControllerProvider);
     final bool busy = auth is AuthSigningIn;
     final String? error = auth is AuthError ? auth.message : null;
-    final bool googleSupported =
-        ref.read(appPlatformProvider).googleSignInSupported;
+    final bool googleSupported = ref.read(identityProvider).googleSupported;
 
     return Scaffold(
       body: SafeArea(

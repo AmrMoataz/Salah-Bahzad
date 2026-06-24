@@ -112,8 +112,8 @@ class _BrandPanel extends StatelessWidget {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 300),
                 child: Text(
-                  'Sign in to play your protected lessons. Everything else '
-                  'lives in the web portal.',
+                  'Sign in to play your protected sessions. Everything else '
+                  'lives in the student portal.',
                   style: TextStyle(
                     fontFamily: SbFonts.sans,
                     fontSize: 15,
@@ -181,7 +181,7 @@ class _FormPanel extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               const Text(
-                'Use the same account as the web portal.',
+                'Use the same account as the student portal.',
                 style: TextStyle(
                   fontFamily: SbFonts.sans,
                   fontSize: 14,
@@ -304,8 +304,10 @@ class _Field extends StatelessWidget {
           ),
           decoration: InputDecoration(
             isDense: true,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
             filled: true,
             fillColor: SbColors.white,
             enabledBorder: const OutlineInputBorder(

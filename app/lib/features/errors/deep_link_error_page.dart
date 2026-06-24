@@ -21,8 +21,7 @@ class DeepLinkErrorPage extends ConsumerWidget {
               'The link looks incomplete or was changed. Head back and press '
               'Play again from the student portal.',
           primaryLabel: 'Back to home',
-          onPrimary: () =>
-              ref.read(pendingDeepLinkProvider.notifier).consume(),
+          onPrimary: () => ref.read(pendingDeepLinkProvider.notifier).consume(),
         ),
       ),
     );

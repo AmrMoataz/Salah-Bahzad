@@ -115,16 +115,16 @@ class FakeTokenRefresher implements TokenRefresher {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 StudentAuthResponse activeResponse() => StudentAuthResponse(
-      accessToken: 'access',
-      refreshToken: 'refresh',
-      accessTokenExpiresAt: DateTime.now().toUtc().add(const Duration(minutes: 15)),
-      refreshTokenExpiresAt: DateTime.now().toUtc().add(const Duration(days: 7)),
-      student: const StudentSummary(
-        id: 'stu-1',
-        fullName: 'Layla Ahmed',
-        status: 'Active',
-      ),
-    );
+  accessToken: 'access',
+  refreshToken: 'refresh',
+  accessTokenExpiresAt: DateTime.now().toUtc().add(const Duration(minutes: 15)),
+  refreshTokenExpiresAt: DateTime.now().toUtc().add(const Duration(days: 7)),
+  student: const StudentSummary(
+    id: 'stu-1',
+    fullName: 'Layla Ahmed',
+    status: 'Active',
+  ),
+);
 
 ProviderContainer makeContainer({
   IdentityProvider? identity,
@@ -140,8 +140,9 @@ ProviderContainer makeContainer({
       sessionStoreProvider.overrideWith((ref) => store ?? FakeSessionStore()),
       apiClientProvider.overrideWith((ref) => FakeApiClient()),
       tokenRefresherProvider.overrideWith((ref) => FakeTokenRefresher()),
-      appPlatformProvider
-          .overrideWith((ref) => AppPlatform(target: AppTarget.android)),
+      appPlatformProvider.overrideWith(
+        (ref) => AppPlatform(target: AppTarget.android),
+      ),
     ],
   );
   addTearDown(container.dispose);
@@ -181,31 +182,37 @@ void main() {
     expect(container.read(authControllerProvider), isA<AuthActive>());
   });
 
-  group('status-gate 403 reasons map to the right error state (contract §A.2)',
-      () {
-    final Map<String, AuthErrorReason> cases = <String, AuthErrorReason>{
-      'account_pending': AuthErrorReason.accountPending,
-      'account_rejected': AuthErrorReason.accountRejected,
-      'account_inactive': AuthErrorReason.accountInactive,
-    };
+  group(
+    'status-gate 403 reasons map to the right error state (contract §A.2)',
+    () {
+      final Map<String, AuthErrorReason> cases = <String, AuthErrorReason>{
+        'account_pending': AuthErrorReason.accountPending,
+        'account_rejected': AuthErrorReason.accountRejected,
+        'account_inactive': AuthErrorReason.accountInactive,
+      };
 
-    cases.forEach((String reason, AuthErrorReason expected) {
-      test('$reason → $expected', () async {
-        final container = makeContainer(
-          repo: FakeAuthRepository(
-            error: ApiException(statusCode: 403, reason: reason, detail: 'why'),
-          ),
-        );
-        final notifier = container.read(authControllerProvider.notifier);
-        await settle();
-        await notifier.signInWithEmail(email: 'a@b.c', password: 'pw');
+      cases.forEach((String reason, AuthErrorReason expected) {
+        test('$reason → $expected', () async {
+          final container = makeContainer(
+            repo: FakeAuthRepository(
+              error: ApiException(
+                statusCode: 403,
+                reason: reason,
+                detail: 'why',
+              ),
+            ),
+          );
+          final notifier = container.read(authControllerProvider.notifier);
+          await settle();
+          await notifier.signInWithEmail(email: 'a@b.c', password: 'pw');
 
-        final AuthState state = container.read(authControllerProvider);
-        expect(state, isA<AuthError>());
-        expect((state as AuthError).reason, expected);
+          final AuthState state = container.read(authControllerProvider);
+          expect(state, isA<AuthError>());
+          expect((state as AuthError).reason, expected);
+        });
       });
-    });
-  });
+    },
+  );
 
   test('401 → noStudent', () async {
     final container = makeContainer(
@@ -235,7 +242,9 @@ void main() {
 
   test('network failure → network', () async {
     final container = makeContainer(
-      repo: FakeAuthRepository(error: ApiException(statusCode: null, isNetwork: true)),
+      repo: FakeAuthRepository(
+        error: ApiException(statusCode: null, isNetwork: true),
+      ),
     );
     final notifier = container.read(authControllerProvider.notifier);
     await settle();

@@ -28,7 +28,8 @@ class PlaybackRequest {
   /// `null` to a clear error state; it must **never** throw (`NFR-APP-REL-002`).
   static PlaybackRequest? tryParse(Uri uri) {
     if (uri.scheme.toLowerCase() != scheme) return null;
-    final bool isStream = uri.host.toLowerCase() == host ||
+    final bool isStream =
+        uri.host.toLowerCase() == host ||
         uri.pathSegments.contains(host) ||
         uri.path == '/$host';
     if (!isStream) return null;

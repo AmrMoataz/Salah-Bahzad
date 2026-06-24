@@ -56,6 +56,15 @@ var ffmpegPath = ResolveFfmpeg();
 // MinIO endpoint + root creds are injected as R2__* env vars — the same keys the API reads for real
 // Cloudflare R2 in staging/prod (the dev bucket sb-dev-private is auto-created on first run).
 var api = builder.AddProject<Projects.SalahBahazad_Api>("api")
+    // Stable, named HTTP endpoint for the native Flutter app. The app is NOT
+    // under Aspire service discovery (it's a separate process), so it needs a
+    // fixed URL that survives restarts — unlike the default "http" endpoint,
+    // whose host port Aspire reassigns every run. The Angular apps keep using
+    // that dynamic "http" endpoint via service discovery; this is additive.
+    // (Dev is HTTP on purpose: Dart/Flutter does not read the Windows cert
+    // store, so the ASP.NET dev cert can't be trusted client-side — TLS is a
+    // prod concern, supplied there via --dart-define=API_BASE_URL=https://…)
+    .WithHttpEndpoint(port: 5080, name: "app")
     .WithReference(db)
     .WaitFor(db)
     .WithReference(redis)

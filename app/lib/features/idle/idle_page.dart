@@ -35,8 +35,7 @@ class IdlePage extends ConsumerWidget {
           signedInAs: fullName.isEmpty ? 'your account' : fullName,
           showAppBar: !isDesktop,
           onOpenPortal: () => _openPortal(portalUrl),
-          onSignOut: () =>
-              ref.read(authControllerProvider.notifier).signOut(),
+          onSignOut: () => ref.read(authControllerProvider.notifier).signOut(),
         ),
       ),
     );

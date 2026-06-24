@@ -17,19 +17,21 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: SbTheme.build(),
-      home: const Material(
-        type: MaterialType.transparency,
-        child: IdleView(
-          fullName: 'Abdul Rahman Mohammed Al-Hassan',
-          signedInAs: 'Abdul Rahman Mohammed Al-Hassan',
-          onOpenPortal: _noop,
-          onSignOut: _noop,
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: SbTheme.build(),
+        home: const Material(
+          type: MaterialType.transparency,
+          child: IdleView(
+            fullName: 'Abdul Rahman Mohammed Al-Hassan',
+            signedInAs: 'Abdul Rahman Mohammed Al-Hassan',
+            onOpenPortal: _noop,
+            onSignOut: _noop,
+          ),
         ),
       ),
-    ));
+    );
     await tester.pump();
 
     FlutterError.onError = prev;

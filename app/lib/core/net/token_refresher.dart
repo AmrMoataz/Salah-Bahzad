@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../logging/logging.dart';
 import '../storage/session.dart';
 
 /// Exchanges a refresh token for a fresh token pair (contract §B,
@@ -10,9 +11,11 @@ import '../storage/session.dart';
 /// them (contract §B "made app-aware"). Only the token pair is consumed here —
 /// the student summary on the response is ignored (unchanged across a refresh).
 class TokenRefresher {
-  TokenRefresher(this._bareDio);
+  TokenRefresher(this._bareDio, {AppLogger? logger})
+    : _log = logger ?? Log.scoped('net');
 
   final Dio _bareDio;
+  final AppLogger _log;
 
   /// Returns the new [Session], or `null` when the refresh token is
   /// expired/invalid (server `401`) or the network is down — the caller then
@@ -33,6 +36,7 @@ class TokenRefresher {
           refresh == null ||
           accessExp == null ||
           refreshExp == null) {
+        _log.warning('Refresh response missing token fields');
         return null;
       }
       return Session(
@@ -41,7 +45,13 @@ class TokenRefresher {
         accessTokenExpiresAt: DateTime.parse(accessExp),
         refreshTokenExpiresAt: DateTime.parse(refreshExp),
       );
-    } on DioException {
+    } on DioException catch (e) {
+      // Expected on an expired/invalid refresh token (401) or no connectivity;
+      // the caller turns null into a clean sign-out. Never logs the token.
+      _log.debug(
+        'Refresh rejected',
+        fields: <String, Object?>{'status': e.response?.statusCode},
+      );
       return null;
     }
   }

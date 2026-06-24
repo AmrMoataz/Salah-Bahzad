@@ -128,7 +128,11 @@ class _EncryptedChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Icon(Icons.shield_outlined, size: 14, color: SbColors.greenSoft),
+          const Icon(
+            Icons.shield_outlined,
+            size: 14,
+            color: SbColors.greenSoft,
+          ),
           const SizedBox(width: 6),
           const Text(
             'Encrypted',
@@ -165,7 +169,11 @@ class _PlaceholderCard extends StatelessWidget {
               color: SbColors.primary.withValues(alpha: 0.92),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.play_arrow, size: 36, color: SbColors.white),
+            child: const Icon(
+              Icons.play_arrow,
+              size: 36,
+              color: SbColors.white,
+            ),
           ),
           const SizedBox(height: 20),
           const Text(
@@ -181,10 +189,10 @@ class _PlaceholderCard extends StatelessWidget {
           Text(
             request == null
                 ? 'No active lesson — press Play in the student portal to open '
-                    'one here.'
+                      'one here.'
                 : 'The deep link was received and parsed. Encrypted HLS, the '
-                    'moving watermark and the capture black-out arrive in the '
-                    'next phase.',
+                      'moving watermark and the capture black-out arrive in the '
+                      'next phase.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: SbFonts.sans,
@@ -221,12 +229,7 @@ class _RequestPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: const <Widget>[
-              SecurePill.dark(),
-              Spacer(),
-            ],
-          ),
+          Row(children: const <Widget>[SecurePill.dark(), Spacer()]),
           const SizedBox(height: 12),
           _Kv('videoId', request.videoId),
           _Kv('sessionId', request.sessionId ?? '—'),

@@ -34,11 +34,10 @@ class AuthRepository {
   /// (used by the player in A1; available now for the Idle greeting).
   Future<StudentProfile> me() async {
     try {
-      final Response<dynamic> res =
-          await _client.dio.get<dynamic>('/api/me/profile');
-      return StudentProfile.fromJson(
-        (res.data as Map).cast<String, dynamic>(),
+      final Response<dynamic> res = await _client.dio.get<dynamic>(
+        '/api/me/profile',
       );
+      return StudentProfile.fromJson((res.data as Map).cast<String, dynamic>());
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }

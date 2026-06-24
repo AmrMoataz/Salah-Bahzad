@@ -72,8 +72,17 @@ class _BrandMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Image.asset(SbAssets.logoWhite, height: 24),
-        const SizedBox(width: 8),
+        // The compact "SB" crown mark — not the full wordmark (design: the
+        // desktop title bar). Rendered white over the navy bar, mirroring the
+        // prototype's `filter:brightness(0) invert(1);opacity:.95` — srcIn tints
+        // the crown's opaque pixels white while keeping its alpha.
+        Image.asset(
+          SbAssets.logoSmall,
+          height: 24,
+          color: SbColors.white.withValues(alpha: 0.95),
+          colorBlendMode: BlendMode.srcIn,
+        ),
+        const SizedBox(width: 9),
         Text(
           'Secure Player',
           style: TextStyle(
@@ -136,10 +145,7 @@ class _MacControls extends StatelessWidget {
       children: <Widget>[
         _MacDot(color: SbColors.macClose, onTap: () => windowManager.close()),
         const SizedBox(width: 8),
-        _MacDot(
-          color: SbColors.macMin,
-          onTap: () => windowManager.minimize(),
-        ),
+        _MacDot(color: SbColors.macMin, onTap: () => windowManager.minimize()),
         const SizedBox(width: 8),
         _MacDot(color: SbColors.macZoom, onTap: _toggleMaximize),
       ],
@@ -196,10 +202,7 @@ class _WindowsControls extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _WinButton(
-          icon: Icons.minimize,
-          onTap: () => windowManager.minimize(),
-        ),
+        _WinButton(icon: Icons.minimize, onTap: () => windowManager.minimize()),
         _WinButton(icon: Icons.crop_square, onTap: _toggleMaximize),
         _WinButton(
           icon: Icons.close,
@@ -212,11 +215,7 @@ class _WindowsControls extends StatelessWidget {
 }
 
 class _WinButton extends StatefulWidget {
-  const _WinButton({
-    required this.icon,
-    required this.onTap,
-    this.hoverColor,
-  });
+  const _WinButton({required this.icon, required this.onTap, this.hoverColor});
 
   final IconData icon;
   final VoidCallback onTap;

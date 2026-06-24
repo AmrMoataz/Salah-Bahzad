@@ -55,6 +55,5 @@ class SessionStore {
     await _storage.write(key: _studentKey, value: json);
   }
 
-  Future<String?> loadStudent() =>
-      _storage.read(key: _studentKey);
+  Future<String?> loadStudent() => _storage.read(key: _studentKey);
 }

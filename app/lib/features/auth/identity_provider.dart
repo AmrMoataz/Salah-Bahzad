@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../core/platform/app_platform.dart';
+import 'google/google_credential_source.dart';
 
 /// A failure raised by the identity layer (Firebase / Google), distinct from the
 /// backend's `app-exchange` errors (which are [ApiException]s). Carries a stable
@@ -21,8 +20,9 @@ class IdentityException implements Exception {
 /// `NFR-APP-REL-003`). Implementations return a **Firebase ID token**, which the
 /// app then trades for a platform session via `app-exchange`.
 abstract class IdentityProvider {
-  /// Whether "Continue with Google" is offered on this platform (mobile/macOS
-  /// only — `google_sign_in` does not ship for Windows).
+  /// Whether "Continue with Google" is offered here. True on mobile/macOS
+  /// (the `google_sign_in` plugin), and on Windows when the desktop OAuth
+  /// client is configured (system-browser loopback flow).
   bool get googleSupported;
 
   Future<String> signInWithEmailPassword({
@@ -35,23 +35,28 @@ abstract class IdentityProvider {
   Future<void> signOut();
 }
 
-/// Real implementation over `firebase_auth` + `google_sign_in` v7.
+/// Real implementation over `firebase_auth`. Google sign-in is uniform across
+/// platforms: a [GoogleCredentialSource] yields a Firebase credential (from the
+/// `google_sign_in` plugin on mobile/macOS, or the desktop OAuth loopback on
+/// Windows), and this provider trades it for a Firebase ID token via the **one**
+/// `signInWithCredential` path.
 class FirebaseIdentityProvider implements IdentityProvider {
   FirebaseIdentityProvider({
-    required AppPlatform platform,
+    required this.googleSupported,
+    required this.googleSource,
     FirebaseAuth? auth,
-    GoogleSignIn? googleSignIn,
-  })  : _googleSupported = platform.googleSignInSupported,
-        _auth = auth ?? FirebaseAuth.instance,
-        _google = googleSignIn ?? GoogleSignIn.instance;
+  }) : _auth = auth ?? FirebaseAuth.instance;
 
-  final bool _googleSupported;
-  final FirebaseAuth _auth;
-  final GoogleSignIn _google;
-  bool _googleInitialized = false;
+  /// True on mobile/macOS, and on Windows when the desktop OAuth client is set.
+  static bool computeGoogleSupported({
+    required bool isWindows,
+    required bool hasDesktopGoogleOAuth,
+  }) => !isWindows || hasDesktopGoogleOAuth;
 
   @override
-  bool get googleSupported => _googleSupported;
+  final bool googleSupported;
+  final GoogleCredentialSource googleSource;
+  final FirebaseAuth _auth;
 
   @override
   Future<String> signInWithEmailPassword({
@@ -78,24 +83,14 @@ class FirebaseIdentityProvider implements IdentityProvider {
       );
     }
     try {
-      if (!_googleInitialized) {
-        await _google.initialize();
-        _googleInitialized = true;
-      }
-      final GoogleSignInAccount account = await _google.authenticate();
-      final String? idToken = account.authentication.idToken;
-      if (idToken == null) {
-        throw IdentityException('google_no_token', 'Google sign-in failed.');
-      }
-      final OAuthCredential credential =
-          GoogleAuthProvider.credential(idToken: idToken);
+      final AuthCredential credential = await googleSource.getCredential();
       final UserCredential cred = await _auth.signInWithCredential(credential);
       return _idTokenOf(cred);
     } on FirebaseAuthException catch (e) {
       throw IdentityException(e.code, _friendly(e.code));
-    } on GoogleSignInException catch (e) {
-      throw IdentityException('google_${e.code.name}', 'Google sign-in failed.');
     }
+    // IdentityExceptions from the source (cancel/timeout/unconfigured/no_token)
+    // propagate unchanged for the controller to render inline.
   }
 
   @override
@@ -103,7 +98,7 @@ class FirebaseIdentityProvider implements IdentityProvider {
     await _auth.signOut();
     if (googleSupported) {
       try {
-        await _google.signOut();
+        await googleSource.signOut();
       } catch (_) {
         // A Google sign-out failure must not block clearing the app session.
       }

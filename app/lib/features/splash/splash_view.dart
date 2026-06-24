@@ -75,14 +75,16 @@ class SplashView extends StatelessWidget {
                       _StepsCard(step: step, pct: pct),
                       const SizedBox(height: 22),
                       Text.rich(
-                        TextSpan(children: <InlineSpan>[
-                          const TextSpan(
-                            text: 'salah-bahazad://stream?videoId=ALG-204\n',
-                          ),
-                          const TextSpan(
-                            text: 'handoff ••••••••  ·  no token in URL',
-                          ),
-                        ]),
+                        TextSpan(
+                          children: <InlineSpan>[
+                            const TextSpan(
+                              text: 'salah-bahazad://stream?videoId=ALG-204\n',
+                            ),
+                            const TextSpan(
+                              text: 'handoff ••••••••  ·  no token in URL',
+                            ),
+                          ],
+                        ),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: SbFonts.mono,
@@ -144,7 +146,10 @@ class _StepsCard extends StatelessWidget {
                     height: 5,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: <Color>[SbColors.accentBlue, SbColors.greenSoft],
+                        colors: <Color>[
+                          SbColors.accentBlue,
+                          SbColors.greenSoft,
+                        ],
                       ),
                     ),
                   ),
@@ -159,7 +164,11 @@ class _StepsCard extends StatelessWidget {
 }
 
 class _StepRow extends StatelessWidget {
-  const _StepRow({required this.label, required this.done, required this.active});
+  const _StepRow({
+    required this.label,
+    required this.done,
+    required this.active,
+  });
 
   final String label;
   final bool done;
@@ -181,17 +190,17 @@ class _StepRow extends StatelessWidget {
           child: done
               ? const Icon(Icons.check, size: 12, color: SbColors.navyDeep)
               : (active
-                  ? Container(
-                      margin: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: SbColors.white.withValues(alpha: 0.9),
-                          width: 2,
+                    ? Container(
+                        margin: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: SbColors.white.withValues(alpha: 0.9),
+                            width: 2,
+                          ),
                         ),
-                      ),
-                    )
-                  : null),
+                      )
+                    : null),
         ),
         const SizedBox(width: 12),
         Expanded(

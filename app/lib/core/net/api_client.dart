@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../logging/logging.dart';
 import '../platform/app_platform.dart';
 import '../storage/session_store.dart';
 import 'app_config.dart';
@@ -35,16 +36,16 @@ class ApiClient {
       validateStatus: (int? code) => code != null && code < 400,
     );
     this.dio.interceptors.add(
-          _AuthInterceptor(
-            store: store,
-            refresher: refresher,
-            retryDio: this.dio,
-            onRevoked: () {
-              unawaited(store.clear());
-              _sessionRevoked.value++;
-            },
-          ),
-        );
+      _AuthInterceptor(
+        store: store,
+        refresher: refresher,
+        retryDio: this.dio,
+        onRevoked: () {
+          unawaited(store.clear());
+          _sessionRevoked.value++;
+        },
+      ),
+    );
   }
 
   final Dio dio;
@@ -69,6 +70,8 @@ class _AuthInterceptor extends Interceptor {
   final TokenRefresher refresher;
   final Dio retryDio;
   final void Function() onRevoked;
+
+  final AppLogger _log = Log.scoped('net');
 
   Future<bool>? _inflight;
 
@@ -102,9 +105,17 @@ class _AuthInterceptor extends Interceptor {
       return;
     }
 
+    _log.debug(
+      '401 received; attempting single-flight refresh',
+      fields: <String, Object?>{'path': opts.path},
+    );
     final String? usedToken = _bearerOf(opts);
     final bool refreshed = await _singleFlightRefresh(usedToken);
     if (!refreshed) {
+      _log.info(
+        'Refresh failed; session revoked',
+        fields: <String, Object?>{'path': opts.path},
+      );
       onRevoked();
       handler.next(err);
       return;
@@ -112,6 +123,10 @@ class _AuthInterceptor extends Interceptor {
 
     final session = store.current;
     if (session == null) {
+      _log.info(
+        'Session cleared mid-refresh; revoking',
+        fields: <String, Object?>{'path': opts.path},
+      );
       onRevoked();
       handler.next(err);
       return;
@@ -123,6 +138,13 @@ class _AuthInterceptor extends Interceptor {
       final Response<dynamic> retried = await retryDio.fetch<dynamic>(opts);
       handler.resolve(retried);
     } on DioException catch (e) {
+      _log.warning(
+        'Retry after refresh failed',
+        fields: <String, Object?>{
+          'path': opts.path,
+          'status': e.response?.statusCode,
+        },
+      );
       handler.next(e);
     }
   }
@@ -131,11 +153,12 @@ class _AuthInterceptor extends Interceptor {
   /// request used it, a concurrent refresh already succeeded → just retry.
   Future<bool> _singleFlightRefresh(String? usedToken) {
     final current = store.current;
-    if (current != null && usedToken != null && current.accessToken != usedToken) {
+    if (current != null &&
+        usedToken != null &&
+        current.accessToken != usedToken) {
       return Future<bool>.value(true);
     }
-    return _inflight ??=
-        _doRefresh().whenComplete(() => _inflight = null);
+    return _inflight ??= _doRefresh().whenComplete(() => _inflight = null);
   }
 
   Future<bool> _doRefresh() async {

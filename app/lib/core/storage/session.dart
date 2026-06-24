@@ -31,16 +31,17 @@ class Session {
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
       accessTokenExpiresAt: accessTokenExpiresAt ?? this.accessTokenExpiresAt,
-      refreshTokenExpiresAt: refreshTokenExpiresAt ?? this.refreshTokenExpiresAt,
+      refreshTokenExpiresAt:
+          refreshTokenExpiresAt ?? this.refreshTokenExpiresAt,
     );
   }
 
   String toJson() => jsonEncode(<String, dynamic>{
-        'accessToken': accessToken,
-        'refreshToken': refreshToken,
-        'accessTokenExpiresAt': accessTokenExpiresAt.toUtc().toIso8601String(),
-        'refreshTokenExpiresAt': refreshTokenExpiresAt.toUtc().toIso8601String(),
-      });
+    'accessToken': accessToken,
+    'refreshToken': refreshToken,
+    'accessTokenExpiresAt': accessTokenExpiresAt.toUtc().toIso8601String(),
+    'refreshTokenExpiresAt': refreshTokenExpiresAt.toUtc().toIso8601String(),
+  });
 
   static Session? tryParse(String? raw) {
     if (raw == null || raw.isEmpty) return null;

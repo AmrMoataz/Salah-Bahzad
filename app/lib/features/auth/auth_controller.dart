@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
+import '../../core/logging/logging.dart';
 import '../../core/net/api_exception.dart';
 import '../../core/storage/session.dart';
 import '../../data/dtos/student_auth_response.dart';
@@ -19,6 +20,8 @@ class AuthController extends Notifier<AuthState> {
 
   /// Safety margin — refresh this long before the access token actually expires.
   static const Duration _refreshLead = Duration(minutes: 1);
+
+  AppLogger get _log => ref.read(loggerProvider).scoped('auth');
 
   @override
   AuthState build() {
@@ -51,8 +54,9 @@ class AuthController extends Notifier<AuthState> {
       return;
     }
     if (session.isAccessExpired) {
-      final Session? refreshed =
-          await ref.read(tokenRefresherProvider).refresh(session.refreshToken);
+      final Session? refreshed = await ref
+          .read(tokenRefresherProvider)
+          .refresh(session.refreshToken);
       if (refreshed == null) {
         await store.clear();
         state = const AuthSignedOut();
@@ -95,18 +99,29 @@ class AuthController extends Notifier<AuthState> {
     state = const AuthSigningIn();
     try {
       final String firebaseIdToken = await getToken();
-      final StudentAuthResponse res =
-          await ref.read(authRepositoryProvider).appExchange(firebaseIdToken);
+      final StudentAuthResponse res = await ref
+          .read(authRepositoryProvider)
+          .appExchange(firebaseIdToken);
       final store = ref.read(sessionStoreProvider);
       await store.save(res.toSession(), persist: rememberMe);
       await store.saveStudent(jsonEncode(res.student.toJson()));
       _scheduleRefresh(res.toSession());
+      _log.info('Sign-in succeeded');
       state = AuthActive(res.student);
     } on IdentityException catch (e) {
+      _log.debug(
+        'Identity sign-in rejected',
+        fields: <String, Object?>{'message': e.message},
+      );
       state = AuthError(AuthErrorReason.invalidCredentials, e.message);
     } on ApiException catch (e) {
+      _log.warning(
+        'app-exchange failed',
+        fields: <String, Object?>{'status': e.statusCode, 'reason': e.reason},
+      );
       state = _mapApiError(e);
-    } catch (_) {
+    } catch (error, stack) {
+      _log.error('Unexpected sign-in failure', error: error, stackTrace: stack);
       state = const AuthError(
         AuthErrorReason.unknown,
         'Sign-in failed. Please try again.',
@@ -120,10 +135,12 @@ class AuthController extends Notifier<AuthState> {
     _refreshTimer?.cancel();
     try {
       await ref.read(identityProvider).signOut();
-    } catch (_) {
+    } catch (error, stack) {
       // Identity sign-out failures must not block clearing the local session.
+      _log.warning('Identity sign-out failed', error: error, stackTrace: stack);
     }
     await ref.read(sessionStoreProvider).clear();
+    _log.info('Signed out');
     state = const AuthSignedOut();
   }
 
@@ -136,8 +153,9 @@ class AuthController extends Notifier<AuthState> {
 
   void _scheduleRefresh(Session session) {
     _refreshTimer?.cancel();
-    final DateTime fireAt =
-        session.accessTokenExpiresAt.toUtc().subtract(_refreshLead);
+    final DateTime fireAt = session.accessTokenExpiresAt.toUtc().subtract(
+      _refreshLead,
+    );
     Duration delay = fireAt.difference(DateTime.now().toUtc());
     if (delay < const Duration(seconds: 5)) {
       delay = const Duration(seconds: 5);
@@ -152,8 +170,9 @@ class AuthController extends Notifier<AuthState> {
       await _handleSessionExpired();
       return;
     }
-    final Session? next =
-        await ref.read(tokenRefresherProvider).refresh(session.refreshToken);
+    final Session? next = await ref
+        .read(tokenRefresherProvider)
+        .refresh(session.refreshToken);
     if (next == null) {
       await _handleSessionExpired();
       return;
@@ -164,6 +183,7 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> _handleSessionExpired() async {
     _refreshTimer?.cancel();
+    _log.info('Session expired; signing out');
     await ref.read(sessionStoreProvider).clear();
     state = const AuthSignedOut();
   }
@@ -176,8 +196,12 @@ class AuthController extends Notifier<AuthState> {
     try {
       final dynamic m = jsonDecode(raw);
       if (m is Map) return StudentSummary.fromJson(m.cast<String, dynamic>());
-    } catch (_) {
-      // fall through
+    } catch (error, stack) {
+      _log.warning(
+        'Cached student blob unreadable; forcing re-auth',
+        error: error,
+        stackTrace: stack,
+      );
     }
     return null;
   }
@@ -202,7 +226,7 @@ class AuthController extends Notifier<AuthState> {
             return const AuthError(
               AuthErrorReason.accountPending,
               "Your account is awaiting approval. You'll be able to sign in "
-                  'once a teacher approves it.',
+              'once a teacher approves it.',
             );
           case 'account_rejected':
             return AuthError(

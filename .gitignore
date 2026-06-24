@@ -35,8 +35,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 coverage/
-.nx/cache/
-.nx/workspace-data/
+**/.nx/cache/
+**/.nx/workspace-data/
 
 # ---------- Editors / OS ----------
 .idea/

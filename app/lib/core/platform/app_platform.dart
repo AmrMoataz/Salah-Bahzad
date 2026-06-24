@@ -36,11 +36,15 @@ class AppPlatform {
 
   bool get isMobile => target == AppTarget.android || target == AppTarget.ios;
 
+  bool get isWindows => target == AppTarget.windows;
+
   /// macOS draws the window controls on the **left** (traffic lights), Windows
   /// on the **right** (min/max/close) — the two desktop-chrome banners.
   bool get controlsOnLeft => target == AppTarget.macos;
 
-  /// `google_sign_in` ships only for Android/iOS/macOS — never Windows.
-  /// (`authenticate()` throws on Windows; we hide the button there.)
-  bool get googleSignInSupported => target != AppTarget.windows;
+  /// Whether the `google_sign_in` **plugin** ships here (Android/iOS/macOS —
+  /// never Windows, where `authenticate()` throws). Used only to pick the
+  /// credential source; whether the Google button is *offered* is decided by
+  /// the identity provider (which also knows the Windows OAuth config).
+  bool get googleSignInPluginSupported => target != AppTarget.windows;
 }

@@ -24,9 +24,7 @@ void main() {
 
     test('rejects the wrong scheme', () {
       expect(
-        PlaybackRequest.tryParseString(
-          'https://stream?videoId=V1&handoff=H1',
-        ),
+        PlaybackRequest.tryParseString('https://stream?videoId=V1&handoff=H1'),
         isNull,
       );
     });

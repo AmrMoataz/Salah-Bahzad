@@ -12,28 +12,32 @@ void main() {
   late Map<String, String> backing;
 
   Session sample() => Session(
-        accessToken: 'access-1',
-        refreshToken: 'refresh-1',
-        accessTokenExpiresAt: DateTime.utc(2030, 1, 1, 0, 15),
-        refreshTokenExpiresAt: DateTime.utc(2030, 1, 8),
-      );
+    accessToken: 'access-1',
+    refreshToken: 'refresh-1',
+    accessTokenExpiresAt: DateTime.utc(2030, 1, 1, 0, 15),
+    refreshTokenExpiresAt: DateTime.utc(2030, 1, 8),
+  );
 
   setUp(() {
     storage = _MockSecureStorage();
     store = SessionStore(storage);
     backing = <String, String>{};
 
-    when(() => storage.write(
-          key: any(named: 'key'),
-          value: any(named: 'value'),
-        )).thenAnswer((Invocation i) async {
+    when(
+      () => storage.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((Invocation i) async {
       backing[i.namedArguments[#key] as String] =
           i.namedArguments[#value] as String;
     });
-    when(() => storage.read(key: any(named: 'key')))
-        .thenAnswer((Invocation i) async => backing[i.namedArguments[#key]]);
-    when(() => storage.delete(key: any(named: 'key')))
-        .thenAnswer((Invocation i) async {
+    when(
+      () => storage.read(key: any(named: 'key')),
+    ).thenAnswer((Invocation i) async => backing[i.namedArguments[#key]]);
+    when(() => storage.delete(key: any(named: 'key'))).thenAnswer((
+      Invocation i,
+    ) async {
       backing.remove(i.namedArguments[#key]);
     });
   });
