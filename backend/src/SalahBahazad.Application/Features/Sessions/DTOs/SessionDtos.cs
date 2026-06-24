@@ -470,3 +470,110 @@ public static class SessionMappings
         };
     }
 }
+
+// ── Student portal · Home · weekly study plan (GET /api/me/plan, contract §A/§B/§E) ──────────────
+
+/// <summary>The action type for a plan step (contract §B). <c>Redeem</c> opens the code modal (next session /
+/// re-enroll after expiry); the others deep-link into the session detail where the runner/quiz live.</summary>
+public enum MyPlanStepKind
+{
+    Quiz,
+    Videos,
+    Assignment,
+    Redeem,
+}
+
+/// <summary>A plan step's derived completion (contract §B). There is no <c>Overdue</c> value — urgency rides
+/// <see cref="MyPlanDueState"/>, which is derived purely from enrollment expiry.</summary>
+public enum MyPlanStepStatus
+{
+    Pending,
+    Completed,
+}
+
+/// <summary>The only real-deadline signal, derived from enrollment expiry alone (contract §B). <c>ExpiringSoon</c>
+/// = active and <c>ExpiresAtUtc ≤ now + 14d</c>; <c>Expired</c> = past expiry and the step is incomplete.</summary>
+public enum MyPlanDueState
+{
+    None,
+    ExpiringSoon,
+    Expired,
+}
+
+/// <summary>What the frontend does for a step (contract §B). <c>Navigate</c> carries an in-portal
+/// <c>route</c>; <c>Redeem</c> carries none (the frontend opens <c>/redeem</c>).</summary>
+public enum MyPlanActionType
+{
+    Navigate,
+    Redeem,
+}
+
+/// <summary>A chunked/multi-item step's progress (contract §A.1): videos watched/total or assignment
+/// answered/total. Null for Quiz/Redeem steps.</summary>
+public sealed record MyPlanProgressDto(int Done, int Total);
+
+/// <summary>What the frontend does for a step (contract §A.1): an in-portal route or a redeem intent — never a
+/// fabricated external URL. <c>Route</c> is null when <see cref="MyPlanActionType.Redeem"/>.</summary>
+public sealed record MyPlanActionDto(MyPlanActionType Type, string? Route, string Label);
+
+/// <summary>One actionable plan step — or a completed one, kept for the "Completed" sub-list and the week bar
+/// (contract §A.1). The plan is <b>derived state</b>: a step's <see cref="Status"/> is computed, never toggled by
+/// the student. <see cref="DueState"/>/<see cref="ExpiresAtUtc"/> come only from the step's session expiry.</summary>
+public sealed record MyPlanStepDto(
+    string Key,
+    MyPlanStepKind Kind,
+    string Title,
+    string? Subtitle,
+    Guid SessionId,
+    string SessionTitle,
+    string? SpecializationName,
+    MyPlanStepStatus Status,
+    bool Blocked,
+    string? BlockedReason,
+    MyPlanDueState DueState,
+    DateTimeOffset? ExpiresAtUtc,
+    MyPlanProgressDto? Progress,
+    MyPlanActionDto Action);
+
+/// <summary>A "Recently enrolled" rail row (contract §A.1/§E.5): the UI renders "Added N days ago" client-side.</summary>
+public sealed record MyPlanRecentDto(
+    Guid SessionId, string Title, string? SpecializationName, DateTimeOffset EnrolledAtUtc);
+
+/// <summary>The Home KPI cards (contract §A.1/§E.5): summed over the caller's <b>active</b> enrolled set for
+/// sessions/videos/progress, and the <b>whole</b> non-refunded set for <see cref="CompletedSessions"/>.</summary>
+public sealed record MyPlanKpisDto(
+    int ActiveSessions,
+    int VideosWatched,
+    int VideosTotal,
+    int OverallProgressPercent,
+    int CompletedSessions);
+
+/// <summary>The focus session (Path A, contract §A.1): the caller's most-urgent active, incomplete enrollment —
+/// null in the onboarding/expired-only/all-done plans. <c>ThumbnailUrl</c> is a short-lived signed R2 URL signed
+/// fresh per read (never cached, §C); <c>ExpiresInDays</c> is null when the session has no expiry.</summary>
+public sealed record MyPlanFocusDto(
+    Guid SessionId,
+    string Title,
+    string? SpecializationName,
+    string? ThumbnailUrl,
+    int ProgressPercent,
+    DateTimeOffset? ExpiresAtUtc,
+    bool IsExpired,
+    int? ExpiresInDays,
+    MyPlanDueState DueState);
+
+/// <summary>The caller's current weekly study plan (student Home, contract §A.1): the ISO-week frame, the headline
+/// counters, the KPI roll-up, the focus session, the gate-ordered steps (≤ 7), and the recently-enrolled rail.
+/// Server-composed, Redis-cached, derived entirely from existing state — no stored plan, no fabricated deadlines.</summary>
+public sealed record MyPlanDto(
+    string IsoWeek,
+    DateTimeOffset WeekStartUtc,
+    DateTimeOffset WeekEndUtc,
+    DateTimeOffset GeneratedAtUtc,
+    int TotalSteps,
+    int CompletedSteps,
+    int OverdueSteps,
+    MyPlanKpisDto Kpis,
+    MyPlanFocusDto? Focus,
+    IReadOnlyList<MyPlanStepDto> Steps,
+    IReadOnlyList<MyPlanRecentDto> RecentlyEnrolled);

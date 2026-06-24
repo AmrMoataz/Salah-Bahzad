@@ -21,6 +21,8 @@
       "@sb/student-portal/data-access": ["libs/student-portal/data-access/src/index.ts"],
       "@sb/student-portal/feature-assessment": ["libs/student-portal/feature-assessment/src/index.ts"],
       "@sb/student-portal/feature-catalogue": ["libs/student-portal/feature-catalogue/src/index.ts"],
+      "@sb/student-portal/feature-home": ["libs/student-portal/feature-home/src/index.ts"],
+      "@sb/student-portal/feature-profile": ["libs/student-portal/feature-profile/src/index.ts"],
       "@sb/student-portal/feature-sessions": ["libs/student-portal/feature-sessions/src/index.ts"],
       "@sb/student-portal/feature-auth": ["libs/student-portal/feature-auth/src/index.ts"],
       "@sb/student-portal/feature-shell": ["libs/student-portal/feature-shell/src/index.ts"],

@@ -1,0 +1,25 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[32m PASS [39m[22m[27m[0m [0m[7m[37m student-portal-feature-home [39m[27m[0m [2mlibs/student-portal/feature-home/src/lib/home/[22m[1mhome.component.spec.ts[22m
+  HomeComponent (FR-STU-SES-001, FR-STU-CAT-003, NFR-A11Y-001)
+    [32m√[39m [2mrenders the greeting + "You have N tasks — M overdue" from totalSteps/overdueSteps (FR-STU-SES-001) (84 ms)[22m
+    [32m√[39m [2momits the "overdue" clause when overdueSteps is 0 (12 ms)[22m
+    [32m√[39m [2mrenders the all-caught-up mascot state + salah-relaxing.png when totalSteps is 0 (4 ms)[22m
+    [32m√[39m [2mrenders the four KPI cards from kpis in order (10 ms)[22m
+    [32m√[39m [2mrenders Pending steps inline and keeps Completed steps behind a disclosure (NFR-A11Y-001) (12 ms)[22m
+    [32m√[39m [2mrenders a read-only completion tick — NEVER a togglable checkbox (contract §0) (9 ms)[22m
+    [32m√[39m [2mrenders a blocked step disabled with its blockedReason and an inert CTA (12 ms)[22m
+    [32m√[39m [2mshows "Expires in N days" for an ExpiringSoon step and "Expired" for an Expired step (contract §E.3) (12 ms)[22m
+    [32m√[39m [2mrenders the per-step {done}/{total} progress label + bar, and none for Quiz/Redeem (FR-STU-SES-001) (9 ms)[22m
+    [32m√[39m [2mroutes a Navigate step to action.route with its server-supplied label (8 ms)[22m
+    [32m√[39m [2mroutes a Redeem step to /redeem (code-only enrollment — FR-STU-CAT-003) (6 ms)[22m
+    [32m√[39m [2mrenders the "This week" bar at round(100 × completedSteps / totalSteps) (9 ms)[22m
+    [32m√[39m [2mrenders the recently-enrolled rail with "Added N days ago" (8 ms)[22m
+    [32m√[39m [2mhides the recently-enrolled rail when the array is empty (7 ms)[22m
+    [32m√[39m [2mshows the mascot empty-state + a Browse-the-catalogue CTA when the plan is empty (FR-STU-CAT-003) (3 ms)[22m
+    [32m√[39m [2mtreats a single onboarding Redeem step as the empty/mascot state (contract §E.4) (2 ms)[22m
+
+[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
+[1mTests:       [22m[1m[32m16 passed[39m[22m, 16 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        [1m[33m3.632 s[39m[22m
+[2mRan all test suites[22m[2m.[22m

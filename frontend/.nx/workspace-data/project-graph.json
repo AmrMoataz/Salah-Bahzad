@@ -180,6 +180,42 @@
         "implicitDependencies": []
       }
     },
+    "student-portal-feature-profile": {
+      "name": "student-portal-feature-profile",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-profile",
+        "name": "student-portal-feature-profile",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-profile/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-profile"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-profile/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
     "admin-portal-feature-sessions": {
       "name": "admin-portal-feature-sessions",
       "type": "lib",
@@ -382,6 +418,42 @@
             ],
             "options": {
               "jestConfig": "libs/student-portal/feature-auth/jest.config.ts"
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "^production",
+              "{workspaceRoot}/jest.preset.js"
+            ]
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "student-portal-feature-home": {
+      "name": "student-portal-feature-home",
+      "type": "lib",
+      "data": {
+        "root": "libs/student-portal/feature-home",
+        "name": "student-portal-feature-home",
+        "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "sourceRoot": "libs/student-portal/feature-home/src",
+        "prefix": "sb",
+        "tags": [
+          "scope:student-portal",
+          "type:feature"
+        ],
+        "targets": {
+          "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+              "{workspaceRoot}/coverage/libs/student-portal/feature-home"
+            ],
+            "options": {
+              "jestConfig": "libs/student-portal/feature-home/jest.config.ts"
             },
             "configurations": {},
             "parallelism": true,
@@ -16483,6 +16555,43 @@
         "type": "static"
       }
     ],
+    "student-portal-feature-profile": [
+      {
+        "source": "student-portal-feature-profile",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "npm:@angular/forms",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-profile",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
     "admin-portal-feature-sessions": [
       {
         "source": "admin-portal-feature-sessions",
@@ -16706,6 +16815,43 @@
       },
       {
         "source": "student-portal-feature-auth",
+        "target": "npm:jest-preset-angular",
+        "type": "static"
+      }
+    ],
+    "student-portal-feature-home": [
+      {
+        "source": "student-portal-feature-home",
+        "target": "student-portal-data-access",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
+        "target": "npm:@angular/router",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
+        "target": "shared-ui",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
+        "target": "npm:@angular/platform-browser",
+        "type": "static"
+      },
+      {
+        "source": "student-portal-feature-home",
         "target": "npm:jest-preset-angular",
         "type": "static"
       }
@@ -17007,12 +17153,22 @@
       },
       {
         "source": "student-portal",
+        "target": "student-portal-feature-home",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
         "target": "student-portal-feature-catalogue",
         "type": "dynamic"
       },
       {
         "source": "student-portal",
         "target": "student-portal-feature-sessions",
+        "type": "dynamic"
+      },
+      {
+        "source": "student-portal",
+        "target": "student-portal-feature-profile",
         "type": "dynamic"
       },
       {
@@ -39422,5 +39578,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1782114335862
+  "computedAt": 1782253780188
 }

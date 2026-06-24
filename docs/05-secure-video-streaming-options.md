@@ -42,7 +42,7 @@ Cloudflare CDN (in front of R2; cached segments, $0 egress)
    ▲
    │  ── student clicks "Play" in the web portal ──
    │  portal opens a DEVICE-AWARE deep link into the native app:
-   │     Win/macOS → salah-bahazad://stream?session=…&video=…&handoff=<one-time code>
+   │     Win/macOS → salah-bahazad://stream?videoId=…&sessionId=…&handoff=<one-time code>
    │     iOS/Android → universal / app link to the same
    │  (app not installed → prompt to install)
    ▼

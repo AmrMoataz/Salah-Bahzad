@@ -9,7 +9,7 @@ using SalahBahazad.Domain.Enums;
 namespace SalahBahazad.Application.Features.Assignments.Commands.AnswerQuestion;
 
 internal sealed class AnswerQuestionHandler(
-    IAppDbContext db, ICurrentUserResolver currentUser, TimeProvider clock)
+    IAppDbContext db, ICurrentUserResolver currentUser, TimeProvider clock, IStudentPlanCache planCache)
     : IRequestHandler<AnswerQuestionCommand, AssignmentProgressDto>
 {
     public async ValueTask<AssignmentProgressDto> Handle(
@@ -42,6 +42,12 @@ internal sealed class AnswerQuestionHandler(
             assignment.TenantId, assignment.Id, AssessmentEventType.Answered, now, answeredOrder));
 
         await db.SaveChangesAsync(cancellationToken);
+
+        // A non-final answer moves the Home plan's assignment progress but raises no domain event (only the last
+        // answer raises AssignmentGraded, handled separately), so drop the cached plan inline (contract §D). The
+        // final answer also invalidates via that event — a harmless double drop. Off the critical path.
+        await planCache.InvalidateAsync(currentUser.UserId, cancellationToken);
+
         return assignment.ToProgressDto();
     }
 }

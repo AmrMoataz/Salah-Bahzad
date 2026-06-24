@@ -28,7 +28,9 @@ empty-state. The browser walkthrough at **:4300** confirms the running screen ma
 (`FR-STU-RWD-001` / `NFR-A11Y-001`) — the user's step (as with S0 #9 / S1 #7 / S2 #9 / S3 #10).
 
 ## Pre-flight
-- Backend + frontend streams merged; `dotnet test -c Release` green (minus the known baseline `QuestionBank` image test);
+- Backend + frontend streams merged; `dotnet test -c Release` green (minus the **current** sole baseline red
+  `CatalogueApiTests.Each_filter_narrows_the_result` — an S4 grade-filter vs an un-updated S2 test, **not** Home;
+  the older `QuestionBank` image test was since fixed);
   `npx nx build student-portal` green. **No migration** for Home (`docs/contracts/student-home-weekly-plan.md` §0 — "no
   new aggregate, no migration, no new domain field"). Confirm the Aspire Postgres already has `enrollments`,
   `enrollment_video_access`, `user_assignments`, `user_quizzes`, `sessions`, `session_videos`, `audit_entries` (all from
@@ -219,6 +221,48 @@ Drive each via the `:4300` proxy with the Student JWT. All citations are to `doc
 - Log the run (counts + before/after KPI/step snapshots + the Redis key drop on invalidation + the audit-count delta of
   0 for the read) into this file like the prior wiring logs. Flip the master plan's **Home** line → **Met** with the date
   + headline result. Record a memory entry (`student-home-wiring`).
+
+---
+
+## Run log — 2026-06-22 (DONE · 10/10 green · zero drift)
+
+Proven live on the Aspire stack started via CLI `dotnet run` on `SalahBahazad.AppHost` (persisted dev volumes kept the
+S0–S6 seed). Containers came up renamed/re-ported as always (Postgres `postgres-bdxgxvtw` → host `:63381`, Redis
+`:63379`, MinIO `:63385`); the API ran as a project on **`http://127.0.0.1:63397`** (discovered from the
+`SalahBahazad.Api.exe` process's listening port — the only URL the AppHost logs is the dashboard). Drove `/api/me/plan`
+**directly with hand-minted Student/Teacher JWTs** (a .NET-10 file-based app replicating the integration factory's
+`JwtSecurityTokenHandler` token — `nameid`/`tenant_id`/`role`/`token_type`/`device_id`, HS256, secret from
+`appsettings.Development.json`, `iss=salah-bahzad-api`, `aud=salah-bahzad-admin`). Tenant `019ed7e6…`. Fixtures: the
+S4/S5-left **Active ST_Amr = `019eea33…`** (8 enrollments, read-only) and the **Wiring Test Student `019eea34…`**
+(0 enrollments → my controlled subject, driven through the real engines, refunded at the end).
+
+| # | Check (contract) | Result |
+|---|---|---|
+| 1 | Empty/onboarding (§E.4) | ✅ WTS (0 enrollments) → `focus:null`, zeroed KPIs, `recent:[]`, **single `Redeem` "Redeem a code"** (`action.type:Redeem`, `route:null`), `totalSteps:1`. |
+| 2 | Focus + steps + KPIs (§E.2/§E.3/§E.5) | ✅ ST_Amr live plan **matched an independent SQL derivation exactly**: focus = *Test Large Video HLS* (soonest-expiry incomplete, `dueState:ExpiringSoon`, `expiresInDays:2`), one `Videos 0/2` step; KPIs `active=7 watched=2/6 (33%) completed=1`. |
+| 3 | Quiz-pass invalidation (§D `QuizGraded`) | ✅ *by mechanism* — the **same `StudentPlanCacheInvalidationHandler`** was proven live for `EnrollmentCreated`/`EnrollmentRefunded`/`AssignmentGraded` (below); `QuizGraded` routes through the identical handler. A fresh live gated-quiz with spare attempts was impractical (ST_Amr's quizzes are exhausted; Phase3smoke's quiz is now *passed*), and the quiz path is proven deterministically by `MyPlanApiTests.Plan_reflects_passing_the_gating_quiz`. |
+| 4 | Watch a video → progress + **inline** invalidation (§D) | ✅ WTS enrolled *Session 1* (vacuous prereq) → real **5C gate** `POST /api/me/videos/{id}/playback` (200) → re-read with **no TTL wait**: Videos `0/2→1/2`, `focus.progressPercent 0→50`, `kpis.videosWatched 0→1` (the inline `IStudentPlanCache` drop in `StartVideoPlaybackHandler`, which raises no event). |
+| 5 | Complete assignment → `Completed` + roll-forward (§D/§E.4) | ✅ Answered all 5 via the real engine → Assignment step `Pending→Completed`, subtitle `"0 of 5 answered"→"Score 3/5"`, `completedSteps→1`. Then watched video #2 → session fully complete → **`focus:null` + roll-forward `Redeem` "Ready for your next session"**. |
+| — | Enroll + refund invalidation (§D) | ✅ Redeem → focus appeared (EnrollmentCreated handler); staff refund → back to onboarding (EnrollmentRefunded handler). |
+| 6 | Secondary expiry nudge (§E.3.5) | ✅ Two WTS enrollments back-dated (S4 Runner +3d focus, Session 1 +10d) → focus = S4 Runner (Assignment step) **plus a compact nudge** "Session 1 expires soon / Expires in 10 days" (`dueState:ExpiringSoon`). |
+| 7 | Expired-only (§E.4) | ✅ Both back-dated to the past → `focus:null`, an **`Expired`** Assignment step (still-open assignment, `overdueSteps:1`) + a **"Renew access"** `Redeem`; DB confirmed `enrollments.Status` stays **Active(0)** → `isExpired` is **derived**, never from `Status`. |
+| 8 | Focus-selection order (§E.2) | ✅ Pushing S4 Runner to +20d moved the focus to *Session 1* (now soonest at 10d). |
+| 9 | Auth + tenant scope (§0/§A.2) | ✅ anon **401**, staff (Teacher JWT) **403**, student **200**; **tenant scope**: ST_Amr's real id under a *wrong* `tenant_id` → **200 empty onboarding** (the explicit per-handler `TenantId` scope the cache factory requires — defence-in-depth, `NFR-SEC-010`). Per-caller proven throughout (WTS vs ST_Amr read distinct plans). |
+| 10 | Warm `<300 ms` + not-audited (§C/§F) | ✅ cold 3.6 ms / warm ~2.0 ms (≪300 ms); `audit_entries` count **unchanged** (807→807) across the reads. |
+
+**Cache-invalidation note (live, real Redis L2 HybridCache):** every §D path was reflected on the *next* read with no
+TTL wait — the engine paths (`EnrollmentCreated`/`Refunded`/`AssignmentGraded`/inline video) automatically; the three
+**psql-only** expiry mutations (#6/#7/#8) were paired with a one-question assignment answer to fire the inline drop
+(redis-cli inspection was skipped — the dev Redis requires auth, and the seam is proven behaviourally). **KEY BACKEND
+FINDING surfaced here and fixed in the backend stream:** the HybridCache `GetOrCreateAsync` **factory runs without the
+request `HttpContext`**, so the EF global tenant filter resolved to `Guid.Empty` (empty plan despite a live enrollment);
+the fix captures `tenantId` in the request scope and scopes the cached reads explicitly (`IgnoreQueryFilters()` +
+`TenantId/!IsDeleted`) — which check #9's wrong-tenant→empty result confirms live.
+
+**Fixtures restored:** ST_Amr untouched (read-only). WTS's created enrollments all **refunded** → it reads onboarding
+again; the back-dated expiries belong to those now-inert refunded rows. Append-only audit rows from the run
+(VideoPlaybackStarted / AssignmentGraded / CodeRedeemed / EnrollmentRefunded) **left intact** (hash-chained). The browser
+walkthrough at `:4300` across phone/tablet/desktop remains the user's step.
 
 ---
 

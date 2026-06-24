@@ -30,10 +30,10 @@ export const appRoutes: Routes = [
       import('@sb/student-portal/feature-shell').then((m) => m.ShellComponent),
     children: [
       {
-        // S0 placeholder home (the sessions/profile children land in S3/S6).
+        // Home — the personalized weekly study plan (replaces the S0 placeholder).
         path: '',
         loadComponent: () =>
-          import('./placeholders/home-placeholder.component').then((m) => m.HomePlaceholderComponent),
+          import('@sb/student-portal/feature-home').then((m) => m.HomeComponent),
       },
       {
         // S2 — the catalogue discovery screen + enroll-by-code modal.
@@ -84,6 +84,12 @@ export const appRoutes: Routes = [
         path: 'sessions/:id/quiz/attempts/:attemptId/review',
         loadComponent: () =>
           import('@sb/student-portal/feature-assessment').then((m) => m.QuizReviewComponent),
+      },
+      {
+        // S6 — the student self-service Profile screen (the FINAL student-portal slice, closes S0..S6).
+        path: 'profile',
+        loadComponent: () =>
+          import('@sb/student-portal/feature-profile').then((m) => m.ProfileComponent),
       },
       {
         // The shell's Redeem FAB target: the catalogue with the enroll modal auto-opened (blank).

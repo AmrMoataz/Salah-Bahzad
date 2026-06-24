@@ -37,7 +37,7 @@ The admin engagement (Phases 0–5C, latest commit `8742138`) built the platform
 | My enrolled sessions (progress + expiry countdown) | `GET /api/me/sessions` | FR-STU-SES-001 | S3 |
 | One session's detail for the student (video playlist + per-video remaining access + lock state, materials signed reads, assignment/quiz status, prerequisite/quiz-gate status) | `GET /api/me/sessions/{id}` (+ `…/materials/{mid}/url`) | FR-STU-SES-002/003/004 | S3 |
 | Student self-service profile (read/update personal info + parent phones + avatar; bound-device info) | `GET /api/me/profile`, `PUT /api/me/profile` | FR-STU-PRO-001/002/003 | S6 |
-| **Personalized Home — a weekly study plan** (KPI roll-up + a current-frontier "what to do next" step list + recently enrolled), derived from existing state and Redis-cached; **net-new** beyond the original "Home = catalogue" (screen #5) | `GET /api/me/plan` | FR-STU-SES-001, FR-PLAT-ENR-003/-007, FR-PLAT-QZ-008 | Home (post-S6) — `docs/contracts/student-home-weekly-plan.md` + `IMPLEMENTATION-PLAN-student-home-{backend,frontend,wiring}.md` |
+| **Personalized Home — a weekly study plan** (KPI roll-up + a current-frontier "what to do next" step list + recently enrolled), derived from existing state and Redis-cached; **net-new** beyond the original "Home = catalogue" (screen #5) | `GET /api/me/plan` | FR-STU-SES-001, FR-PLAT-ENR-003/-007, FR-PLAT-QZ-008 | Home (post-S6) — **Met (wiring DONE 2026-06-22, 10/10 live checks on the Aspire stack, zero drift)** — `docs/contracts/student-home-weekly-plan.md` + `IMPLEMENTATION-PLAN-student-home-{backend,frontend,wiring}.md` |
 
 > Note: `/api/profile` already exists but is **staff-only** (Settings → own profile). The student profile is a **new, separate** `/api/me/profile` group, scoped to the caller's JWT (no IDOR surface), to match the `/api/me/*` family.
 
@@ -299,12 +299,35 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 - **Exit:** an attempt randomises; the timer is authoritative; leaving forfeits with zero (consumes the attempt); focus-loss is logged not forfeited; passing (`≥` min) unlocks the session's videos; best-of is shown; **the per-attempt answer-key review renders (your vs correct + score) for the caller's own terminal attempt**.
 
 ### S6 — Profile
+> **Status: ✅ MET (2026-06-22)** — backend + frontend built; **wiring proven live on the Aspire stack — all scripted
+> checks green, ZERO contract drift** (the `:4300` browser walkthrough is the user's visual step, as in prior phases).
+> Verified: `GET /api/me/profile` returns the exact 14-key `StudentProfileDto` (grade/city/region **names** == DB, the
+> active `boundDevice` summary+date, **no `email`/`avatar`/`deviceTokenHash`**, `null` when no device); `PUT` persists
+> the **seven** writable fields, **leaves `GradeId` unchanged**, **ignores** adversarial `gradeId`/`email` keys, and
+> writes **one** `Student` / `ActorType=Student` audit row via the interceptor; the **8-case** `400` validation matrix
+> (incl. region-not-in-city); `401` anon / `403` staff on both routes; cross-tenant **404** (EF global filter); and the
+> three client-only flows (device-reset INFO modal, Firebase `sendPasswordResetEmail`, sign-out clears the JWT pair)
+> fire **no** profile API. Run log in `IMPLEMENTATION-PLAN-student-s6-wiring.md`. *(Planned + adversarially reviewed
+> earlier the same day — 3-lens Workflow, 6 fixes incl. a hallucinated `cities."Name"`→`NameEn` and a six-vs-seven
+> writable-field fix.)* S6 is the **final vertical slice — it CLOSES the student-portal plan (S0..S6)** (the personalized
+> Home/weekly-plan phase is separately planned, post-S6).
+>
+> **Four user-confirmed decisions (2026-06-22) + grounding corrections to the prototype:** (1) **avatar = initials
+> only** — no upload control, **no `Avatar` field, no migration**; real upload deferred (§7). (2) **device reset =
+> contact-support only** — the "Reset device" button opens an **informational** modal and calls **no API** (matches
+> `FR-STU-DEV-002` + the prototype's no-op confirm); recovery is the existing staff `POST /api/students/{id}/clear-device`
+> (`FR-PLAT-DEV-004`). (3) **password = Firebase `sendPasswordResetEmail`** (email reset link) — **no form, no backend**
+> (`FR-PLAT-AUTH-009`); the prototype's current/new/confirm form is dropped. (4) **email = read-only Firebase identity**
+> — **not** on `Student`, **not** in the GET/PUT DTOs; shown disabled from `firebaseAuth.currentUser.email`. Net backend:
+> **two** new `RequireStudent` endpoints + **one** new `Student.UpdateOwnProfile(...)` domain method (grade unchanged),
+> **no migration**.
+
 **Goal:** self-service account management.
-- **Backend:** **new** `GET /api/me/profile` + `PUT /api/me/profile` (personal info, parent phones, avatar; bound-device info). Password is Firebase self-service.
-- **Frontend:** `feature-profile` — header band, personal-info form (grade disabled), parent numbers, bound-device card + reset modal, security (change-password modal → Firebase, sign-out confirm) (prototype § PROFILE + Change-password / Device-reset modals).
+- **Backend:** **new** `GET /api/me/profile` + `PUT /api/me/profile` (personal info, parent phones, bound-device info; **avatar deferred — initials only**) + a new `Student.UpdateOwnProfile(...)` domain method (grade unchanged), **no migration**. Mirrors the staff `ProfileEndpoints`. Password is Firebase self-service.
+- **Frontend:** `feature-profile` — header band, personal-info form (grade + **email disabled**), parent numbers, bound-device card + **contact-support** reset modal, security (change-password → Firebase **email reset link**, sign-out confirm) (prototype § PROFILE + Change-password / Device-reset modals).
 - **Contract:** `docs/contracts/student-s6-profile.md`.
-- **Reqs:** FR-STU-PRO-001..003, FR-PLAT-AUTH-009, FR-STU-DEV-003.
-- **Exit:** profile reads/saves; bound device + bind date shown; change-password defers to Firebase; reset-device requests the staff-clear path; sign-out clears the session.
+- **Reqs:** FR-STU-PRO-001..003, FR-PLAT-AUTH-009, FR-STU-DEV-002/003, FR-PLAT-DEV-004.
+- **Exit:** profile reads/saves the seven writable fields; grade + email read-only; bound device + bind date shown; change-password sends a Firebase reset email; reset-device is **contact-support only** (informational modal, no API); sign-out clears the session.
 
 ---
 
@@ -328,4 +351,4 @@ Each phase: **Goal · Backend · Frontend · Design anchor (prototype § section
 ---
 
 ### Per-phase docs to produce (as each phase starts, mirroring the admin plan)
-`docs/contracts/student-s{1,2,3,4,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. **S4** reuses the 5B-1 engine (`phase5b1-assignments-attendance.md`) but adds **one** new student review read, so it has its **own** contract (`student-s4-assignments.md`) + all **three** streams. **S5** likewise reuses the existing engine (`phase5b2-quizzes.md`, `phase5c-video-gate.md`) **but**, like S4, adds **one** new student review read (`GET /api/me/quizzes/attempts/{attemptId}/review`, the only student surface exposing quiz `isCorrect`) + one additive attempt-`id` field — so it too has its **own** contract (`student-s5-quizzes.md`) + all **three** streams (`-backend`/`-frontend`/`-wiring`). *(Planning 2026-06-22 revised the earlier "frontend + wiring only" note: `FR-STU-QZ-009`'s per-attempt answer-key review had no backend path.)*
+`docs/contracts/student-s{1,2,3,4,6}-*.md` (frozen contracts) and `docs/IMPLEMENTATION-PLAN-student-s{0..6}-{backend,frontend,wiring}.md` — same naming and three-stream split as `IMPLEMENTATION-PLAN-phase5c-*`. **S4** reuses the 5B-1 engine (`phase5b1-assignments-attendance.md`) but adds **one** new student review read, so it has its **own** contract (`student-s4-assignments.md`) + all **three** streams. **S5** likewise reuses the existing engine (`phase5b2-quizzes.md`, `phase5c-video-gate.md`) **but**, like S4, adds **one** new student review read (`GET /api/me/quizzes/attempts/{attemptId}/review`, the only student surface exposing quiz `isCorrect`) + one additive attempt-`id` field — so it too has its **own** contract (`student-s5-quizzes.md`) + all **three** streams (`-backend`/`-frontend`/`-wiring`). *(Planning 2026-06-22 revised the earlier "frontend + wiring only" note: `FR-STU-QZ-009`'s per-attempt answer-key review had no backend path.)* **S6** (the final slice) likewise has its **own** contract (`student-s6-profile.md`) + all **three** streams (authored 2026-06-22): it adds **two** new `/api/me/profile` endpoints + one `Student.UpdateOwnProfile(...)` domain method, **no migration**, and **closes** the student-portal plan (S0..S6).

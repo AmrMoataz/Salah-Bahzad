@@ -3,6 +3,7 @@ using MockQueryable.NSubstitute;
 using NSubstitute;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Auth.Commands.ExchangeStudentFirebaseToken;
+using SalahBahazad.Application.Features.Auth.DTOs;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
 
@@ -30,10 +31,15 @@ internal static class AuthTestHelpers
         db.StudentDevices.Returns(deviceSet);
         db.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(1);
 
-        // The handler wraps the success path in ExecuteInTransactionAsync; run the action directly.
+        // Both student-exchange handlers wrap their success path in ExecuteInTransactionAsync; run the action
+        // directly. The portal handler returns StudentExchangeResult, the app handler StudentAuthResponse —
+        // the generic mock is configured per concrete TResult, so set up both instantiations.
         db.ExecuteInTransactionAsync(
                 Arg.Any<Func<Task<StudentExchangeResult>>>(), Arg.Any<CancellationToken>())
             .Returns(call => call.Arg<Func<Task<StudentExchangeResult>>>().Invoke());
+        db.ExecuteInTransactionAsync(
+                Arg.Any<Func<Task<StudentAuthResponse>>>(), Arg.Any<CancellationToken>())
+            .Returns(call => call.Arg<Func<Task<StudentAuthResponse>>>().Invoke());
 
         return db;
     }
@@ -49,12 +55,15 @@ internal static class AuthTestHelpers
     public static IJwtTokenService Jwt()
     {
         var jwt = Substitute.For<IJwtTokenService>();
-        jwt.IssueStudentAccessToken(Arg.Any<Student>(), Arg.Any<Guid>())
-            .Returns(ci => new PlatformToken($"access-{ci.Arg<Guid>():N}", DateTimeOffset.UtcNow.AddMinutes(15)));
-        jwt.IssueStudentRefreshToken(Arg.Any<Student>(), Arg.Any<Guid>())
-            .Returns(ci => new PlatformToken($"refresh-{ci.Arg<Guid>():N}", DateTimeOffset.UtcNow.AddDays(7)));
+        // deviceId is Guid? — null on the device-agnostic app path (the token then carries no device_id).
+        jwt.IssueStudentAccessToken(Arg.Any<Student>(), Arg.Any<Guid?>())
+            .Returns(ci => new PlatformToken($"access-{Suffix(ci.Arg<Guid?>())}", DateTimeOffset.UtcNow.AddMinutes(15)));
+        jwt.IssueStudentRefreshToken(Arg.Any<Student>(), Arg.Any<Guid?>())
+            .Returns(ci => new PlatformToken($"refresh-{Suffix(ci.Arg<Guid?>())}", DateTimeOffset.UtcNow.AddDays(7)));
         return jwt;
     }
+
+    private static string Suffix(Guid? deviceId) => deviceId is { } id ? id.ToString("N") : "app";
 
     /// <summary>A device-binding fake that issues a fixed (token, hash) and echoes the fingerprint.</summary>
     public static IDeviceBindingService Binding(

@@ -70,6 +70,26 @@ export type {
   StudentQuizAttemptReview,
 } from './lib/quizzes/quiz.models';
 
+export { ProfileService } from './lib/profile/profile.service';
+export type {
+  StudentProfile,
+  BoundDevice,
+  UpdateMyStudentProfile,
+} from './lib/profile/profile.models';
+
+export { PlanService } from './lib/plan/plan.service';
+export type {
+  MyPlanStepKind,
+  MyPlanStepStatus,
+  MyPlanDueState,
+  MyPlanActionType,
+  MyPlanKpis,
+  MyPlanFocus,
+  MyPlanStep,
+  MyPlanRecent,
+  MyPlanDto,
+} from './lib/plan/plan.models';
+
 export { RegistrationService, registrationConfig } from './lib/registration/registration.service';
 export {
   ID_IMAGE_MAX_BYTES,

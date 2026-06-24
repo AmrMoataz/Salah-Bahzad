@@ -11,11 +11,14 @@ namespace SalahBahazad.Application.Features.Auth.Commands.RefreshToken;
 /// <summary>
 /// Validates a platform refresh token (signature, issuer, audience, lifetime and <c>token_type=refresh</c>)
 /// and reissues a fresh access+refresh pair. <b>Role-aware</b> (S0): a <c>role=Student</c> token reloads the
-/// <c>Student</c>, re-checks it is <c>Active</c> and that its bound device is still active, and reissues a
-/// student pair preserving <c>device_id</c>; any other role takes the staff path. Reloading from the
-/// database (rather than trusting the token) means an account deactivated/deleted — or a device cleared by
-/// staff — since the token was issued can no longer refresh. Any failure → 401, so the client falls back to
-/// a full sign-in (FR-PLAT-AUTH-002, FR-ADM-AUTH-001, FR-PLAT-DEV-003/004).
+/// <c>Student</c> and re-checks it is <c>Active</c>; any other role takes the staff path. Within the student
+/// path it is also <b>app-aware</b> (Native App A0, contract §B): a <b>portal</b> token (with
+/// <c>device_id</c>) additionally re-verifies the bound device is still active and reissues preserving
+/// <c>device_id</c>, while an <b>app</b> token (no <c>device_id</c>) is device-agnostic — the device re-check
+/// is skipped and a device-less pair is reissued (FR-APP-DEV-001). Reloading from the database (rather than
+/// trusting the token) means an account deactivated/deleted — or a device cleared by staff — since the token
+/// was issued can no longer refresh. Any failure → 401, so the client falls back to a full sign-in
+/// (FR-PLAT-AUTH-002, FR-ADM-AUTH-001, FR-PLAT-DEV-003/004).
 /// </summary>
 internal sealed class RefreshTokenHandler(
     IJwtTokenService jwtTokenService,
@@ -87,11 +90,32 @@ internal sealed class RefreshTokenHandler(
             throw new UnauthorizedAccessException("Your session has expired. Please sign in again.");
         }
 
-        // The device identity travels in the signed token; re-verify it still maps to an active binding so a
-        // staff-cleared device (FR-PLAT-DEV-004) cannot keep refreshing — it must sign in again to re-bind.
+        // App-aware (contract §B, FR-APP-DEV-001): an app refresh token carries no device_id, so the session
+        // is device-agnostic — there is no binding to re-verify. Reissue a device-less student pair (the
+        // Active re-check above is the only gate). The portal path (device_id present) is unchanged below.
+        if (string.IsNullOrEmpty(principal.DeviceId))
+        {
+            var appAccess = jwtTokenService.IssueStudentAccessToken(student, deviceId: null);
+            var appRefresh = jwtTokenService.IssueStudentRefreshToken(student, deviceId: null);
+
+            logger.LogInformation("Student {StudentId} refreshed their app session (device-agnostic)", student.Id);
+
+            return new RefreshResult(
+                Staff: null,
+                Student: new StudentAuthResponse(
+                    appAccess.Value,
+                    appRefresh.Value,
+                    appAccess.ExpiresAt,
+                    appRefresh.ExpiresAt,
+                    new StudentInfo(student.Id, student.FullName, student.Status, BoundDevice: null)));
+        }
+
+        // The device identity travels in the signed portal token; re-verify it still maps to an active
+        // binding so a staff-cleared device (FR-PLAT-DEV-004) cannot keep refreshing — it must sign in again
+        // to re-bind. (A present-but-malformed device_id is treated as a stale/forged session → 401.)
         if (!Guid.TryParse(principal.DeviceId, out var deviceId))
         {
-            logger.LogWarning("Refresh rejected — student {StudentId} token carries no device_id", student.Id);
+            logger.LogWarning("Refresh rejected — student {StudentId} token carries a malformed device_id", student.Id);
             throw new UnauthorizedAccessException("Your session has expired. Please sign in again.");
         }
 

@@ -19,6 +19,7 @@ export type ProgressVariant = 'primary' | 'success' | 'danger' | 'warning' | 'in
         class="sb-progress__track"
         [style.height.px]="height()"
         role="progressbar"
+        [attr.aria-label]="ariaLabel() || null"
         [attr.aria-valuenow]="clamped()"
         aria-valuemin="0"
         aria-valuemax="100"
@@ -57,6 +58,8 @@ export class ProgressComponent {
   readonly label = input<string>('');
   readonly showValue = input<boolean>(false);
   readonly height = input<number>(8);
+  /** Accessible name for the bar when there is no visible `label` (e.g. a heading sits beside it). */
+  readonly ariaLabel = input<string>('');
 
   readonly clamped = computed(() => Math.min(Math.max(this.value(), 0), 100));
   readonly color = computed(() => {

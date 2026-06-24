@@ -9,14 +9,15 @@ public interface IJwtTokenService
     PlatformToken IssueRefreshToken(Staff staff);
 
     /// <summary>
-    /// Issues a student access token: <c>role=Student</c>, the student's tenant, and the bound
+    /// Issues a student access token: <c>role=Student</c>, the student's tenant, and — when bound — the
     /// <paramref name="deviceId"/> stamped as the <c>device_id</c> claim that the resolvers read
-    /// (FR-PLAT-AUTH-002, FR-PLAT-DEV-001).
+    /// (FR-PLAT-AUTH-002, FR-PLAT-DEV-001). Pass <c>null</c> for the device-agnostic app session: the token
+    /// then carries <b>no</b> <c>device_id</c> claim (contract §A, FR-APP-DEV-001).
     /// </summary>
-    PlatformToken IssueStudentAccessToken(Student student, Guid deviceId);
+    PlatformToken IssueStudentAccessToken(Student student, Guid? deviceId);
 
-    /// <summary>Issues the matching student refresh token, preserving the <paramref name="deviceId"/>.</summary>
-    PlatformToken IssueStudentRefreshToken(Student student, Guid deviceId);
+    /// <summary>Issues the matching student refresh token, preserving the <paramref name="deviceId"/> (or its absence).</summary>
+    PlatformToken IssueStudentRefreshToken(Student student, Guid? deviceId);
 
     TokenPrincipal? ValidateRefreshToken(string refreshToken);
 }

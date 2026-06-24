@@ -20,7 +20,8 @@ internal sealed class StartVideoPlaybackHandler(
     TimeProvider clock,
     IAuditWriter auditWriter,
     IPlaybackHandoffStore handoffStore,
-    PlaybackOptions playbackOptions)
+    PlaybackOptions playbackOptions,
+    IStudentPlanCache planCache)
     : IRequestHandler<StartVideoPlaybackCommand, PlaybackHandoffDto>
 {
     public async ValueTask<PlaybackHandoffDto> Handle(
@@ -81,6 +82,11 @@ internal sealed class StartVideoPlaybackHandler(
             new PlaybackHandoff(video.Id, enrollmentId, currentUser.UserId, currentUser.TenantId),
             ttl,
             cancellationToken);
+
+        // Spending a view moves the caller's videos-watched / progress, which the Home plan derives — but this
+        // gate raises no domain event, so drop the cached plan inline so it reflects the watch on the next read
+        // (contract §D). Off the critical path; a miss self-heals at the weekly TTL.
+        await planCache.InvalidateAsync(currentUser.UserId, cancellationToken);
 
         return new PlaybackHandoffDto(code, clock.GetUtcNow().Add(ttl));
     }

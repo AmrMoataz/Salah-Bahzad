@@ -2,6 +2,7 @@ using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SalahBahazad.Application.Features.Auth.Commands.ExchangeFirebaseToken;
+using SalahBahazad.Application.Features.Auth.Commands.ExchangeStudentAppToken;
 using SalahBahazad.Application.Features.Auth.Commands.ExchangeStudentFirebaseToken;
 using SalahBahazad.Application.Features.Auth.Commands.RefreshToken;
 using SalahBahazad.Application.Features.Auth.DTOs;
@@ -40,6 +41,20 @@ internal sealed class AuthEndpoints : IEndpointGroup
             .AllowAnonymous()
             .WithName("ExchangeStudentFirebaseToken")
             .WithSummary("Exchange a student Firebase ID token for a Student-role JWT pair (status-gated, device-bound)")
+            .Produces<StudentAuthResponse>(StatusCodes.Status200OK)
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status401Unauthorized)
+            .Produces<ProblemDetails>(StatusCodes.Status403Forbidden)
+            .Produces<ProblemDetails>(StatusCodes.Status429TooManyRequests);
+
+        // Device-agnostic native-app sign-in (contract §A): same status gate, but NO device binding — reads no
+        // device cookie/fingerprint, sets no cookie, and issues JWTs with no device_id. The browser portal
+        // keeps using /student/exchange above; the app uses this so an Active student signs in on any machine.
+        group.MapPost("/student/app-exchange", ExchangeStudentAppAsync)
+            .RequireRateLimiting("auth")
+            .AllowAnonymous()
+            .WithName("ExchangeStudentAppToken")
+            .WithSummary("Device-agnostic student sign-in for the native app (status-gated, no device binding)")
             .Produces<StudentAuthResponse>(StatusCodes.Status200OK)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status401Unauthorized)
@@ -100,6 +115,16 @@ internal sealed class AuthEndpoints : IEndpointGroup
             httpContext.Response.Cookies.Append(DeviceCookieName, token, BuildDeviceCookieOptions(environment));
 
         return Results.Ok(result.Response);
+    }
+
+    private static async Task<IResult> ExchangeStudentAppAsync(
+        [FromBody] StudentExchangeRequest request,
+        ISender sender,
+        CancellationToken cancellationToken)
+    {
+        // Device-agnostic: no cookie read, no fingerprint, no device headers — just the Firebase token.
+        var result = await sender.Send(new ExchangeStudentAppTokenCommand(request.FirebaseIdToken), cancellationToken);
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> RefreshAsync(

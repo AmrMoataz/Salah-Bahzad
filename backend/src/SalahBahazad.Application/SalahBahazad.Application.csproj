@@ -10,6 +10,9 @@
     <PackageReference Include="Mediator.Abstractions" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <!-- HybridCache abstraction: the student-Home plan read composes + caches via HybridCache.GetOrCreateAsync
+         (Infrastructure registers the implementation with AddHybridCache). -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
   </ItemGroup>
 
   <!-- Handlers are internal (invoked only via ISender). Expose them to:

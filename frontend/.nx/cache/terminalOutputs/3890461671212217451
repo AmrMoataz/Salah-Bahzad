@@ -1,0 +1,37 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m student-portal-feature-profile [39m[27m[0m [2mlibs/student-portal/feature-profile/src/lib/profile/[22m[1mprofile.component.spec.ts[22m ([0m[1m[41m7.335 s[49m[22m[0m)
+  ProfileComponent (FR-STU-PRO-001/002/003)
+    [32m√[39m [2mrenders the header band: initials avatar, name, "{gradeName} · {cityName}" sub-line, and the "Active" chip (117 ms)[22m
+    [32m√[39m [2mpre-fills the form from the loaded profile; Email + Grade are DISABLED and show the right values (22 ms)[22m
+    [32m√[39m [2mchanging City re-fetches regions for the new city and resets the Region control (§C.3 cascade) (21 ms)[22m
+    [32m√[39m [2mSave PUTs exactly the seven writable fields (no email/grade), then re-seeds + toasts success (20 ms)[22m
+    [32m√[39m [2mrenders the server `detail` inline when Save returns a 400 (mismatched city/region) (19 ms)[22m
+    [32m√[39m [2mparent Primary is required (Save disabled when blank); Secondary is optional and sent as null when blank (18 ms)[22m
+    [31m×[39m [2mthe Bound device card shows the summary + "Bound {date}", and a generic label when boundDevice is null (14 ms)[22m
+    [32m√[39m [2mthe device-reset modal opens on "Reset device" and its confirm action calls NO service (decision 2 / §D.2) (18 ms)[22m
+    [32m√[39m [2mChange password calls StudentAuthStore.requestPasswordReset(email) and shows "Check your inbox" (decision 3 / §D.3) (17 ms)[22m
+    [32m√[39m [2mSign out opens the confirm modal and its confirm calls StudentAuthStore.signOut (§D.4) (15 ms)[22m
+
+[1m[31m  [1m● [22m[1mProfileComponent (FR-STU-PRO-001/002/003) › the Bound device card shows the summary + "Bound {date}", and a generic label when boundDevice is null[39m[22m
+
+    Cannot configure the test module when the test module has already been instantiated. Make sure you are not using `inject` before `TestBed.configureTestingModule`.
+[2m[22m
+[2m    [0m [90m 74 |[39m     toast [33m=[39m { success[33m:[39m jest[33m.[39mfn()[33m,[39m error[33m:[39m jest[33m.[39mfn()[33m,[39m info[33m:[39m jest[33m.[39mfn() }[33m;[39m[22m
+[2m     [90m 75 |[39m[22m
+[2m    [31m[1m>[22m[2m[39m[90m 76 |[39m     [33mTestBed[39m[33m.[39mconfigureTestingModule({[22m
+[2m     [90m    |[39m             [31m[1m^[22m[2m[39m[22m
+[2m     [90m 77 |[39m       imports[33m:[39m [[33mProfileComponent[39m][33m,[39m[22m
+[2m     [90m 78 |[39m       providers[33m:[39m [[22m
+[2m     [90m 79 |[39m         { provide[33m:[39m [33mProfileService[39m[33m,[39m useValue[33m:[39m service }[33m,[39m[0m[22m
+[2m[22m
+[2m      [2mat _TestBedImpl.assertNotInstantiated ([22m[2m../../../node_modules/@angular/core/fesm2022/testing.mjs[2m:2099:19)[22m[2m[22m
+[2m      [2mat _TestBedImpl.configureTestingModule ([22m[2m../../../node_modules/@angular/core/fesm2022/testing.mjs[2m:1973:14)[22m[2m[22m
+[2m      [2mat _TestBedImpl.configureTestingModule ([22m[2m../../../node_modules/@angular/core/fesm2022/testing.mjs[2m:1805:37)[22m[2m[22m
+[2m      [2mat setup ([22m[2m[0m[36msrc/lib/profile/profile.component.spec.ts[39m[0m[2m:76:13)[22m[2m[22m
+[2m      [2mat [22m[2m[0m[36msrc/lib/profile/profile.component.spec.ts[39m[0m[2m:240:11[22m[2m[22m
+
+[1mTest Suites: [22m[1m[31m1 failed[39m[22m, 1 total
+[1mTests:       [22m[1m[31m1 failed[39m[22m, [1m[32m9 passed[39m[22m, 10 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        15.955 s
+[2mRan all test suites[22m[2m.[22m

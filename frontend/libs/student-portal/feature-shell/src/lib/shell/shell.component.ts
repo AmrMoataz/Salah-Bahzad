@@ -26,12 +26,13 @@ const ICON = {
 };
 
 // S0 gates everything but Home off (the placeholder home). Catalogue + My Sessions are live (S2/S3);
-// Profile stays disabled ("Soon") until S6. Phases flip each item's `disabled` off as they land.
+// Profile is now live (S6 — the final student-portal slice). Phases flip each item's `disabled` off
+// as they land.
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
   { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
   { label: 'My Sessions', route: '/sessions', icon: ICON.sessions },
-  { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
+  { label: 'Profile', route: '/profile', icon: ICON.profile },
 ];
 
 // The mobile bottom-nav: two items, the centre Redeem FAB, then two items.
@@ -39,7 +40,7 @@ const BOTTOM_ITEMS: NavItem[] = [
   { label: 'Home', route: '/', exact: true, icon: ICON.home },
   { label: 'Catalogue', route: '/catalogue', icon: ICON.catalogue },
   { label: 'Sessions', route: '/sessions', icon: ICON.sessions },
-  { label: 'Profile', route: '/profile', icon: ICON.profile, disabled: true },
+  { label: 'Profile', route: '/profile', icon: ICON.profile },
 ];
 
 /** Route segment → [crumb, pageTitle] shown in the header (prototype's `titles` map). */

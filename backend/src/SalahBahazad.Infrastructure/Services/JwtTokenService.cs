@@ -23,10 +23,10 @@ internal sealed class JwtTokenService(IConfiguration configuration, TimeProvider
     public PlatformToken IssueRefreshToken(Staff staff) =>
         BuildToken(staff.Id, staff.TenantId, staff.Role.ToString(), deviceId: null, RefreshExpiry(), "refresh");
 
-    public PlatformToken IssueStudentAccessToken(Student student, Guid deviceId) =>
+    public PlatformToken IssueStudentAccessToken(Student student, Guid? deviceId) =>
         BuildToken(student.Id, student.TenantId, "Student", deviceId, AccessExpiry(), "access");
 
-    public PlatformToken IssueStudentRefreshToken(Student student, Guid deviceId) =>
+    public PlatformToken IssueStudentRefreshToken(Student student, Guid? deviceId) =>
         BuildToken(student.Id, student.TenantId, "Student", deviceId, RefreshExpiry(), "refresh");
 
     public TokenPrincipal? ValidateRefreshToken(string refreshToken)

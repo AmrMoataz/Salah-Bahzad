@@ -37,7 +37,7 @@ Quality attributes and constraints for the companion app whose functional scope 
 
 | ID | Requirement | Notes |
 |---|---|---|
-| NFR-APP-SEC-001 | Session and device tokens SHALL be stored in the **OS keystore** (iOS/macOS Keychain, Windows Credential Manager, Android Keystore), never in plaintext files or preferences. | — |
+| NFR-APP-SEC-001 | The session token SHALL be stored in the **OS keystore** (iOS/macOS Keychain, Windows Credential Manager, Android Keystore), never in plaintext files or preferences. | — |
 | NFR-APP-SEC-002 | TLS certificate validation SHALL **never** be disabled in any build. The current production TLS-bypass override SHALL be removed. | Fixes a current critical finding. |
 | NFR-APP-SEC-003 | Bearer tokens, handoff codes, signed URLs, and PII SHALL **never** be written to logs or crash reports. | Fixes the current token-in-logs finding. |
 | NFR-APP-SEC-004 | The raw bearer token SHALL never be transported in a deep-link URL; only a short-lived one-time handoff code SHALL be. | Mirrors `FR-APP-AUTH-003`. |
@@ -95,7 +95,7 @@ Quality attributes and constraints for the companion app whose functional scope 
 
 | ID | Requirement | Notes |
 |---|---|---|
-| NFR-APP-PRIV-001 | The app SHALL collect only what playback/auth/device-binding require and SHALL declare it accurately in App Store / Play privacy disclosures. | Store compliance + minors' data. |
+| NFR-APP-PRIV-001 | The app SHALL collect only what playback and authentication require and SHALL declare it accurately in App Store / Play privacy disclosures. | Store compliance + minors' data. |
 
 ## Maintainability & delivery
 

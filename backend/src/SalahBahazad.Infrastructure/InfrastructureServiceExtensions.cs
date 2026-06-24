@@ -186,6 +186,10 @@ public static class InfrastructureServiceExtensions
         // HybridCache (L1 in-process; promotes to the Redis L2 above when an IDistributedCache is registered).
         services.AddHybridCache();
 
+        // Student-Home weekly-plan cache invalidation seam (contract §D) over the HybridCache above — its tag
+        // (plan:{studentId}) is dropped on every student state-change so the plan reflects it on the next read.
+        services.AddScoped<IStudentPlanCache, StudentPlanCache>();
+
         // ── Hangfire (authoritative quiz auto-submit timer, FR-PLAT-QZ-005) ──────
         // PostgreSQL-backed so a scheduled auto-submit survives an API restart; the schema is created on first
         // use (PrepareSchemaIfNecessary). A short polling interval keeps the deadline tight.

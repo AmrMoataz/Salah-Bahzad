@@ -77,6 +77,16 @@ export class StudentAuthStore {
   }
 
   /**
+   * The signed-in Firebase identity's email — read-only display for the S6 Profile screen
+   * (contract §C.2: email lives only in Firebase, is not stored on `Student`, and is never sent on
+   * PUT). Kept behind this store accessor so the feature lib never injects Firebase `Auth` directly
+   * (the S0 seam) and the Jest specs can stub it without a real `Auth`.
+   */
+  getCurrentEmail(): string | null {
+    return this.#firebaseAuth.currentUser?.email ?? null;
+  }
+
+  /**
    * Exchanges the stored refresh token for a fresh access+refresh pair (FR-PLAT-AUTH-002). The
    * student refresh re-checks `Active` + the bound device server-side and preserves `device_id`.
    * Concurrent callers share a single in-flight request (one server hit). Emits the new access

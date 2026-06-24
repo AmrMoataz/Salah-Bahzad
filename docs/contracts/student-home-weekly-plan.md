@@ -164,6 +164,11 @@ no active enrollments — never 404). Served from the Redis cache when warm; com
   (§E) once and caches it; warm reads are L1/L2 hits. This is what makes "compute on login" work — the first authenticated
   Home load *is* the compute. Heavy work stays within `NFR-PERF-001` (< 300 ms p95) because the underlying reads are the
   same small per-student projections S2/S3 already ship (no N+1 — batch the counters/assignment/quiz lookups, `NFR-PERF-005`).
+- **Thumbnail URL is signed per read, never cached.** `focus.thumbnailUrl` is a *short-lived* signed R2 URL whose
+  lifetime (minutes) is far shorter than the plan's week-long TTL, so caching it would serve an expired URL. The
+  **cached snapshot carries only the focus thumbnail's R2 object key**; the handler signs it **fresh on every read**
+  (outside `GetOrCreateAsync`) and fills `focus.thumbnailUrl` then — same short-lived `IFileStorage.GetSignedReadUrlAsync`
+  pattern as `/me/sessions`. The cache holds the derived plan, not any signed URL.
 
 ## D. Cache invalidation (a small seam called from every student state-change)
 

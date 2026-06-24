@@ -228,6 +228,41 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         ParentPhoneSecondary = string.IsNullOrWhiteSpace(parentPhoneSecondary) ? null : parentPhoneSecondary.Trim();
     }
 
+    /// <summary>
+    /// The student edits their <b>own</b> profile from the student portal (FR-STU-PRO-001/002, Student-Portal S6).
+    /// Updates the seven self-service fields — name, contact + parent/guardian phones, school, city, region — and
+    /// deliberately leaves <see cref="GradeId"/> UNCHANGED: grade is staff-managed (FR-ADM-STU-005), so unlike the
+    /// staff-side <see cref="UpdateContactInfo"/> this method takes no <c>gradeId</c>. Email is the Firebase identity
+    /// and is not stored here at all (Student-Portal S6 §C.2). The city/region pair's existence + belongs-to-city is
+    /// validated by the handler before this is called (a 400, Student-Portal S6 §C.3); this method only enforces the
+    /// shape invariants the entity owns.
+    /// </summary>
+    public void UpdateOwnProfile(
+        string fullName,
+        string phoneNumber,
+        string schoolName,
+        Guid cityId,
+        Guid regionId,
+        string parentPhonePrimary,
+        string? parentPhoneSecondary)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fullName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
+        ArgumentException.ThrowIfNullOrWhiteSpace(schoolName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(parentPhonePrimary);
+        if (cityId == Guid.Empty) throw new ArgumentException("A student must have a city.", nameof(cityId));
+        if (regionId == Guid.Empty) throw new ArgumentException("A student must have a region.", nameof(regionId));
+
+        FullName = fullName.Trim();
+        PhoneNumber = phoneNumber.Trim();
+        SchoolName = schoolName.Trim();
+        CityId = cityId;
+        RegionId = regionId;
+        ParentPhonePrimary = parentPhonePrimary.Trim();
+        ParentPhoneSecondary = string.IsNullOrWhiteSpace(parentPhoneSecondary) ? null : parentPhoneSecondary.Trim();
+        // GradeId is intentionally NOT touched — a student cannot change their own grade (FR-ADM-STU-005).
+    }
+
     /// <summary>Stamps a successful sign-in, surfaced as "Last active" to staff (FR-ADM-STU-002).</summary>
     public void RecordSignIn(DateTimeOffset now) => LastSeenAtUtc = now;
 
