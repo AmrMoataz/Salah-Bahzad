@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/responsive/breakpoints.dart';
 import '../../core/responsive/responsive_builder.dart';
+import '../../core/secure_surface/secure_surface.dart';
 import '../../core/theme/sb_assets.dart';
 import '../../core/theme/sb_text.dart';
 import '../../core/theme/sb_tokens.dart';
@@ -31,10 +32,18 @@ class PlayerView extends StatelessWidget {
     required this.onToggleMute,
     required this.onToggleFullscreen,
     required this.onPrimaryAction,
+    this.captureStatus = SecureSurfaceStatus.protected,
     this.animateWatermark = true,
   });
 
   final PlayerState state;
+
+  /// The **real** OS capture-protection state (A2), fed from
+  /// `secureSurfaceStatusProvider`. Drives the banner variant (green protected /
+  /// amber unsupported / hidden off); it never *calls* a channel here — the page
+  /// owns every native call (view↔page split).
+  final SecureSurfaceStatus captureStatus;
+
   final String lessonTitle;
   final String watermarkLabel;
 
@@ -88,12 +97,15 @@ class PlayerView extends StatelessWidget {
                 ),
               ),
 
-              // Static "Screen capture blocked" reassurance (A1 banner only).
-              if (!state.hasError)
-                const Positioned(
+              // Capture-state banner — driven by the REAL protection state (A2,
+              // F6): green when protected, amber when best-effort/unsupported.
+              // Hidden on error (the refusal overlay carries that message) and
+              // when off.
+              if (!state.hasError && captureStatus != SecureSurfaceStatus.off)
+                Positioned(
                   top: 64,
                   left: 14,
-                  child: CaptureBlockedBanner(),
+                  child: CaptureBlockedBanner(status: captureStatus),
                 ),
 
               // Buffering / loading spinner.

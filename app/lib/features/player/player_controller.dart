@@ -39,7 +39,8 @@ class PlayerController extends Notifier<PlayerState> {
   PlaybackManifest? _manifest;
   Uri? _localUrl;
   bool _started = false;
-  final List<StreamSubscription<Object?>> _subs = <StreamSubscription<Object?>>[];
+  final List<StreamSubscription<Object?>> _subs =
+      <StreamSubscription<Object?>>[];
 
   @override
   PlayerState build() {
@@ -68,12 +69,16 @@ class PlayerController extends Notifier<PlayerState> {
     try {
       final PlaybackManifest manifest = await _repo.redeem(request.handoff);
       _manifest = manifest;
-      // Surface "N of M views left" from the manifest budget (contract §D,
-      // FR-APP-VID-004); the gate already spent this view, so accessRemaining is
-      // the post-Play count. Null (older API) keeps the fallback chip.
+      // Surface the per-playback manifest extras (contract §D): "N of M views
+      // left" (FR-APP-VID-004; gate already spent this view, so accessRemaining
+      // is the post-Play count), the video's own title (top bar), and the bound
+      // student's serial·name watermark (FR-APP-VID-003). Null (older API) keeps
+      // the fallbacks. Set BEFORE opening the engine so they show on first frame.
       state = state.copyWith(
         viewsLeft: manifest.accessRemaining,
         viewsTotal: manifest.accessAllowed,
+        videoTitle: manifest.videoTitle,
+        watermark: manifest.watermark,
       );
       await _openManifest(manifest, request.videoId);
     } on ApiException catch (e) {
@@ -119,6 +124,33 @@ class PlayerController extends Notifier<PlayerState> {
 
     // Redeem never completed; reuse the SAME handoff while it is still valid.
     await _redeemAndPlay();
+  }
+
+  // ── Capture protection (A2) ──────────────────────────────────────────────────
+
+  /// COMPAT-002 fail-safe (`NFR-APP-COMPAT-002`): the OS cannot **guarantee**
+  /// the capture black-out on this device (e.g. Windows < 2004), so the player
+  /// **refuses** protected playback rather than open the engine unprotected.
+  /// Surfaces a player-reachable refusal state — **no engine opened, no view
+  /// spent** (the page must not call [start] in this branch). iOS is the one
+  /// best-effort exception and is **not** routed here (it plays with the amber
+  /// banner + watermark).
+  void refuseUnprotected() {
+    _started = true; // belt-and-suspenders: never start after a refusal.
+    _fail(_captureUnsupported());
+  }
+
+  /// iOS reactive capture defence (`FR-APP-CAP-002` / `NFR-APP-CAP-004`): active
+  /// screen capture / mirroring started → pause so the recording captures the
+  /// paused frame, not the lesson. The watermark stays on screen.
+  Future<void> onCaptureStarted() async {
+    if (state.isPlaying) await _engine.pause();
+  }
+
+  /// Capture / mirroring stopped → resume (only from a clean paused state, never
+  /// out of an error/ended state).
+  Future<void> onCaptureStopped() async {
+    if (state.status == PlayerStatus.paused) await _engine.play();
   }
 
   // ── Controls ────────────────────────────────────────────────────────────────
@@ -221,10 +253,23 @@ class PlayerController extends Notifier<PlayerState> {
     primaryAction: PlayerAction.retry,
   );
 
+  PlayerError _captureUnsupported() => const PlayerError(
+    kind: PlayerErrorKind.forbidden,
+    title: "We can't protect this lesson here",
+    message:
+        "This device can't block screen capture for this video, so playback is "
+        'turned off to keep the lesson safe. Try the app on a newer device or '
+        'an updated OS.',
+    primaryActionLabel: 'Back to portal',
+    primaryAction: PlayerAction.backToPortal,
+    reason: 'capture_unsupported',
+  );
+
   PlayerError _handoffExpired() => const PlayerError(
     kind: PlayerErrorKind.notfound,
     title: "We can't find this lesson",
-    message: 'This play link expired. Press Play again in the portal to start '
+    message:
+        'This play link expired. Press Play again in the portal to start '
         'a fresh session.',
     primaryActionLabel: 'Back to portal',
     primaryAction: PlayerAction.backToPortal,

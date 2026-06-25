@@ -34,7 +34,7 @@ internal sealed class RedeemPlaybackHandler(
             .AsNoTracking()
             .SelectMany(s => s.Videos)
             .Where(v => v.Id == handoff.VideoId)
-            .Select(v => new { v.HlsManifestKey, v.ProcessingStatus })
+            .Select(v => new { v.HlsManifestKey, v.ProcessingStatus, v.Title })
             .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException("Video", handoff.VideoId);
 
@@ -74,8 +74,23 @@ internal sealed class RedeemPlaybackHandler(
             .Select(a => new { a.AccessRemaining, a.AccessAllowed })
             .FirstOrDefaultAsync(cancellationToken);
 
+        // The student's anti-sharing watermark identity (serial + name), carried on the manifest so the
+        // player overlay is bound to this playback and always present (FR-APP-VID-003) — never dependent on a
+        // separate /api/me/profile fetch. Caller is the handoff's bound student (StudentId == caller). Never the
+        // phone (contract §C). The serial is always populated post-A1; fall back to name only if it somehow isn't.
+        var student = await db.Students
+            .AsNoTracking()
+            .Where(s => s.Id == currentUser.UserId)
+            .Select(s => new { s.Serial, s.FullName })
+            .FirstOrDefaultAsync(cancellationToken);
+        var watermark = student is null
+            ? string.Empty
+            : string.IsNullOrEmpty(student.Serial) ? student.FullName : $"{student.Serial} · {student.FullName}";
+
         return new PlaybackManifestDto(
-            rewritten, keyUrl, soonestExpiry, access?.AccessRemaining ?? 0, access?.AccessAllowed ?? 0);
+            rewritten, keyUrl, soonestExpiry,
+            access?.AccessRemaining ?? 0, access?.AccessAllowed ?? 0,
+            video.Title, watermark);
     }
 
     private async Task<string> ReadManifestAsync(string manifestKey, CancellationToken cancellationToken)

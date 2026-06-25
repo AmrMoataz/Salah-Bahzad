@@ -15,6 +15,8 @@ class PlaybackManifest {
     required this.expiresAtUtc,
     this.accessRemaining,
     this.accessAllowed,
+    this.videoTitle,
+    this.watermark,
   });
 
   /// The rewritten `.m3u8` text (signed segment URLs + the absolute key URI).
@@ -35,6 +37,15 @@ class PlaybackManifest {
   final int? accessRemaining;
   final int? accessAllowed;
 
+  /// The SessionVideo's own title (contract §D) — the player's top-bar title.
+  /// Null on an older API → the player falls back to a neutral label.
+  final String? videoTitle;
+
+  /// The bound student's "{serial} · {fullName}" watermark identity (contract §D,
+  /// FR-APP-VID-003), carried per-playback so the overlay is always present and
+  /// never depends on a separate `/api/me/profile` fetch. Never the phone.
+  final String? watermark;
+
   bool isExpiredAt(DateTime nowUtc) => !nowUtc.isBefore(expiresAtUtc.toUtc());
 
   factory PlaybackManifest.fromJson(Map<String, dynamic> json) {
@@ -44,6 +55,8 @@ class PlaybackManifest {
       expiresAtUtc: DateTime.parse(json['expiresAtUtc'] as String),
       accessRemaining: json['accessRemaining'] as int?,
       accessAllowed: json['accessAllowed'] as int?,
+      videoTitle: json['videoTitle'] as String?,
+      watermark: json['watermark'] as String?,
     );
   }
 

@@ -95,7 +95,9 @@ The watermark identity source.
   "keyUrl": "https://…/api/me/videos/{id}/hls.key",
   "expiresAtUtc": "2026-…Z",
   "accessRemaining": 2,                  // NEW — views left AFTER this Play (the "N", FR-APP-VID-004)
-  "accessAllowed": 3 }                   // NEW — total views granted for this enrollment+video (the "M")
+  "accessAllowed": 3,                    // NEW — total views granted for this enrollment+video (the "M")
+  "videoTitle": "Quadratic equations",   // NEW — the SessionVideo's own title (player top-bar title)
+  "watermark": "STU-7K2M9X · Layla Ahmed" }  // NEW — bound student's "{serial} · {fullName}" overlay (FR-APP-VID-003; never the phone)
 ```
 
 ### D.2 Error modes (frozen — verbatim reasons; the app renders `detail` inline)

@@ -92,6 +92,11 @@ public sealed class VideoPlaybackTests(SalahBahazadApiFactory factory)
         manifest.AccessRemaining.Should().Be(1); // 2 → 1 after the gate spent this view
         manifest.AccessAllowed.Should().Be(2);
 
+        // The player's top-bar title (the video's own title) + the bound student's serial·name watermark
+        // (FR-APP-VID-003) ride the manifest, so the player never needs a separate read.
+        manifest.VideoTitle.Should().NotBeNullOrWhiteSpace();
+        manifest.Watermark.Should().StartWith("STU-").And.Contain("Seed Student");
+
         // The signed segment URL actually serves bytes from MinIO (short-lived, non-replayable).
         var segmentUrl = manifest.ManifestContent
             .Split('\n').First(l => l.StartsWith("http", StringComparison.OrdinalIgnoreCase));

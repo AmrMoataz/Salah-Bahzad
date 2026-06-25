@@ -12,7 +12,10 @@ public sealed record PlaybackHandoffDto(string HandoffCode, DateTimeOffset Expir
 /// gated key endpoint). <see cref="ExpiresAtUtc"/> is the soonest signed-segment expiry.
 /// <see cref="AccessRemaining"/>/<see cref="AccessAllowed"/> surface the view budget so the native player can
 /// render "N of M views left" (FR-APP-VID-004); the gate already spent this view, so <see cref="AccessRemaining"/>
-/// is the post-Play count.
+/// is the post-Play count. <see cref="VideoTitle"/> is the SessionVideo's own title (the player's top-bar title),
+/// and <see cref="Watermark"/> is the bound student's "{serial} · {fullName}" overlay identity (FR-APP-VID-003) —
+/// both carried here so the player never depends on a separate read.
 /// </summary>
 public sealed record PlaybackManifestDto(
-    string ManifestContent, string KeyUrl, DateTimeOffset ExpiresAtUtc, int AccessRemaining, int AccessAllowed);
+    string ManifestContent, string KeyUrl, DateTimeOffset ExpiresAtUtc, int AccessRemaining, int AccessAllowed,
+    string VideoTitle, string Watermark);

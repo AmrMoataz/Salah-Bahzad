@@ -7,7 +7,10 @@ import 'package:secure_player/core/net/api_client.dart';
 import 'package:secure_player/core/net/app_config.dart';
 import 'package:secure_player/core/net/token_refresher.dart';
 import 'package:secure_player/core/platform/app_platform.dart';
+import 'package:secure_player/core/playback/hls_key_loader.dart';
+import 'package:secure_player/core/playback/local_manifest_proxy.dart';
 import 'package:secure_player/core/playback/video_engine.dart';
+import 'package:secure_player/core/secure_surface/secure_surface.dart';
 import 'package:secure_player/core/storage/session.dart';
 import 'package:secure_player/core/storage/session_store.dart';
 import 'package:secure_player/data/dtos/playback_handoff.dart';
@@ -240,6 +243,8 @@ PlaybackManifest fixtureManifest({
   String keyUrl = 'https://api.test/api/me/videos/vid-1/hls.key',
   int? accessRemaining = 2,
   int? accessAllowed = 3,
+  String? videoTitle = 'Quadratic equations',
+  String? watermark = 'STU-7K2M9X · Layla Ahmed',
 }) {
   final String body = <String>[
     '#EXTM3U',
@@ -255,6 +260,8 @@ PlaybackManifest fixtureManifest({
     expiresAtUtc: DateTime.now().toUtc().add(ttl),
     accessRemaining: accessRemaining,
     accessAllowed: accessAllowed,
+    videoTitle: videoTitle,
+    watermark: watermark,
   );
 }
 
@@ -265,4 +272,52 @@ String? firstLeak(String haystack, List<String> secrets) {
     if (s.isNotEmpty && haystack.contains(s)) return s;
   }
   return null;
+}
+
+/// A hand fake [SecureSurface] — no native channel (`NFR-APP-REL-003`). Scripted
+/// to return [enableStatus]; records `enable`/`disable` call counts so a test
+/// can prove `enable == 1` on mount and `disable` on dispose (`FR-APP-CAP-003`,
+/// `NFR-APP-CAP-006`). [captureController] lets an iOS test push capture events.
+class FakeSecureSurface implements SecureSurface {
+  FakeSecureSurface({this.enableStatus = SecureSurfaceStatus.protected});
+
+  SecureSurfaceStatus enableStatus;
+  int enableCalls = 0;
+  int disableCalls = 0;
+
+  final StreamController<SecureSurfaceEvent> captureController =
+      StreamController<SecureSurfaceEvent>.broadcast();
+
+  @override
+  Future<SecureSurfaceStatus> enable() async {
+    enableCalls++;
+    return enableStatus;
+  }
+
+  @override
+  Future<void> disable() async => disableCalls++;
+
+  @override
+  Stream<SecureSurfaceEvent> get captureEvents => captureController.stream;
+
+  Future<void> dispose() => captureController.close();
+}
+
+/// A [LocalManifestProxy] that **never binds a real `HttpServer`** — so a
+/// `testWidgets` (fake-async) page test doesn't trip the pending-timer guard
+/// over the server's idle timer. Returns a fixed loopback URL.
+class FakeLocalManifestProxy extends LocalManifestProxy {
+  FakeLocalManifestProxy() : super(HlsKeyLoader(FakePlaybackRepository()));
+
+  final Uri started = Uri.parse('http://127.0.0.1:0/manifest.m3u8');
+  int stopCalls = 0;
+
+  @override
+  Future<Uri> start({
+    required PlaybackManifest manifest,
+    required String videoId,
+  }) async => started;
+
+  @override
+  Future<void> stop() async => stopCalls++;
 }

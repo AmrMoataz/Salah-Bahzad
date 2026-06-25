@@ -15,6 +15,9 @@ import '../core/playback/hls_key_loader.dart';
 import '../core/playback/local_manifest_proxy.dart';
 import '../core/playback/media_kit_video_engine.dart';
 import '../core/playback/video_engine.dart';
+import '../core/secure_surface/method_channel_secure_surface.dart';
+import '../core/secure_surface/noop_secure_surface.dart';
+import '../core/secure_surface/secure_surface.dart';
 import '../core/storage/session_store.dart';
 import '../data/auth_repository.dart';
 import '../data/dtos/student_profile.dart';
@@ -139,6 +142,37 @@ final videoEngineProvider = Provider.autoDispose<VideoEngine>((ref) {
 final playerControllerProvider =
     NotifierProvider.autoDispose<PlayerController, PlayerState>(
       PlayerController.new,
+    );
+
+// ── Capture protection (A2 · core/secure_surface) ────────────────────────────
+
+/// Picks the OS capture-protection impl per platform, branching on
+/// [appPlatformProvider] exactly like [googleCredentialSourceProvider]: a real
+/// [MethodChannelSecureSurface] on the four wired targets (Android/Windows/
+/// macOS/iOS), falling back to [NoopSecureSurface] for any unwired host (web,
+/// Linux) — which reports `unsupported` so the COMPAT-002 gate refuses rather
+/// than play unprotected. Overridable with a fake in tests (`NFR-APP-REL-003`).
+final secureSurfaceProvider = Provider<SecureSurface>((ref) {
+  final AppTarget target = ref.read(appPlatformProvider).target;
+  const Set<AppTarget> wired = <AppTarget>{
+    AppTarget.android,
+    AppTarget.windows,
+    AppTarget.macos,
+    AppTarget.ios,
+  };
+  if (wired.contains(target)) {
+    return const MethodChannelSecureSurface();
+  }
+  return const NoopSecureSurface();
+});
+
+/// The **real** protection state the player engaged (`protected`/`unsupported`/
+/// `off`). The page writes it after `enable()` resolves and resets it on leave;
+/// the view reads it to render the banner variant and the page reads it to
+/// drive the refuse gate. Default `off`.
+final secureSurfaceStatusProvider =
+    NotifierProvider<SecureSurfaceStatusController, SecureSurfaceStatus>(
+      SecureSurfaceStatusController.new,
     );
 
 // ── Identity (Firebase / Google) ────────────────────────────────────────────

@@ -56,6 +56,12 @@ void main() {
     expect(state.status, PlayerStatus.playing);
     expect(state.viewsLeft, 2, reason: 'N from manifest accessRemaining (§D)');
     expect(state.viewsTotal, 3, reason: 'M from manifest accessAllowed (§D)');
+    expect(state.videoTitle, 'Quadratic equations', reason: 'title from manifest');
+    expect(
+      state.watermark,
+      'STU-7K2M9X · Layla Ahmed',
+      reason: 'watermark identity from manifest (§D, FR-APP-VID-003)',
+    );
     expect(repo.redeemCalls, 1, reason: 'D2 redeem once');
     expect(repo.startPlaybackCalls, 0, reason: 'deep-link path never calls D1');
     expect(engine.opened.length, 1);

@@ -1,33 +1,66 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/secure_surface/secure_surface.dart';
 import '../../../core/theme/sb_text.dart';
 import '../../../core/theme/sb_tokens.dart';
 
-/// The static **"Screen capture blocked"** pill (`PLAYER` banner, master §5.3).
+/// The capture-state pill (`PLAYER` banner, master §5.3) — now **truthful**: it
+/// reflects the **real** [SecureSurfaceStatus] the player engaged (A2), not a
+/// static reassurance.
 ///
-/// **A1 ships only this reassurance banner** — the real OS capture black-out
-/// (`core/secure_surface`) is **A2**. It states the protection that A2 will
-/// enforce; it does not itself block anything.
+/// * [SecureSurfaceStatus.protected] — the OS black-out is active: the original
+///   dark pill with the green `videocam_off` icon + **"Screen capture blocked"**
+///   (`FR-APP-CAP-001`).
+/// * [SecureSurfaceStatus.unsupported] — best-effort / unguaranteed (iOS
+///   still-screenshot gap `NFR-APP-CAP-005`, or a platform where the black-out
+///   can't be guaranteed): an **amber** warning. On desktop/Android this pairs
+///   with the COMPAT-002 **warn + refuse** (the player won't play); on iOS it
+///   plays best-effort behind the watermark.
+/// * [SecureSurfaceStatus.off] — renders nothing (the mount site also gates it).
+///
+/// Tokens only (`SbColors`/`SbRadii`/`SbFonts`) — **no new hex**: the protected
+/// pill keeps the existing green/black, the unsupported variant reuses
+/// `SbColors.amber`.
 class CaptureBlockedBanner extends StatelessWidget {
-  const CaptureBlockedBanner({super.key});
+  const CaptureBlockedBanner({
+    super.key,
+    this.status = SecureSurfaceStatus.protected,
+  });
+
+  final SecureSurfaceStatus status;
 
   @override
   Widget build(BuildContext context) {
+    if (status == SecureSurfaceStatus.off) return const SizedBox.shrink();
+
+    final bool protected = status == SecureSurfaceStatus.protected;
+    final Color accent = protected ? SbColors.greenSoft : SbColors.amber;
+    final IconData icon = protected
+        ? Icons.videocam_off_outlined
+        : Icons.warning_amber_rounded;
+    final String label = protected
+        ? 'Screen capture blocked'
+        : "Capture can't be blocked on this device";
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
       decoration: BoxDecoration(
         color: SbColors.black.withValues(alpha: 0.42),
         borderRadius: SbRadii.brPill,
-        border: Border.all(color: SbColors.white.withValues(alpha: 0.14)),
+        border: Border.all(
+          color: protected
+              ? SbColors.white.withValues(alpha: 0.14)
+              : SbColors.amber.withValues(alpha: 0.45),
+        ),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(Icons.videocam_off_outlined, size: 14, color: SbColors.greenSoft),
-          SizedBox(width: 6),
+          Icon(icon, size: 14, color: accent),
+          const SizedBox(width: 6),
           Text(
-            'Screen capture blocked',
-            style: TextStyle(
+            label,
+            style: const TextStyle(
               fontFamily: SbFonts.sans,
               fontSize: 11.5,
               fontWeight: FontWeight.w700,

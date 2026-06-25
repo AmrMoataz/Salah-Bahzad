@@ -194,6 +194,8 @@ class PlayerState {
     this.buffering = false,
     this.viewsLeft,
     this.viewsTotal,
+    this.videoTitle,
+    this.watermark,
     this.error,
   });
 
@@ -213,6 +215,13 @@ class PlayerState {
   /// Total views granted for this enrollment+video (the "M"); `null` until known.
   final int? viewsTotal;
 
+  /// The video's own title (from the redeem manifest); `null` until it arrives.
+  final String? videoTitle;
+
+  /// The "{serial} · {fullName}" watermark identity (from the redeem manifest,
+  /// FR-APP-VID-003); `null` until it arrives → the page falls back to the name.
+  final String? watermark;
+
   final PlayerError? error;
 
   bool get isPlaying => status == PlayerStatus.playing;
@@ -230,6 +239,8 @@ class PlayerState {
     bool? buffering,
     int? viewsLeft,
     int? viewsTotal,
+    String? videoTitle,
+    String? watermark,
     PlayerError? error,
     bool clearError = false,
   }) {
@@ -245,6 +256,8 @@ class PlayerState {
       buffering: buffering ?? this.buffering,
       viewsLeft: viewsLeft ?? this.viewsLeft,
       viewsTotal: viewsTotal ?? this.viewsTotal,
+      videoTitle: videoTitle ?? this.videoTitle,
+      watermark: watermark ?? this.watermark,
       error: clearError ? null : (error ?? this.error),
     );
   }
