@@ -15,6 +15,14 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
     private Student() { }
 
     public string FirebaseUid { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Randomly-generated, tenant-unique watermark identity in the form <c>STU-XXXXXX</c> (FR-APP-VID-003).
+    /// Minted once at <see cref="Register"/> and never changed — the native player renders "{Serial} · {FullName}"
+    /// as the anti-sharing watermark (it replaces device binding for the app). Stable across a reject→resubmit cycle.
+    /// </summary>
+    public string Serial { get; private set; } = string.Empty;
+
     public string FullName { get; private set; } = string.Empty;
 
     /// <summary>The student's own contact phone number (FR-STU-REG-004).</summary>
@@ -71,6 +79,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
     public static Student Register(
         Guid tenantId,
         string firebaseUid,
+        string serial,
         string fullName,
         string phoneNumber,
         string parentPhonePrimary,
@@ -83,6 +92,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         DateTimeOffset termsAcceptedAtUtc)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(firebaseUid);
+        ArgumentException.ThrowIfNullOrWhiteSpace(serial);
         ArgumentException.ThrowIfNullOrWhiteSpace(fullName);
         ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
         ArgumentException.ThrowIfNullOrWhiteSpace(parentPhonePrimary);
@@ -95,6 +105,7 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
         var student = new Student
         {
             FirebaseUid = firebaseUid,
+            Serial = serial,
             FullName = fullName.Trim(),
             PhoneNumber = phoneNumber.Trim(),
             ParentPhonePrimary = parentPhonePrimary.Trim(),
@@ -190,6 +201,8 @@ public sealed class Student : TenantEntityBase, ISoftDeletable
 
         Status = StudentStatus.Pending;
         RejectionReason = null;
+        // Serial is intentionally NOT touched — the watermark identity is minted once at Register and is stable
+        // across a reject→resubmit cycle (FR-APP-VID-003).
     }
 
     /// <summary>Deactivates an active account; sign-in is refused while inactive (FR-ADM-STU-006).</summary>

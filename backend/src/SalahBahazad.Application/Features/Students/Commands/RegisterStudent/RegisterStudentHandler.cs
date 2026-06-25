@@ -4,6 +4,7 @@ using SalahBahazad.Application.Common;
 using SalahBahazad.Application.Common.Exceptions;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Students.DTOs;
+using SalahBahazad.Domain.Common;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
 
@@ -95,9 +96,21 @@ internal sealed class RegisterStudentHandler(
         }
         else
         {
+            // Mint the tenant-unique watermark serial (FR-APP-VID-003). Anonymous path → no tenant claim, so read
+            // with IgnoreQueryFilters + explicit TenantId; include soft-deleted rows so a serial is never reissued
+            // (same rationale as the (TenantId, Serial) unique index). NextUnique seeds from this set to avoid an
+            // up-front collision; the index is the hard guarantee.
+            var existingSerials = await db.Students
+                .IgnoreQueryFilters()
+                .Where(s => s.TenantId == tenant.Id)
+                .Select(s => s.Serial)
+                .ToHashSetAsync(cancellationToken);
+            var serial = StudentSerialGenerator.NextUnique(existingSerials);
+
             student = Student.Register(
                 tenant.Id,
                 claims.Uid,
+                serial,
                 command.FullName,
                 command.PhoneNumber,
                 command.ParentPhonePrimary,

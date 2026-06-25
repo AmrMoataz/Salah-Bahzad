@@ -10,6 +10,7 @@ public class StudentTests
     private static StudentEntity NewPending() => StudentEntity.Register(
         tenantId: Guid.NewGuid(),
         firebaseUid: "fb-uid",
+        serial: "STU-TEST01",
         fullName: "  Mariam Adel  ",
         phoneNumber: "  01099999999 ",
         parentPhonePrimary: "  01000000000 ",
@@ -44,7 +45,7 @@ public class StudentTests
     public void Register_throws_when_fullName_blank(string fullName)
     {
         var act = () => StudentEntity.Register(
-            Guid.NewGuid(), "fb", fullName, "0111", "0100", null,
+            Guid.NewGuid(), "fb", "STU-TEST01", fullName, "0111", "0100", null,
             Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
 
         act.Should().Throw<ArgumentException>();
@@ -54,10 +55,54 @@ public class StudentTests
     public void Register_throws_when_grade_missing()
     {
         var act = () => StudentEntity.Register(
-            Guid.NewGuid(), "fb", "Name", "0111", "0100", null,
+            Guid.NewGuid(), "fb", "STU-TEST01", "Name", "0111", "0100", null,
             Guid.Empty, Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
 
         act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Register_sets_the_provided_serial()
+    {
+        var student = StudentEntity.Register(
+            Guid.NewGuid(), "fb", "STU-ABC123", "Name", "0111", "0100", null,
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
+
+        student.Serial.Should().Be("STU-ABC123");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Register_throws_when_serial_blank(string serial)
+    {
+        var act = () => StudentEntity.Register(
+            Guid.NewGuid(), "fb", serial, "Name", "0111", "0100", null,
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "School", "v1", DateTimeOffset.UtcNow);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Resubmit_keeps_the_original_serial()
+    {
+        var student = NewPending();          // serial "STU-TEST01"
+        student.Reject("Blurry ID photo");
+
+        student.Resubmit(
+            fullName: "Mariam Adel Hassan",
+            phoneNumber: "01088888888",
+            parentPhonePrimary: "01000000001",
+            parentPhoneSecondary: null,
+            gradeId: Guid.NewGuid(),
+            cityId: Guid.NewGuid(),
+            regionId: Guid.NewGuid(),
+            schoolName: "New School",
+            termsVersion: "v2",
+            termsAcceptedAtUtc: DateTimeOffset.UtcNow);
+
+        // Minted once at Register, stable across a reject→resubmit cycle (FR-APP-VID-003).
+        student.Serial.Should().Be("STU-TEST01");
     }
 
     [Fact]

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
@@ -21,6 +22,10 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       Log.installErrorHandlers();
+
+      // Initialise the video engine (libmpv) once before any Player is created
+      // (used by the A1 secure player).
+      MediaKit.ensureInitialized();
 
       final AppPlatform platform = AppPlatform();
 

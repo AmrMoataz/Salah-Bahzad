@@ -13,6 +13,7 @@ namespace SalahBahazad.Application.Features.Profile.DTOs;
 /// </summary>
 public sealed record StudentProfileDto(
     Guid Id,
+    string Serial,
     string FullName,
     string PhoneNumber,
     string ParentPhonePrimary,
@@ -51,6 +52,7 @@ public static class StudentProfileMappings
         string? regionName,
         StudentDeviceEntity? activeDevice) => new(
         s.Id,
+        s.Serial,
         s.FullName,
         s.PhoneNumber,
         s.ParentPhonePrimary,

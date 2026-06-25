@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using SalahBahazad.Application.Common;
 using SalahBahazad.Application.Common.Interfaces;
+using SalahBahazad.Domain.Common;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
 using SalahBahazad.Infrastructure.Persistence;
@@ -235,8 +236,8 @@ public sealed class SalahBahazadApiFactory : WebApplicationFactory<Program>, IAs
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var student = Student.Register(
-            tenantId, $"uid-{Guid.NewGuid():N}", "Seed Student", "01055555555", "01000000000", null,
-            gradeId, cityId, regionId, "Seed School", "v1", DateTimeOffset.UtcNow);
+            tenantId, $"uid-{Guid.NewGuid():N}", StudentSerialGenerator.Next(), "Seed Student", "01055555555",
+            "01000000000", null, gradeId, cityId, regionId, "Seed School", "v1", DateTimeOffset.UtcNow);
 
         switch (status)
         {

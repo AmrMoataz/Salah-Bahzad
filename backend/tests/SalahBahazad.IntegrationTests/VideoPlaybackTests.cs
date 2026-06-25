@@ -88,6 +88,10 @@ public sealed class VideoPlaybackTests(SalahBahazadApiFactory factory)
         manifest.KeyUrl.Should().Contain($"/api/me/videos/{ctx.VideoId}/hls.key");
         manifest.ManifestContent.Should().Contain(manifest.KeyUrl);
 
+        // "N of M views left" budget surfaced for the native player (FR-APP-VID-004): post-gate remaining + total.
+        manifest.AccessRemaining.Should().Be(1); // 2 → 1 after the gate spent this view
+        manifest.AccessAllowed.Should().Be(2);
+
         // The signed segment URL actually serves bytes from MinIO (short-lived, non-replayable).
         var segmentUrl = manifest.ManifestContent
             .Split('\n').First(l => l.StartsWith("http", StringComparison.OrdinalIgnoreCase));

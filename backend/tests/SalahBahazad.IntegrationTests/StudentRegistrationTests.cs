@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using SalahBahazad.Domain.Enums;
 
 namespace SalahBahazad.IntegrationTests;
@@ -117,6 +118,42 @@ public sealed class StudentRegistrationTests(SalahBahazadApiFactory factory)
         detail!.Status.Should().Be("Pending");
         detail.RejectionReason.Should().BeNull();
         detail.FullName.Should().Be("Mariam Adel Hassan");
+    }
+
+    [Fact]
+    public async Task Register_mints_a_distinct_STU_serial_per_student()
+    {
+        var (cityId, regionId) = await factory.GetSeedLocationAsync();
+        var tenant = await factory.SeedTenantEntityAsync();
+        var grade = await factory.SeedGradeAsync(tenant.Id);
+
+        // Two distinct Firebase identities → two separate students in the same tenant.
+        factory.PinFirebaseUser("serial-token-a", $"serial-uid-a-{Guid.NewGuid():N}");
+        factory.PinFirebaseUser("serial-token-b", $"serial-uid-b-{Guid.NewGuid():N}");
+        var anon = factory.CreateClient();
+
+        var a = await anon.PostAsync("/api/students/register",
+            BuildForm("serial-token-a", tenant.Slug, grade.Id, cityId, regionId, "Student A"));
+        var b = await anon.PostAsync("/api/students/register",
+            BuildForm("serial-token-b", tenant.Slug, grade.Id, cityId, regionId, "Student B"));
+        a.StatusCode.Should().Be(HttpStatusCode.Created);
+        b.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var idA = (await a.Content.ReadFromJsonAsync<StudentRegistrationResponse>(TestJson.Options))!.StudentId;
+        var idB = (await b.Content.ReadFromJsonAsync<StudentRegistrationResponse>(TestJson.Options))!.StudentId;
+
+        // Read the serials straight from the row (no HTTP context → tenant filter resolves to Empty → ignore it).
+        var serials = await factory.QueryDbAsync(db => db.Students
+            .IgnoreQueryFilters()
+            .Where(s => s.Id == idA || s.Id == idB)
+            .Select(s => s.Serial)
+            .ToListAsync());
+
+        serials.Should().HaveCount(2);
+        serials.Should().OnlyContain(s => s.StartsWith("STU-"));
+        // The handler's NextUnique seeding + the (TenantId, Serial) unique index guarantee per-tenant uniqueness
+        // (a collision would have failed the second insert).
+        serials.Should().OnlyHaveUniqueItems();
     }
 
     private static MultipartFormDataContent BuildForm(

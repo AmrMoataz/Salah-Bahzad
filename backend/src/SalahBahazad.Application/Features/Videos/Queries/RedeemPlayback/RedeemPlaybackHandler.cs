@@ -63,7 +63,19 @@ internal sealed class RedeemPlaybackHandler(
         var keyUrl = $"{query.ApiBaseUrl}/api/me/videos/{handoff.VideoId}/hls.key";
         var rewritten = string.Join('\n', lines).Replace(HlsConventions.KeyUriPlaceholder, keyUrl);
 
-        return new PlaybackManifestDto(rewritten, keyUrl, soonestExpiry);
+        // The per-video view budget for this enrollment, so the player can show "N of M views left"
+        // (FR-APP-VID-004). The gate (D1) already spent this view, so AccessRemaining is the post-Play count.
+        // The handoff implies a passed gate, so the access row exists; default defensively if it somehow doesn't.
+        var access = await db.Enrollments
+            .AsNoTracking()
+            .Where(e => e.Id == handoff.EnrollmentId)
+            .SelectMany(e => e.VideoAccesses)
+            .Where(a => a.VideoId == handoff.VideoId)
+            .Select(a => new { a.AccessRemaining, a.AccessAllowed })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return new PlaybackManifestDto(
+            rewritten, keyUrl, soonestExpiry, access?.AccessRemaining ?? 0, access?.AccessAllowed ?? 0);
     }
 
     private async Task<string> ReadManifestAsync(string manifestKey, CancellationToken cancellationToken)

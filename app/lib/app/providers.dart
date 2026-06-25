@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,14 +11,22 @@ import '../core/net/api_client.dart';
 import '../core/net/app_config.dart';
 import '../core/net/token_refresher.dart';
 import '../core/platform/app_platform.dart';
+import '../core/playback/hls_key_loader.dart';
+import '../core/playback/local_manifest_proxy.dart';
+import '../core/playback/media_kit_video_engine.dart';
+import '../core/playback/video_engine.dart';
 import '../core/storage/session_store.dart';
 import '../data/auth_repository.dart';
+import '../data/dtos/student_profile.dart';
+import '../data/playback_repository.dart';
 import '../features/auth/auth_controller.dart';
 import '../features/auth/auth_state.dart';
 import '../features/auth/google/desktop_google_credential_source.dart';
 import '../features/auth/google/desktop_oauth_client.dart';
 import '../features/auth/google/google_credential_source.dart';
 import '../features/auth/identity_provider.dart';
+import '../features/player/player_controller.dart';
+import '../features/player/player_state.dart';
 
 // ── Diagnostics ─────────────────────────────────────────────────────────────
 
@@ -82,6 +92,54 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.read(apiClientProvider)),
 );
+
+/// The signed-in student's profile (contract §C) — the **watermark identity**
+/// source (`serial · fullName`). Auto-disposed so it's re-fetched per player
+/// mount and not held while idle. Reads are not audited (contract §0).
+final studentProfileProvider = FutureProvider.autoDispose<StudentProfile>(
+  (ref) => ref.read(authRepositoryProvider).me(),
+);
+
+// ── Secure video playback (A1) ───────────────────────────────────────────────
+
+/// The gate (contract §D) over the shared [ApiClient]. Stateless → app-lifetime.
+final playbackRepositoryProvider = Provider<PlaybackRepository>(
+  (ref) => PlaybackRepository(ref.read(apiClientProvider)),
+);
+
+/// Authenticates the AES-128 key fetch (D3). Stateless → app-lifetime.
+final hlsKeyLoaderProvider = Provider<HlsKeyLoader>(
+  (ref) => HlsKeyLoader(ref.read(playbackRepositoryProvider)),
+);
+
+/// The engine-agnostic loopback proxy (key memory-only, `NFR-APP-SEC-005`).
+/// Auto-disposed so leaving the player closes its `HttpServer`.
+final localManifestProxyProvider = Provider.autoDispose<LocalManifestProxy>((
+  ref,
+) {
+  final LocalManifestProxy proxy = LocalManifestProxy(
+    ref.read(hlsKeyLoaderProvider),
+    logger: ref.read(loggerProvider).scoped('playback'),
+  );
+  ref.onDispose(() => unawaited(proxy.stop()));
+  return proxy;
+});
+
+/// The native video engine (libmpv via media_kit). Auto-disposed so the player
+/// frees the decoder + render surface when the route is left. Overridden with a
+/// fake in tests — `flutter test` never constructs the native engine.
+final videoEngineProvider = Provider.autoDispose<VideoEngine>((ref) {
+  final VideoEngine engine = MediaKitVideoEngine();
+  ref.onDispose(() => unawaited(engine.dispose()));
+  return engine;
+});
+
+/// The player state machine (redeem → key → play; TTL-safe retry). Auto-disposed
+/// so its proxy/subscriptions tear down on leaving the route.
+final playerControllerProvider =
+    NotifierProvider.autoDispose<PlayerController, PlayerState>(
+      PlayerController.new,
+    );
 
 // ── Identity (Firebase / Google) ────────────────────────────────────────────
 

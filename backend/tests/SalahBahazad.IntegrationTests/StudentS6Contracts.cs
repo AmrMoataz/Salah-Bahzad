@@ -10,6 +10,7 @@ namespace SalahBahazad.IntegrationTests;
 /// </summary>
 public sealed record StudentProfileResponse(
     Guid Id,
+    string Serial,
     string FullName,
     string PhoneNumber,
     string ParentPhonePrimary,

@@ -6,7 +6,7 @@ import '../core/deeplink/pending_deep_link.dart';
 import '../features/auth/auth_state.dart';
 import '../features/errors/deep_link_error_page.dart';
 import '../features/idle/idle_page.dart';
-import '../features/player/player_placeholder_page.dart';
+import '../features/player/player_page.dart';
 import '../features/signin/sign_in_page.dart';
 import '../features/splash/splash_page.dart';
 import 'providers.dart';
@@ -27,10 +27,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (_, _) => const SplashPage()),
       GoRoute(path: '/signin', builder: (_, _) => const SignInPage()),
       GoRoute(path: '/idle', builder: (_, _) => const IdlePage()),
-      GoRoute(
-        path: '/player',
-        builder: (_, _) => const PlayerPlaceholderPage(),
-      ),
+      GoRoute(path: '/player', builder: (_, _) => const PlayerPage()),
       GoRoute(path: '/error', builder: (_, _) => const DeepLinkErrorPage()),
     ],
   );

@@ -16,6 +16,8 @@ internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder.Property(s => s.FirebaseUid).HasMaxLength(128).IsRequired();
         builder.HasIndex(s => new { s.TenantId, s.FirebaseUid }).IsUnique();
 
+        builder.Property(s => s.Serial).HasMaxLength(20).IsRequired();
+
         builder.Property(s => s.FullName).HasMaxLength(200).IsRequired();
         builder.Property(s => s.PhoneNumber).HasMaxLength(32).IsRequired();
         builder.Property(s => s.ParentPhonePrimary).HasMaxLength(32).IsRequired();
@@ -53,6 +55,10 @@ internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
             .WithMany()
             .HasForeignKey(s => s.RegionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Serials are unique per tenant (FR-APP-VID-003). Includes soft-deleted rows so a serial is never
+        // reissued; the registration handler seeds from this set with IgnoreQueryFilters.
+        builder.HasIndex(s => new { s.TenantId, s.Serial }).IsUnique();
 
         // Primary triage index: list/filter by status within a tenant (FR-ADM-STU-001).
         builder.HasIndex(s => new { s.TenantId, s.Status });

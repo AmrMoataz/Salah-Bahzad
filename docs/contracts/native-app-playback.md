@@ -61,7 +61,7 @@ The watermark identity source.
 ```jsonc
 {
   "id": "guid",
-  "serial": "STU-7K2M9",                 // NEW — randomly-generated unique serial (FR-APP-VID-003)
+  "serial": "STU-7K2M9X",                // NEW — randomly-generated unique serial, STU- + 6 Crockford chars (FR-APP-VID-003)
   "fullName": "string",                  // watermark renders: "{serial} · {fullName}"
   "phoneNumber": "+9647701800000",
   "parentPhonePrimary": "string", "parentPhoneSecondary": "string|null",
@@ -93,7 +93,9 @@ The watermark identity source.
 // D2 — PlaybackManifestDto
 { "manifestContent": "#EXTM3U…",      // rewritten .m3u8: signed R2 segment URLs (~120 s TTL) + absolute key URL
   "keyUrl": "https://…/api/me/videos/{id}/hls.key",
-  "expiresAtUtc": "2026-…Z" }
+  "expiresAtUtc": "2026-…Z",
+  "accessRemaining": 2,                  // NEW — views left AFTER this Play (the "N", FR-APP-VID-004)
+  "accessAllowed": 3 }                   // NEW — total views granted for this enrollment+video (the "M")
 ```
 
 ### D.2 Error modes (frozen — verbatim reasons; the app renders `detail` inline)

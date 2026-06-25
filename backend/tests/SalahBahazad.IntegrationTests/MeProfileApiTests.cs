@@ -63,6 +63,7 @@ public sealed class MeProfileApiTests(SalahBahazadApiFactory factory)
         var profile = await GetProfileAsync(factory.CreateClientForStudent(tenant, student.Id));
 
         profile.Id.Should().Be(student.Id);
+        profile.Serial.Should().Match("STU-*");                  // watermark identity (FR-APP-VID-003)
         profile.FullName.Should().Be("Seed Student");
         profile.PhoneNumber.Should().Be("01055555555");
         profile.ParentPhonePrimary.Should().Be("01000000000");
@@ -85,6 +86,7 @@ public sealed class MeProfileApiTests(SalahBahazadApiFactory factory)
         var tokenHash = await factory.QueryDbAsync(db => db.StudentDevices
             .IgnoreQueryFilters()           // no HTTP context here → tenant resolves to Empty (factory docstring)
             .Where(d => d.Id == device.Id).Select(d => d.DeviceTokenHash).FirstAsync());
+        raw.Should().Contain("\"serial\"");
         raw.Should().NotContain(tokenHash);
         raw.Should().NotContain("deviceTokenHash").And.NotContain("tokenHash");
         raw.Should().NotContain("\"email\"").And.NotContain("\"avatar\"");

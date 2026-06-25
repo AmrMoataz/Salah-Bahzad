@@ -4,6 +4,7 @@ using NSubstitute;
 using SalahBahazad.Application.Common.Interfaces;
 using SalahBahazad.Application.Features.Auth.Commands.ExchangeStudentFirebaseToken;
 using SalahBahazad.Application.Features.Auth.DTOs;
+using SalahBahazad.Domain.Common;
 using SalahBahazad.Domain.Entities;
 using SalahBahazad.Domain.Enums;
 
@@ -82,8 +83,8 @@ internal static class AuthTestHelpers
         Guid? tenantId = null)
     {
         var student = Student.Register(
-            tenantId ?? Guid.NewGuid(), uid, "Mariam Adel", "01099999999", "01000000000", null,
-            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Nile School", "v1", DateTimeOffset.UtcNow);
+            tenantId ?? Guid.NewGuid(), uid, StudentSerialGenerator.Next(), "Mariam Adel", "01099999999",
+            "01000000000", null, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Nile School", "v1", DateTimeOffset.UtcNow);
 
         switch (status)
         {
