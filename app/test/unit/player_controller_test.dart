@@ -8,6 +8,7 @@ import 'package:secure_player/features/player/player_state.dart';
 
 import '../support/playback_fakes.dart';
 
+
 /// Pumps the microtask queue so async controller steps settle.
 Future<void> pump() => Future<void>.delayed(const Duration(milliseconds: 5));
 
@@ -20,7 +21,11 @@ const PlaybackRequest _request = PlaybackRequest(
 ProviderContainer makeContainer({
   required FakePlaybackRepository repo,
   required FakeVideoEngine engine,
+  FakeConnectivityChecker? connectivity,
 }) {
+  final FakeConnectivityChecker conn =
+      connectivity ?? FakeConnectivityChecker();
+  addTearDown(conn.dispose);
   final ProviderContainer container = ProviderContainer(
     overrides: [
       playbackRepositoryProvider.overrideWithValue(repo),
@@ -28,6 +33,7 @@ ProviderContainer makeContainer({
         ref.onDispose(() async => engine.dispose());
         return engine;
       }),
+      connectivityCheckerProvider.overrideWithValue(conn),
     ],
   );
   addTearDown(container.dispose);
@@ -253,6 +259,8 @@ void main() {
         manifest: fixtureManifest(),
       );
       final FakeVideoEngine engine = FakeVideoEngine();
+      final FakeConnectivityChecker conn = FakeConnectivityChecker();
+      addTearDown(conn.dispose);
       final ProviderContainer container = ProviderContainer(
         overrides: [
           playbackRepositoryProvider.overrideWithValue(repo),
@@ -260,6 +268,7 @@ void main() {
             ref.onDispose(() async => engine.dispose());
             return engine;
           }),
+          connectivityCheckerProvider.overrideWithValue(conn),
           loggerProvider.overrideWithValue(capturingLogger(sink)),
         ],
       );

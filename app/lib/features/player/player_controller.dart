@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../core/deeplink/playback_request.dart';
 import '../../core/logging/logging.dart';
 import '../../core/net/api_exception.dart';
+import '../../core/playback/connectivity_checker.dart';
 import '../../core/playback/local_manifest_proxy.dart';
 import '../../core/playback/video_engine.dart';
 import '../../data/dtos/playback_manifest.dart';
@@ -34,6 +36,7 @@ class PlayerController extends Notifier<PlayerState> {
   late LocalManifestProxy _proxy;
   late VideoEngine _engine;
   late AppLogger _log;
+  late ConnectivityChecker _connectivity;
 
   PlaybackRequest? _request;
   PlaybackManifest? _manifest;
@@ -42,12 +45,17 @@ class PlayerController extends Notifier<PlayerState> {
   final List<StreamSubscription<Object?>> _subs =
       <StreamSubscription<Object?>>[];
 
+  /// Connectivity subscription — pauses mid-playback on offline, resumes on
+  /// reconnect (A3). Kept separate from [_subs] so it can be nullable + typed.
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+
   @override
   PlayerState build() {
     _repo = ref.read(playbackRepositoryProvider);
     _proxy = ref.watch(localManifestProxyProvider);
     _engine = ref.watch(videoEngineProvider);
     _log = ref.read(loggerProvider).scoped('player');
+    _connectivity = ref.read(connectivityCheckerProvider);
     ref.onDispose(_teardown);
     return const PlayerState();
   }
@@ -84,7 +92,12 @@ class PlayerController extends Notifier<PlayerState> {
     } on ApiException catch (e) {
       _fail(PlayerError.fromApi(e));
     } catch (e, s) {
-      _log.warning('Unexpected redeem failure', error: e, stackTrace: s);
+      _log.warning(
+        'Unexpected redeem failure',
+        error: e,
+        stackTrace: s,
+        fields: <String, Object?>{'videoId': _request?.videoId},
+      );
       _fail(_engineError());
     }
   }
@@ -110,7 +123,12 @@ class PlayerController extends Notifier<PlayerState> {
       try {
         await _openManifest(manifest, videoId);
       } catch (e, s) {
-        _log.warning('Retry re-open failed', error: e, stackTrace: s);
+        _log.warning(
+          'Retry re-open failed',
+          error: e,
+          stackTrace: s,
+          fields: <String, Object?>{'videoId': videoId},
+        );
         _fail(_engineError());
       }
       return;
@@ -234,12 +252,47 @@ class PlayerController extends Notifier<PlayerState> {
       }),
     );
     _subs.add(
-      _engine.errorStream.listen((String _) {
-        // libmpv error strings can echo the loopback URL — never log the body.
-        _log.warning('Engine reported a playback error');
-        _fail(_engineError());
-      }),
+      _engine.errorStream.listen(_onEngineError),
     );
+
+    // A3 — offline pause/resume: proactively pause on connectivity loss so
+    // the recording captures a still frame rather than live content; auto-resume
+    // when the connection returns (if still in a clean paused state, not error).
+    _connectivitySub = _connectivity.onChange.listen(_onConnectivityChanged);
+  }
+
+  /// Engine error callback. Checks connectivity to choose the right §H state:
+  /// a network-layer failure while offline → `offline` (transient, "Try again");
+  /// an engine failure while online → `server` (playback problem).
+  Future<void> _onEngineError(String _) async {
+    // libmpv error strings can echo the loopback URL — never log the body.
+    _log.warning(
+      'Engine reported a playback error',
+      fields: <String, Object?>{'videoId': _request?.videoId},
+    );
+    try {
+      final List<ConnectivityResult> results = await _connectivity.check();
+      final bool offline =
+          results.every((ConnectivityResult r) => r == ConnectivityResult.none);
+      _fail(offline ? _offlineError() : _engineError());
+    } catch (_) {
+      // If connectivity check itself fails, default to the generic engine error.
+      _fail(_engineError());
+    }
+  }
+
+  void _onConnectivityChanged(List<ConnectivityResult> results) {
+    final bool online =
+        results.any((ConnectivityResult r) => r != ConnectivityResult.none);
+    if (!online && state.isPlaying) {
+      // Lost connectivity mid-playback: pause immediately so a recording
+      // captures a still frame rather than streaming content.
+      unawaited(_engine.pause());
+    } else if (online && state.status == PlayerStatus.paused) {
+      // Connectivity restored: resume if the player was simply paused, not
+      // in an error or ended state (those require an explicit retry).
+      unawaited(_engine.play());
+    }
   }
 
   void _fail(PlayerError error) =>
@@ -249,6 +302,16 @@ class PlayerController extends Notifier<PlayerState> {
     kind: PlayerErrorKind.server,
     title: 'Something went wrong',
     message: "That one's on us, not you. Give it another go in a moment.",
+    primaryActionLabel: 'Try again',
+    primaryAction: PlayerAction.retry,
+  );
+
+  PlayerError _offlineError() => const PlayerError(
+    kind: PlayerErrorKind.offline,
+    title: "You're offline",
+    message:
+        "Check your connection — your place is saved and we'll pick up right "
+        'where you left off.',
     primaryActionLabel: 'Try again',
     primaryAction: PlayerAction.retry,
   );
@@ -277,6 +340,8 @@ class PlayerController extends Notifier<PlayerState> {
   );
 
   Future<void> _teardown() async {
+    await _connectivitySub?.cancel();
+    _connectivitySub = null;
     for (final StreamSubscription<Object?> s in _subs) {
       await s.cancel();
     }
