@@ -28,7 +28,11 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<!-- Play deep link: salah-bahazad://stream (contract §E). -->
+	<!-- URL schemes:
+	     • salah-bahazad://stream — Play deep link (contract §E).
+	     • com.googleusercontent.apps.<reversed-client-id> — Google Sign-In OAuth
+	       callback. Must match REVERSED_CLIENT_ID in GoogleService-Info.plist;
+	       without it, the google_sign_in plugin can't receive the auth redirect. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -39,6 +43,16 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>salah-bahazad</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.salahbahzad.securePlayer.google-signin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.643096678500-b85elbstlekuf56nl8nnlga9hdkf3017</string>
 			</array>
 		</dict>
 	</array>

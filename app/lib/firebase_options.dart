@@ -19,12 +19,16 @@ class DefaultFirebaseOptions {
       return web;
     }
     switch (defaultTargetPlatform) {
+      // macOS uses the native Firebase iOS SDK, which validates `appId` against
+      // `^\d+:(ios|macos):[a-f0-9]+$`. The `web:` prefix throws an NSException
+      // before Dart can catch it — so macOS needs its own per-platform options.
+      case TargetPlatform.macOS:
+        return macos;
       case TargetPlatform.android:
       case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
       case TargetPlatform.windows:
-      // All platforms reuse the dev web config for A0 (auth only needs apiKey + projectId);
-      // per-platform apps land at packaging time (A4).
+      // Android/iOS get real per-platform configs at packaging time (A4).
+      // Windows uses the Firebase C++ desktop SDK, which accepts the web config.
       default:
         return web;
     }
@@ -38,5 +42,18 @@ class DefaultFirebaseOptions {
     authDomain: 'salah-bahzad-development.firebaseapp.com',
     storageBucket: 'salah-bahzad-development.firebasestorage.app',
     measurementId: 'G-T5W4DYNSRZ',
+  );
+
+  // Mirrors macos/Runner/GoogleService-Info.plist (Firebase Apple app for bundle id
+  // com.salahbahzad.securePlayer). Required because macOS rejects the `web:` appId.
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD4VXH3GgUzp1wJOlBhqz62NGu3tsZZhPw',
+    appId: '1:643096678500:ios:12d9bc384474c01417cf71',
+    messagingSenderId: '643096678500',
+    projectId: 'salah-bahzad-development',
+    storageBucket: 'salah-bahzad-development.firebasestorage.app',
+    iosClientId:
+        '643096678500-b85elbstlekuf56nl8nnlga9hdkf3017.apps.googleusercontent.com',
+    iosBundleId: 'com.salahbahzad.securePlayer',
   );
 }

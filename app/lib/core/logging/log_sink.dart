@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
+
 import 'log_record.dart';
 
 /// A destination for [LogRecord]s. The whole point of this seam: the app code
@@ -16,24 +18,38 @@ abstract interface class LogSink {
 }
 
 /// The default sink: writes through `dart:developer.log`, so records show up in
-/// the Flutter/DevTools console with their category as the `name` and the error
-/// + stack trace attached. Cheap and stripped from release builds by the
+/// DevTools with their category as the `name` and the error + stack trace
+/// attached. Also mirrors to stdout in debug builds — `dart:developer.log` does
+/// not reliably surface in the `flutter run` terminal on macOS, so without this
+/// dev iteration is blind. Cheap and stripped from release builds by the
 /// configured level floor — never the place secrets would leak.
 class ConsoleLogSink implements LogSink {
   const ConsoleLogSink();
 
   @override
   void emit(LogRecord record) {
-    final String prefix = record.fields.isEmpty
+    final String body = record.fields.isEmpty
         ? record.message
         : '${record.message} ${record.fields}';
     developer.log(
-      prefix,
+      body,
       time: record.timestamp,
       level: record.level.severity,
       name: record.category ?? 'app',
       error: record.error,
       stackTrace: record.stackTrace,
     );
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('${record.level.label} ${record.category ?? 'app'}: $body');
+      if (record.error != null) {
+        // ignore: avoid_print
+        print('  error: ${record.error}');
+      }
+      if (record.stackTrace != null) {
+        // ignore: avoid_print
+        print('  stack:\n${record.stackTrace}');
+      }
+    }
   }
 }

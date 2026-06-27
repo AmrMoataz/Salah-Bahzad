@@ -6,5 +6,13 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- Sandboxed macOS apps need this for flutter_secure_storage and the native
+	     Google Sign-In SDK to reach the Keychain. Without it, both throw
+	     errSecMissingEntitlement (-34018), which surfaces as a bootstrap warning
+	     and Google sign-in's google_providerConfigurationError. -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.salahbahzad.securePlayer</string>
+	</array>
 </dict>
 </plist>

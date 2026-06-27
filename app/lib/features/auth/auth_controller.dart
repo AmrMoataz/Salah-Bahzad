@@ -39,35 +39,50 @@ class AuthController extends Notifier<AuthState> {
   // — Startup —
 
   Future<void> _bootstrap() async {
-    final store = ref.read(sessionStoreProvider);
-    final Session? session = await store.load();
-    if (session == null || session.isRefreshExpired) {
-      await store.clear();
-      state = const AuthSignedOut();
-      return;
-    }
-    final StudentSummary? student = await _loadCachedStudent();
-    if (student == null) {
-      // Tokens without a known identity (corrupt/upgraded blob) → re-auth.
-      await store.clear();
-      state = const AuthSignedOut();
-      return;
-    }
-    if (session.isAccessExpired) {
-      final Session? refreshed = await ref
-          .read(tokenRefresherProvider)
-          .refresh(session.refreshToken);
-      if (refreshed == null) {
+    // The splash route is gated on AuthUnknown — any throw here would leave the
+    // user staring at it forever (NFR-APP-PERF-001). Drop to AuthSignedOut on
+    // *any* failure so the splash resolves to /signin.
+    try {
+      final store = ref.read(sessionStoreProvider);
+      final Session? session = await store.load();
+      if (session == null || session.isRefreshExpired) {
         await store.clear();
         state = const AuthSignedOut();
         return;
       }
-      await store.save(refreshed);
-      _scheduleRefresh(refreshed);
-    } else {
-      _scheduleRefresh(session);
+      final StudentSummary? student = await _loadCachedStudent();
+      if (student == null) {
+        // Tokens without a known identity (corrupt/upgraded blob) → re-auth.
+        await store.clear();
+        state = const AuthSignedOut();
+        return;
+      }
+      if (session.isAccessExpired) {
+        final Session? refreshed = await ref
+            .read(tokenRefresherProvider)
+            .refresh(session.refreshToken);
+        if (refreshed == null) {
+          await store.clear();
+          state = const AuthSignedOut();
+          return;
+        }
+        await store.save(refreshed);
+        _scheduleRefresh(refreshed);
+      } else {
+        _scheduleRefresh(session);
+      }
+      state = AuthActive(student);
+    } catch (error, stack) {
+      // Typical culprit on macOS: flutter_secure_storage throws
+      // `errSecMissingEntitlement` (-34018) when the app is sandboxed without
+      // the `keychain-access-groups` entitlement. Don't crash the splash.
+      _log.warning(
+        'Auth bootstrap failed; starting signed-out',
+        error: error,
+        stackTrace: stack,
+      );
+      state = const AuthSignedOut();
     }
-    state = AuthActive(student);
   }
 
   // — Sign in —
@@ -111,7 +126,7 @@ class AuthController extends Notifier<AuthState> {
     } on IdentityException catch (e) {
       _log.debug(
         'Identity sign-in rejected',
-        fields: <String, Object?>{'message': e.message},
+        fields: <String, Object?>{'code': e.code, 'message': e.message},
       );
       state = AuthError(AuthErrorReason.invalidCredentials, e.message);
     } on ApiException catch (e) {
