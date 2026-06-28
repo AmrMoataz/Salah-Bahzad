@@ -1,6 +1,12 @@
 # ---------- .NET ----------
 [Bb]in/
 [Oo]bj/
+# Stray Windows-style output dirs accidentally created on macOS/Linux: the dir NAME literally contains a
+# backslash (e.g. "bin\Debug", written by a misconfigured tool / Roslyn BuildHost). The [Bb]in/ rule does
+# NOT match these, and a recursive **/*.cs|*.resx glob walking into them breaks MSBuild on a clean checkout
+# (literal-glob CS2001 / MSB3552). Never commit them.
+**bin\\Debug**
+**obj\\Debug**
 [Oo]ut/
 *.user
 *.suo

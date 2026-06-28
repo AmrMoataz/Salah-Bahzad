@@ -17,6 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false   # build all three images even if one fails, so we see every error at once
       matrix:
         include:
           - { name: api,     ctx: backend,  file: backend/Dockerfile,                      args: "" }
