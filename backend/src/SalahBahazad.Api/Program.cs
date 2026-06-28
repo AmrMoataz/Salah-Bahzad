@@ -27,14 +27,43 @@ try
     builder.AddServiceDefaults();
 
     // ── Serilog (NFR-OBS-001, NFR-PRIV-005) ─────────────────────────────────
-    builder.Host.UseSerilog((ctx, services, cfg) => cfg
-        .ReadFrom.Configuration(ctx.Configuration)
-        .ReadFrom.Services(services)
-        .Enrich.FromLogContext()
-        .Enrich.WithMachineName()
-        .Enrich.WithThreadId()
-        .WriteTo.Console(outputTemplate:
-            "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"));
+    // UseSerilog replaces the Microsoft logging pipeline entirely, which means
+    // builder.Logging.AddOpenTelemetry() in ServiceDefaults is bypassed and the
+    // Aspire structured-logs tab stays empty. WriteTo.OpenTelemetry() re-routes
+    // log events to the same OTLP endpoint Aspire injects for traces/metrics.
+    builder.Host.UseSerilog((ctx, services, cfg) =>
+    {
+        cfg.ReadFrom.Configuration(ctx.Configuration)
+           .ReadFrom.Services(services)
+           .Enrich.FromLogContext()
+           .Enrich.WithMachineName()
+           .Enrich.WithThreadId()
+           .WriteTo.Console(outputTemplate:
+               "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+
+        var otlpEndpoint = ctx.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+        if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+        {
+            cfg.WriteTo.OpenTelemetry(o =>
+            {
+                o.Endpoint = otlpEndpoint.TrimEnd('/') + "/v1/logs";
+                o.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
+                o.ResourceAttributes = new Dictionary<string, object>
+                {
+                    ["service.name"] = builder.Environment.ApplicationName,
+                };
+                var headers = ctx.Configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+                if (!string.IsNullOrWhiteSpace(headers))
+                {
+                    foreach (var pair in headers.Split(','))
+                    {
+                        var kv = pair.Split('=', 2);
+                        if (kv.Length == 2) o.Headers[kv[0].Trim()] = kv[1].Trim();
+                    }
+                }
+            });
+        }
+    });
 
     // ── Upload limits (large source-video uploads) ──────────────────────────
     // Defaults silently reset the connection (no HTTP response) for big uploads: Kestrel caps the request
