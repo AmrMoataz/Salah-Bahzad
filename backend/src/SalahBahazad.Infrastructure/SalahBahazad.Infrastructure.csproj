@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <!-- Seeded Egypt cities/regions reference dataset, loaded at model-build for EF HasData. -->
-    <EmbeddedResource Include="Persistence\SeedData\egypt-locations.json" />
+    <EmbeddedResource Include="Persistence/SeedData/egypt-locations.json" />
   </ItemGroup>
 
   <ItemGroup>
