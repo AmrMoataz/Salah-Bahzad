@@ -21,16 +21,18 @@ enum PlayerErrorKind {
   notfound,
   offline,
   server,
+  updateRequired, // 426 outdated_app — A4; requires the student to update before playback
   generic,
 }
 
 /// What the failure state's primary button does. The page maps these to a
 /// navigation / retry behaviour.
-enum PlayerAction { signIn, openPortal, backToPortal, retry }
+enum PlayerAction { signIn, openPortal, backToPortal, launchStore, retry }
 
 /// A resolved failure surface: the §H verbatim [title] + [message] + the
 /// [primaryActionLabel]/[primaryAction]. [reason]/[detail] are carried for the
-/// generic case (rendered inline) and for diagnostics.
+/// generic case (rendered inline) and for diagnostics. [storeUrl] is non-null
+/// only for [PlayerErrorKind.updateRequired].
 @immutable
 class PlayerError {
   const PlayerError({
@@ -41,6 +43,7 @@ class PlayerError {
     required this.primaryAction,
     this.reason,
     this.detail,
+    this.storeUrl,
   });
 
   final PlayerErrorKind kind;
@@ -50,12 +53,12 @@ class PlayerError {
   final PlayerAction primaryAction;
   final String? reason;
   final String? detail;
+  final String? storeUrl;
 
   /// Maps a gate failure (contract §D.2) to a §H state. Titles are **verbatim**
-  /// from contract §H; the `426 outdated_app` row is A4 and not handled here.
-  ///
-  /// `409 not_ready` and `403 quiz_required` have **no** §H row → [generic],
-  /// which renders the server `detail` inline (no invented title/action).
+  /// from contract §H. `409 not_ready` and `403 quiz_required` have **no** §H
+  /// row → [generic], which renders the server `detail` inline (no invented
+  /// title/action).
   factory PlayerError.fromApi(ApiException e) {
     final int? status = e.statusCode;
     final String? reason = e.reason;
@@ -142,6 +145,22 @@ class PlayerError {
         primaryAction: PlayerAction.backToPortal,
         reason: reason,
         detail: detail,
+      );
+    }
+
+    // 426 Upgrade Required — update required (contract §H / §F.2).
+    // The backend sends the store URL in ProblemDetails.detail.
+    if (status == 426) {
+      return PlayerError(
+        kind: PlayerErrorKind.updateRequired,
+        title: 'Update required',
+        message: 'A newer version of the app is needed to play this lesson. '
+            'Update and try again.',
+        primaryActionLabel: 'Update the app',
+        primaryAction: PlayerAction.launchStore,
+        reason: reason,
+        detail: detail,
+        storeUrl: detail,
       );
     }
 

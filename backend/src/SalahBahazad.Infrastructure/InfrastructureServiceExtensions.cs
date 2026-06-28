@@ -68,6 +68,10 @@ public static class InfrastructureServiceExtensions
             ?? new PlaybackOptions();
         services.AddSingleton(playbackOptions);
 
+        // App version floors — hot-reloadable via IOptionsMonitor<AppVersionsOptions> so the operator can
+        // raise the min-version floor without a redeploy (NFR-APP-UPD-002, contract §F).
+        services.Configure<AppVersionsOptions>(configuration.GetSection(AppVersionsOptions.SectionName));
+
         // Enrollment side-effect seam — Phase 5B-1 makes this real: snapshots the question bank into a
         // per-student assignment on enrol/extend (idempotent). Prerequisite-quiz snapshot is still 5B-2
         // (FR-PLAT-ENR-005, FR-PLAT-ASG-001, FR-PLAT-QZ-001).

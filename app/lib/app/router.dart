@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/deeplink/pending_deep_link.dart';
+import '../data/dtos/app_version_status.dart';
 import '../features/auth/auth_state.dart';
 import '../features/errors/deep_link_error_page.dart';
+import '../features/errors/update_required_page.dart';
 import '../features/idle/idle_page.dart';
 import '../features/player/player_page.dart';
 import '../features/signin/sign_in_page.dart';
@@ -17,6 +19,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final _RouterRefresh refresh = _RouterRefresh();
   ref.listen(authControllerProvider, (_, _) => refresh.bump());
   ref.listen(pendingDeepLinkProvider, (_, _) => refresh.bump());
+  ref.listen(versionCheckProvider, (_, _) => refresh.bump());
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -29,19 +32,30 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/idle', builder: (_, _) => const IdlePage()),
       GoRoute(path: '/player', builder: (_, _) => const PlayerPage()),
       GoRoute(path: '/error', builder: (_, _) => const DeepLinkErrorPage()),
+      GoRoute(
+        path: '/update-required',
+        builder: (_, _) => const UpdateRequiredPage(),
+      ),
     ],
   );
 });
 
-/// Resolves the destination. Priority: still booting → Splash; a malformed link
-/// → Error; a valid link → Player (signed in) or Sign in first; otherwise the
-/// home for the auth state.
+/// Resolves the destination. Priority: still booting → Splash; hard version
+/// block → UpdateRequired; a malformed link → Error; a valid link → Player
+/// (signed in) or Sign in first; otherwise the home for the auth state.
 String? _redirect(Ref ref, String location) {
   final AuthState auth = ref.read(authControllerProvider);
+  final AsyncValue<AppVersionStatusDto> version = ref.read(versionCheckProvider);
   final PendingDeepLink? pending = ref.read(pendingDeepLinkProvider);
 
-  if (auth is AuthUnknown) {
+  // Stay on splash while auth is resolving or the version check is in-flight.
+  if (auth is AuthUnknown || version is AsyncLoading) {
     return location == '/splash' ? null : '/splash';
+  }
+
+  // Hard block: this build is below the enforced minimum floor.
+  if (version.asData?.value.status == 'update_required') {
+    return location == '/update-required' ? null : '/update-required';
   }
 
   if (pending is PendingMalformed) {

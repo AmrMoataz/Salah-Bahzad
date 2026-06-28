@@ -17,6 +17,7 @@ class ErrorStateView extends StatelessWidget {
     required this.onPrimary,
     this.secondaryLabel,
     this.onSecondary,
+    this.footer = 'Your place is saved — nothing is lost.',
   });
 
   final String title;
@@ -25,6 +26,10 @@ class ErrorStateView extends StatelessWidget {
   final VoidCallback onPrimary;
   final String? secondaryLabel;
   final VoidCallback? onSecondary;
+
+  /// Footer reassurance text. Override for contexts where there is no player
+  /// session (e.g. the startup update-required block).
+  final String footer;
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +132,9 @@ class ErrorStateView extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Text(
-              'Your place is saved — nothing is lost.',
-              style: TextStyle(
+            Text(
+              footer,
+              style: const TextStyle(
                 fontFamily: SbFonts.sans,
                 fontSize: 12,
                 color: SbColors.ink6,

@@ -21,8 +21,10 @@ import '../core/secure_surface/noop_secure_surface.dart';
 import '../core/secure_surface/secure_surface.dart';
 import '../core/storage/session_store.dart';
 import '../data/auth_repository.dart';
+import '../data/dtos/app_version_status.dart';
 import '../data/dtos/student_profile.dart';
 import '../data/playback_repository.dart';
+import '../data/version_repository.dart';
 import '../features/auth/auth_controller.dart';
 import '../features/auth/auth_state.dart';
 import '../features/auth/google/desktop_google_credential_source.dart';
@@ -213,6 +215,23 @@ final identityProvider = Provider<IdentityProvider>((ref) {
 
 final authControllerProvider = NotifierProvider<AuthController, AuthState>(
   AuthController.new,
+);
+
+// ── Version check (A4 — FR-APP-UPD-001, NFR-APP-UPD-001/002) ───────────────
+
+final versionRepositoryProvider = Provider<VersionRepository>(
+  (ref) => RemoteVersionRepository(
+    ref.read(apiClientProvider),
+    ref.read(appConfigProvider),
+    ref.read(appPlatformProvider),
+  ),
+);
+
+/// Runs once on startup; the endpoint is anonymous so this fires before auth
+/// resolves. Network errors are treated as `ok` — a startup check failure must
+/// never block playback (the `redeem` call enforces the hard floor instead).
+final versionCheckProvider = FutureProvider<AppVersionStatusDto>(
+  (ref) => ref.read(versionRepositoryProvider).checkStatus(),
 );
 
 // ── Deep links ──────────────────────────────────────────────────────────────

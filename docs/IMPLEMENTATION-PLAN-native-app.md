@@ -260,7 +260,7 @@ Each phase: **Goal · Backend · App · Design anchor · Reqs · Exit · Streams
 - **A1:** `docs/contracts/native-app-playback.md` (**frozen first** — companion to this plan) + `…-a1-{backend,app,wiring}.md`.
 - **A2:** `…-a2-{app,wiring}.md` (+ the capture-protection manual matrix doc).
 - **A3:** `…-a3-{app,wiring}.md`.
-- **A4:** `…-a4-{backend,app,wiring}.md`.
+- **A4:** 📋 **Planned (2026-06-28)** — `IMPLEMENTATION-PLAN-native-app-a4-{backend,app,wiring}.md` all written. Backend: `GET /api/app/version-status` + `426 outdated_app` enforcement at `redeem`. App: 8th §H state + startup version check + signing/packaging/CI for all four platforms.
 - **Register** this engagement in `docs/IMPLEMENTATION-PLAN-student-portal.md` (a `### Native App (post-Home)` pointer + a Gaps-table row) so it's traceable from the master.
 
 ---

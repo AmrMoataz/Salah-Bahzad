@@ -175,6 +175,16 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         await _openPortal();
       case PlayerAction.backToPortal:
         if (mounted) context.go('/idle');
+      case PlayerAction.launchStore:
+        final String? url = error.storeUrl;
+        if (url != null && url.isNotEmpty) {
+          final Uri? uri = Uri.tryParse(url);
+          if (uri != null) {
+            try {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } catch (_) {}
+          }
+        }
     }
   }
 

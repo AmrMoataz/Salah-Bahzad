@@ -1,6 +1,9 @@
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SalahBahazad.Api.Authorization;
+using SalahBahazad.Application.Common;
+using SalahBahazad.Application.Common.Exceptions;
 using SalahBahazad.Application.Features.Videos.Commands.StartVideoPlayback;
 using SalahBahazad.Application.Features.Videos.DTOs;
 using SalahBahazad.Application.Features.Videos.Queries.GetHlsKey;
@@ -36,7 +39,8 @@ internal sealed class VideoEndpoints : IEndpointGroup
             .WithName("RedeemVideoPlayback")
             .WithSummary("Exchange a one-time handoff code for a per-playback signed HLS manifest")
             .Produces<PlaybackManifestDto>()
-            .Produces<ProblemDetails>(StatusCodes.Status410Gone);
+            .Produces<ProblemDetails>(StatusCodes.Status410Gone)
+            .Produces<ProblemDetails>(StatusCodes.Status426UpgradeRequired);
 
         group.MapGet("/{videoId:guid}/hls.key", GetKeyAsync)
             .RequireStudent()
@@ -54,9 +58,25 @@ internal sealed class VideoEndpoints : IEndpointGroup
     private static async Task<IResult> RedeemAsync(
         [FromBody] RedeemPlaybackRequest request,
         HttpContext httpContext,
+        IOptionsMonitor<AppVersionsOptions> versionOptions,
         ISender sender,
         CancellationToken cancellationToken)
     {
+        // Min-version gate (contract §F.2, NFR-APP-UPD-002). App-only step — the portal's gate (StartPlayback)
+        // is intentionally unaffected. Leniency: absent or unrecognised headers are ignored so the portal
+        // (which never sends these headers) is never blocked by this check.
+        var platform = httpContext.Request.Headers["X-Platform"].FirstOrDefault()?.Trim().ToLowerInvariant();
+        var versionRaw = httpContext.Request.Headers["X-App-Version"].FirstOrDefault();
+
+        if (platform is not null
+            && versionOptions.CurrentValue.Platforms.TryGetValue(platform, out var pOpts)
+            && Version.TryParse(versionRaw, out var requested)
+            && Version.TryParse(pOpts.MinVersion, out var min)
+            && requested < min)
+        {
+            throw new UpgradeRequiredException(pOpts.StoreUrl);
+        }
+
         // The endpoint owns the HTTP request, so it derives the absolute base the handler bakes into the
         // manifest's gated key URL.
         var apiBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";

@@ -19,6 +19,9 @@ class IdleView extends StatelessWidget {
     required this.onOpenPortal,
     required this.onSignOut,
     this.showAppBar = true,
+    this.updateAvailable = false,
+    this.onUpdate,
+    this.onDismissUpdate,
   });
 
   final String fullName;
@@ -29,6 +32,12 @@ class IdleView extends StatelessWidget {
   final VoidCallback onOpenPortal;
   final VoidCallback onSignOut;
   final bool showAppBar;
+
+  /// When `true`, a dismissible amber update banner is shown at the top.
+  /// Controlled by the page (requires a non-empty store URL on the backend).
+  final bool updateAvailable;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDismissUpdate;
 
   String get _firstName => fullName.trim().isEmpty
       ? 'there'
@@ -53,6 +62,8 @@ class IdleView extends StatelessWidget {
       child: Column(
         children: <Widget>[
           if (showAppBar) _AccountBar(name: fullName, initials: _initials),
+          if (updateAvailable)
+            _UpdateBanner(onUpdate: onUpdate, onDismiss: onDismissUpdate),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
@@ -498,6 +509,66 @@ class _SecurityCard extends StatelessWidget {
               height: 1.45,
               color: SbColors.ink4,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Amber dismissible banner shown when a newer app version is available but not
+/// required (soft nudge, `update_available`). Hidden when `storeUrl` is empty.
+class _UpdateBanner extends StatelessWidget {
+  const _UpdateBanner({this.onUpdate, this.onDismiss});
+
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: SbColors.amberBg,
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+      child: Row(
+        children: <Widget>[
+          const Icon(
+            Icons.notifications_outlined,
+            color: SbColors.amberText,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'A new version is available.',
+              style: TextStyle(
+                fontFamily: SbFonts.sans,
+                fontSize: 13,
+                color: SbColors.amberText,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onUpdate,
+            style: TextButton.styleFrom(
+              foregroundColor: SbColors.amberText,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              'Update',
+              style: TextStyle(
+                fontFamily: SbFonts.sans,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: onDismiss,
+            icon: const Icon(Icons.close, size: 16, color: SbColors.amberText),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            tooltip: 'Dismiss',
           ),
         ],
       ),

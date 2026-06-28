@@ -68,6 +68,7 @@ internal sealed class GlobalExceptionHandler(
             ConflictException => (StatusCodes.Status409Conflict, "Conflict.", null),
             ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden.", null),
             GoneException => (StatusCodes.Status410Gone, "Gone.", null),
+            UpgradeRequiredException => (StatusCodes.Status426UpgradeRequired, "Upgrade required.", null),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized.", null),
             // Malformed multipart / over-size source uploads (streaming cap, bad boundary) — client errors.
             InvalidDataException => (StatusCodes.Status400BadRequest, "Malformed or oversized request.", null),
