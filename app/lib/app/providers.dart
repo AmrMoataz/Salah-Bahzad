@@ -11,6 +11,7 @@ import '../core/net/api_client.dart';
 import '../core/net/app_config.dart';
 import '../core/net/token_refresher.dart';
 import '../core/platform/app_platform.dart';
+import '../core/playback/connectivity_checker.dart';
 import '../core/playback/hls_key_loader.dart';
 import '../core/playback/local_manifest_proxy.dart';
 import '../core/playback/media_kit_video_engine.dart';
@@ -104,6 +105,12 @@ final studentProfileProvider = FutureProvider.autoDispose<StudentProfile>(
 );
 
 // ── Secure video playback (A1) ───────────────────────────────────────────────
+
+/// Connectivity check + stream (A3). Wraps connectivity_plus so tests can
+/// override without triggering native method channels.
+final connectivityCheckerProvider = Provider<ConnectivityChecker>(
+  (_) => LiveConnectivityChecker(),
+);
 
 /// The gate (contract §D) over the shared [ApiClient]. Stateless → app-lifetime.
 final playbackRepositoryProvider = Provider<PlaybackRepository>(

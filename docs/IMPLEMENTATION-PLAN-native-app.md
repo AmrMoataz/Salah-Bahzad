@@ -209,7 +209,14 @@ Each phase: **Goal · Backend · App · Design anchor · Reqs · Exit · Streams
 - **Streams:** app (shims) · wiring (the on-device manual matrix — this is the "live check").
 
 ### A3 — Failure states, idle polish, observability
-> **Status: Planned — not yet built.**
+> **Status: App stream DONE (2026-06-27).** Sentry (`sentry_flutter ^8.10.0` +
+> `SentryLogSink` + `SentryFlutter.init` in `main.dart`, gated on `SENTRY_DSN`
+> dart-define), offline mid-playback (`connectivity_plus ^6.1.4`: pause on
+> connectivity loss, auto-resume on restore, engine-error → connectivity check →
+> `offline` vs `server` state), and playback-failure context (`videoId` field on
+> log calls) are all wired. Idle + failure states + sign-out were already complete
+> from A1/A2 — audit confirmed no polish work needed. Wiring stream (7-state live
+> drive) is the user's step — see `IMPLEMENTATION-PLAN-native-app-a3-wiring.md`.
 - **Goal:** every failure has a specific, recoverable, watermark-safe state; crashes/playback failures report without leaking secrets.
 - **Backend:** none.
 - **App:** the failure-state screen + its **seven** design states (contract §H; the 8th, *update-required*, lands with A4); verbatim copy + right actions; retry without losing player context; offline pause/resume; idle/home polish (security strip, "how to start", sign-out clears the session + cached URLs/keys); Sentry (no PII/tokens); playback-failure context (type, video id, app version).

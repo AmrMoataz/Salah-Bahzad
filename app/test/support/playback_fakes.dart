@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/widgets.dart';
 import 'package:secure_player/core/logging/logging.dart';
 import 'package:secure_player/core/net/api_client.dart';
 import 'package:secure_player/core/net/app_config.dart';
 import 'package:secure_player/core/net/token_refresher.dart';
 import 'package:secure_player/core/platform/app_platform.dart';
+import 'package:secure_player/core/playback/connectivity_checker.dart';
 import 'package:secure_player/core/playback/hls_key_loader.dart';
 import 'package:secure_player/core/playback/local_manifest_proxy.dart';
 import 'package:secure_player/core/playback/video_engine.dart';
@@ -272,6 +274,30 @@ String? firstLeak(String haystack, List<String> secrets) {
     if (s.isNotEmpty && haystack.contains(s)) return s;
   }
   return null;
+}
+
+/// A [ConnectivityChecker] that never touches native method channels.
+/// Defaults to wifi (online). Call [push] to drive connectivity changes;
+/// set [current] before a [check] call to control the synchronous result.
+class FakeConnectivityChecker implements ConnectivityChecker {
+  List<ConnectivityResult> current = <ConnectivityResult>[
+    ConnectivityResult.wifi,
+  ];
+  final StreamController<List<ConnectivityResult>> _ctrl =
+      StreamController<List<ConnectivityResult>>.broadcast();
+
+  @override
+  Future<List<ConnectivityResult>> check() async => current;
+
+  @override
+  Stream<List<ConnectivityResult>> get onChange => _ctrl.stream;
+
+  void push(List<ConnectivityResult> results) {
+    current = results;
+    _ctrl.add(results);
+  }
+
+  Future<void> dispose() => _ctrl.close();
 }
 
 /// A hand fake [SecureSurface] — no native channel (`NFR-APP-REL-003`). Scripted

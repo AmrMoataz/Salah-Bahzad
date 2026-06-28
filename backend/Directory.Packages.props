@@ -2,7 +2,6 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <!-- Microsoft / EF Core (track .NET 10) -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
@@ -14,52 +13,45 @@
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
   </ItemGroup>
-
   <!-- CQRS — source-generated Mediator (Artem Shykhermanov) -->
   <ItemGroup>
     <PackageVersion Include="Mediator.Abstractions" Version="2.1.7" />
     <PackageVersion Include="Mediator.SourceGenerator" Version="2.1.7" />
   </ItemGroup>
-
   <!-- Validation -->
   <ItemGroup>
     <PackageVersion Include="FluentValidation" Version="11.11.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
   </ItemGroup>
-
   <!-- Identity & token -->
   <ItemGroup>
     <PackageVersion Include="FirebaseAdmin" Version="3.0.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.10.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.10.0" />
   </ItemGroup>
-
   <!-- Caching / messaging / real-time -->
   <ItemGroup>
     <PackageVersion Include="StackExchange.Redis" Version="2.8.0" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
   </ItemGroup>
-
   <!-- Background jobs (Hangfire + PostgreSQL storage) -->
   <ItemGroup>
     <PackageVersion Include="Hangfire.Core" Version="1.8.17" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.17" />
     <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.10" />
   </ItemGroup>
-
   <!-- Object storage (Cloudflare R2 / MinIO via the AWS S3 SDK) -->
   <ItemGroup>
     <PackageVersion Include="AWSSDK.S3" Version="4.0.25.2" />
   </ItemGroup>
-
   <!-- API docs / OpenAPI -->
   <ItemGroup>
     <PackageVersion Include="Scalar.AspNetCore" Version="2.5.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
   </ItemGroup>
-
   <!-- Logging -->
   <ItemGroup>
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
@@ -67,7 +59,6 @@
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
   </ItemGroup>
-
   <!--
     Observability — versions pinned here for CPM-managed projects.
     ServiceDefaults opts out of CPM and uses these same versions inline.
@@ -80,7 +71,6 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
   </ItemGroup>
-
   <!-- Testing -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
