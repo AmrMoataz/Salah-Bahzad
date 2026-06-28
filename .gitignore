@@ -26,6 +26,20 @@ serviceAccountKey*.json
 *serviceaccount*.json
 *-firebase-adminsdk-*.json
 
+# ---------- App signing / store secrets (CI-only — never commit; NFR-SEC-002) ----------
+**/key.properties
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.pfx
+**/*.cer
+**/*.mobileprovision
+**/*.p8
+# Per-environment PROD Flutter Firebase configs (dev configs may stay tracked — they are public client config)
+app/android/app/src/prod/google-services.json
+app/ios/config/prod/GoogleService-Info.plist
+app/macos/config/prod/GoogleService-Info.plist
+
 # ---------- Node / Angular ----------
 node_modules/
 dist/

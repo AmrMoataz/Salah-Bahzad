@@ -13,4 +13,16 @@ public sealed class TranscodeOptions
 
     /// <summary>Target HLS segment length in seconds.</summary>
     public int HlsTimeSeconds { get; set; } = 6;
+
+    /// <summary>
+    /// x264 encoding preset (trades CPU-seconds for output size). Defaults to <c>veryfast</c> so a single
+    /// transcode doesn't monopolise a small (2 vCPU) shared box while the API serves live traffic.
+    /// </summary>
+    public string VideoPreset { get; set; } = "veryfast";
+
+    /// <summary>
+    /// ffmpeg thread cap. Defaults to 1 so one transcode can't saturate every core on a constrained host;
+    /// raise it where the box has spare CPU.
+    /// </summary>
+    public int Threads { get; set; } = 1;
 }

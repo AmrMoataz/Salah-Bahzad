@@ -127,17 +127,23 @@ try
     builder.Services.AddOpenApi();
 
     // ── Rate limiting (NFR-SEC-006) ───────────────────────────────────────────
+    // Partition by client IP so the limit is PER-CALLER. A single global FixedWindow bucket would throttle
+    // ALL logins platform-wide to PermitLimit/min — a self-inflicted DoS at scale. Behind Traefik the real
+    // client IP is restored by forwarded-headers (ASPNETCORE_FORWARDEDHEADERS_ENABLED=true). The limit stays
+    // config-overridable so the integration suite (all calls from one loopback IP → one partition) can relax it.
+    var authPermitLimit = builder.Configuration.GetValue("RateLimiting:AuthPermitLimit", 10);
     builder.Services.AddRateLimiter(opts =>
     {
-        opts.AddFixedWindowLimiter("auth", limiter =>
-        {
-            limiter.Window = TimeSpan.FromMinutes(1);
-            // Config-overridable so the integration suite (which shares this single global bucket across many
-            // auth calls on one host) isn't throttled; production keeps the tight default (NFR-SEC-006).
-            limiter.PermitLimit = builder.Configuration.GetValue("RateLimiting:AuthPermitLimit", 10);
-            limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            limiter.QueueLimit = 0;
-        });
+        opts.AddPolicy("auth", httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(1),
+                    PermitLimit = authPermitLimit,
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    QueueLimit = 0,
+                }));
 
         opts.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     });

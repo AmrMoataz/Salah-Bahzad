@@ -1,10 +1,9 @@
 export const environment = {
   production: false,
-  // Cross-origin in staging (portal ↔ API on different hosts): the device cookie is
-  // issued SameSite=None; Secure by the API, and every /api call rides withCredentials
-  // (see studentAuthInterceptor) so the cookie is sent. The API must allow this origin
-  // with AllowCredentials() (backend §4).
-  apiUrl: 'https://api.staging.salahbahzad.com',
+  // Same-origin (matches prod): the portal's nginx reverse-proxies /api and /hubs to the internal API.
+  // This keeps the device cookie (sb_device) a FIRST-PARTY cookie — a cross-origin api.* host would make it
+  // a third-party SameSite=None cookie that Safari ITP blocks, silently breaking device binding.
+  apiUrl: '',
   tenantSlug: 'salah-bahzad',
   termsVersion: 'v1',
   firebase: {

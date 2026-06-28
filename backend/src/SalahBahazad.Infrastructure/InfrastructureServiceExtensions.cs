@@ -204,7 +204,14 @@ public static class InfrastructureServiceExtensions
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings()
             .UsePostgreSqlStorage(opts => opts.UseNpgsqlConnection(hangfireConnectionString)));
-        services.AddHangfireServer(opts => opts.SchedulePollingInterval = TimeSpan.FromSeconds(1));
+        services.AddHangfireServer(opts =>
+        {
+            opts.SchedulePollingInterval = TimeSpan.FromSeconds(1);
+            // The default WorkerCount is min(20, CPU*5) = 10 on a 2 vCPU box; nothing would then stop several
+            // concurrent libx264 transcodes from pinning every core and starving the live API/SignalR quiz.
+            // Cap it (default 1 → one transcode at a time) — override via Hangfire:WorkerCount where there's headroom.
+            opts.WorkerCount = configuration.GetValue("Hangfire:WorkerCount", 1);
+        });
 
         // ── Object storage (R2 / MinIO) ─────────────────────────────────────────
         AddObjectStorage(services, configuration);

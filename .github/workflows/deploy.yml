@@ -1,0 +1,66 @@
+name: build-and-deploy
+
+# Builds the API + both Angular portals OFF the VPS (an Angular/.NET build can OOM the 2 vCPU / 8 GB box),
+# pushes images to GHCR, and triggers Dokploy. STAGING auto-deploys; PRODUCTION stays a deliberate manual
+# deploy (take a Postgres backup + Hostinger snapshot first — NFR-AVAIL-004).
+# See docs/IMPLEMENTATION-PLAN-deployment.md §8 / §10.
+
+on:
+  push:
+    branches: [main, staging]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { name: api,     ctx: backend,  file: backend/Dockerfile,                      args: "" }
+          - { name: admin,   ctx: frontend, file: frontend/apps/admin-portal/Dockerfile,   args: "APP=admin-portal" }
+          - { name: student, ctx: frontend, file: frontend/apps/student-portal/Dockerfile, args: "APP=student-portal" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: cfg
+        run: |
+          echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"   # GHCR requires a lowercase image path
+          echo "env=${{ github.ref_name == 'main' && 'prod' || 'stg' }}" >> "$GITHUB_OUTPUT"
+          echo "ngcfg=${{ github.ref_name == 'main' && 'production' || 'staging' }}" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.ctx }}
+          file: ${{ matrix.file }}
+          push: true
+          build-args: |
+            ${{ matrix.args }}
+            NX_CONFIG=${{ steps.cfg.outputs.ngcfg }}
+          tags: |
+            ghcr.io/${{ steps.cfg.outputs.repo }}/${{ matrix.name }}:${{ steps.cfg.outputs.env }}
+            ghcr.io/${{ steps.cfg.outputs.repo }}/${{ matrix.name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Staging only — production deploy is triggered by hand in Dokploy after a backup.
+  deploy-staging:
+    needs: build
+    if: github.ref_name == 'staging'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Dokploy (staging)
+        env:
+          HOOK: ${{ secrets.DOKPLOY_HOOK_STG }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "DOKPLOY_HOOK_STG not set yet — images are in GHCR; skipping deploy trigger."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK"

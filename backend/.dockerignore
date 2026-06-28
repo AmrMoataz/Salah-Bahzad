@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+tests/
+src/SalahBahazad.AppHost/
+**/appsettings.Development.json
+**/.git
+**/*.md
+Dockerfile
+.dockerignore

@@ -42,8 +42,9 @@ internal sealed class FfmpegMediaTranscoder(TranscodeOptions options, ILogger<Ff
             options.FfmpegPath,
             [
                 "-nostdin", "-y",
+                "-threads", options.Threads.ToString(CultureInfo.InvariantCulture),
                 "-i", sourceUrl,
-                "-c:v", "libx264", "-c:a", "aac",
+                "-c:v", "libx264", "-preset", options.VideoPreset, "-c:a", "aac",
                 "-hls_time", options.HlsTimeSeconds.ToString(CultureInfo.InvariantCulture),
                 "-hls_playlist_type", "vod",
                 "-hls_key_info_file", keyInfoPath,

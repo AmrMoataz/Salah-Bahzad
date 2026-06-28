@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://api.staging.salahbahzad.com',
+  // Same-origin: the portal's nginx reverse-proxies /api (and /hubs) to the internal API, matching prod.
+  apiUrl: '',
   firebase: {
     apiKey: 'AIzaSyC0IXB7W4qBq_dmoZm2Rsn_vvkMe4ZPMqM',
     authDomain: 'salah-bahzad-staging.firebaseapp.com',
