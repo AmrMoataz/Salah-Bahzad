@@ -1,5 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <!-- This project ships exactly one embedded resource (egypt-locations.json, declared explicitly below)
+         and has no .resx files. Disable the SDK's default **/*.resx EmbeddedResource glob: when an explicit
+         EmbeddedResource is present, that default glob is left unexpanded on the Linux build host and fails
+         `dotnet publish` with MSB3552 ("Resource file '**/*.resx' cannot be found"). Safe — there are no resx. -->
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SalahBahazad.Application\SalahBahazad.Application.csproj" />
   </ItemGroup>
